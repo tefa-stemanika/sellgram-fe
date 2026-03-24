@@ -1,0 +1,60 @@
+{
+  "users": [
+    {
+      "id": "clh1234abcdef",
+      "name": "Budi Santoso",
+      "password": "hashedpassword123",
+      "email": "budi@example.com",
+      "createdAt": "2024-03-15T08:00:00Z",
+      "updatedAt": "2024-03-15T08:00:00Z"
+    },
+    {
+      "id": "clh5678ghijkl",
+      "name": "Siti Rahayu",
+      "password": "hashedpassword456",
+      "email": "siti@example.com",
+      "createdAt": "2024-03-15T09:00:00Z",
+      "updatedAt": "2024-03-15T09:00:00Z"
+    },
+    {
+      "name": "Test 2",
+      "password": "123456",
+      "email": "user",
+      "createdAt": "2024-03-15T08:00:00Z",
+      "updatedAt": "2024-03-15T08:00:00Z",
+      "id": "dbed"
+    }
+  ],
+  "cashflows": [
+    {
+      "id": "clf1234mnopqr",
+      "type": "INCOME",
+      "amount": "5000000",
+      "userId": "clh1234abcdef",
+      "note": "Gaji Bulanan",
+      "isDeleted": false,
+      "createdAt": "2024-03-15T10:00:00Z",
+      "updatedAt": "2024-03-15T10:00:00Z"
+    },
+    {
+      "id": "clf5678stuvwx",
+      "type": "EXPENSE",
+      "amount": "1500000",
+      "userId": "clh1234abcdef",
+      "note": "Bayar Sewa Kos",
+      "isDeleted": false,
+      "createdAt": "2024-03-15T11:00:00Z",
+      "updatedAt": "2024-03-15T11:00:00Z"
+    },
+    {
+      "id": "clf9012yzabcd",
+      "type": "INCOME",
+      "amount": "4500000",
+      "userId": "clh5678ghijkl",
+      "note": "Pendapatan Freelance",
+      "isDeleted": false,
+      "createdAt": "2024-03-15T12:00:00Z",
+      "updatedAt": "2024-03-15T12:00:00Z"
+    }
+  ]
+}
