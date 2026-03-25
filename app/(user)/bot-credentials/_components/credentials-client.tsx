@@ -115,13 +115,11 @@ export function CredentialsClient({ token, initialData }: CredentialsClientProps
 
   return (
     <div className="space-y-4">
-      <div>
-        <div>
-          <h1 className="text-2xl font-semibold">Bot Credentials</h1>
-          <p className="text-sm text-muted-foreground">
-            Semua credential key ditampilkan langsung di halaman ini dan dapat diedit per item.
-          </p>
-        </div>
+      <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
+        <h1 className="text-2xl font-semibold">Bot Credentials</h1>
+        <p className="text-sm text-muted-foreground">
+          Semua credential key ditampilkan langsung di halaman ini dan dapat diedit per item.
+        </p>
       </div>
 
       <div className="space-y-3">
@@ -135,7 +133,7 @@ export function CredentialsClient({ token, initialData }: CredentialsClientProps
             <div
               key={key}
               className={[
-                'rounded-lg border p-4 transition-colors',
+                'rounded-xl border p-4 shadow-sm transition-colors',
                 isStored
                   ? 'border-emerald-300 bg-emerald-50/80 dark:border-emerald-800 dark:bg-emerald-950/20'
                   : 'border-amber-300 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/20'

@@ -45,7 +45,7 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
               <FormLabel>Mode Bot</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background/80">
                     <SelectValue placeholder="Pilih mode" />
                   </SelectTrigger>
                 </FormControl>
@@ -66,7 +66,7 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
           control={form.control}
           name="aiEnabled"
           render={({ field }) => (
-            <FormItem className="rounded-md border p-3">
+            <FormItem className="rounded-xl border border-border/70 bg-background/70 p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <FormLabel>AI Mode</FormLabel>
@@ -89,7 +89,7 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
               <FormLabel>Model Gemini</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background/80">
                     <SelectValue placeholder="Pilih model" />
                   </SelectTrigger>
                 </FormControl>
@@ -111,7 +111,7 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
           control={form.control}
           name="midtransIsProduction"
           render={({ field }) => (
-            <FormItem className="rounded-md border p-3">
+            <FormItem className="rounded-xl border border-border/70 bg-background/70 p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <FormLabel>Environment Midtrans</FormLabel>

@@ -109,22 +109,27 @@ export function ProductsClient({ token, initialData }: ProductsClientProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Produk</h1>
-          <p className="text-sm text-muted-foreground">Kelola daftar produk untuk bot Anda.</p>
+      <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold">Produk</h1>
+            <p className="text-sm text-muted-foreground">Kelola daftar produk untuk bot Anda.</p>
+          </div>
+          <Button
+            className="shadow-sm"
+            onClick={() => {
+              setSelectedProduct(null)
+              setIsFormOpen(true)
+            }}>
+            <Plus className="h-4 w-4" />
+            Tambah Produk
+          </Button>
         </div>
-        <Button
-          onClick={() => {
-            setSelectedProduct(null)
-            setIsFormOpen(true)
-          }}>
-          <Plus className="h-4 w-4" />
-          Tambah Produk
-        </Button>
       </div>
 
-      <DataTable columns={columns} data={products} />
+      <div className="rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm">
+        <DataTable columns={columns} data={products} />
+      </div>
 
       <Dialog
         open={isFormOpen}
@@ -134,7 +139,7 @@ export function ProductsClient({ token, initialData }: ProductsClientProps) {
             setSelectedProduct(null)
           }
         }}>
-        <DialogContent>
+        <DialogContent className="border-border/70 bg-card/95 backdrop-blur">
           <DialogHeader>
             <DialogTitle>{isEditMode ? 'Edit Produk' : 'Tambah Produk'}</DialogTitle>
             <DialogDescription>

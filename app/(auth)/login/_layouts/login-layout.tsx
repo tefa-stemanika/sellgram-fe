@@ -49,13 +49,15 @@ const LoginLayout = () => {
   }
 
   return (
-    <div className="flex items-center justify-center h-screen w-full">
-      <div className="max-w-lg w-full bg-background rounded-lg p-8 drop-shadow-xl">
-        <h1 className="text-2xl font-bold text-center mb-8">
-          Welcome to <br /> the app
-        </h1>
+    <div className="flex min-h-screen w-full items-center justify-center p-4">
+      <div className="w-full max-w-md rounded-2xl border border-border/70 bg-card/90 p-6 shadow-xl backdrop-blur sm:p-8">
+        <div className="mb-8 space-y-2 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Order Bot Dashboard</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Selamat Datang Kembali</h1>
+          <p className="text-sm text-muted-foreground">Masuk untuk mengelola produk, order, dan konfigurasi bot Anda.</p>
+        </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 w-full">
             <FormField
               control={form.control}
               name="email"
@@ -63,7 +65,7 @@ const LoginLayout = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="shadcn" {...field} />
+                    <Input type="email" placeholder="owner@example.com" {...field} className="h-10 bg-background/80" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -76,7 +78,7 @@ const LoginLayout = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="shadcn" {...field} />
+                    <Input type="password" placeholder="Masukkan password" {...field} className="h-10 bg-background/80" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

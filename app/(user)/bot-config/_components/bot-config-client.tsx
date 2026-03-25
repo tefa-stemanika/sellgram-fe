@@ -39,12 +39,14 @@ export function BotConfigClient({ token, initialConfig }: BotConfigClientProps) 
 
   return (
     <div className="max-w-2xl space-y-4">
-      <div>
+      <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
         <h1 className="text-2xl font-semibold">Bot Config</h1>
         <p className="text-sm text-muted-foreground">Atur mode bot, AI, dan pengaturan pembayaran.</p>
       </div>
 
-      <BotConfigForm defaultValues={config ?? undefined} onSubmit={handleSubmit} isLoading={isLoading} />
+      <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
+        <BotConfigForm defaultValues={config ?? undefined} onSubmit={handleSubmit} isLoading={isLoading} />
+      </div>
     </div>
   )
 }

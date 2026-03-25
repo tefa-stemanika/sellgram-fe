@@ -46,6 +46,8 @@ order-bot-dashboard
 │  │  │  │  ├─ credentials-client.tsx
 │  │  │  │  └─ delete-credential-dialog.tsx
 │  │  │  └─ page.tsx
+│  │  ├─ dashboard
+│  │  │  └─ page.tsx
 │  │  ├─ layout.tsx
 │  │  ├─ orders
 │  │  │  ├─ _components
@@ -53,7 +55,6 @@ order-bot-dashboard
 │  │  │  │  ├─ order-detail-dialog.tsx
 │  │  │  │  └─ orders-client.tsx
 │  │  │  └─ page.tsx
-│  │  ├─ page.tsx
 │  │  ├─ products
 │  │  │  ├─ _components
 │  │  │  │  ├─ delete-product-dialog.tsx
@@ -69,7 +70,8 @@ order-bot-dashboard
 │  │  ├─ GeistMonoVF.woff
 │  │  └─ GeistVF.woff
 │  ├─ globals.css
-│  └─ layout.tsx
+│  ├─ layout.tsx
+│  └─ page.tsx
 ├─ commitlint.config.js
 ├─ components
 │  ├─ core

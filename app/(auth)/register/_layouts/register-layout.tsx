@@ -55,13 +55,15 @@ const RegisterLayout = () => {
   }
 
   return (
-    <div className="flex items-center justify-center h-screen w-full">
-      <div className="max-w-lg w-full bg-background rounded-lg p-8 drop-shadow-xl">
-        <h1 className="text-2xl font-bold text-center mb-8">
-          Welcome to <br /> the app
-        </h1>
+    <div className="flex min-h-screen w-full items-center justify-center p-4">
+      <div className="w-full max-w-lg rounded-2xl border border-border/70 bg-card/90 p-6 shadow-xl backdrop-blur sm:p-8">
+        <div className="mb-8 space-y-2 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Order Bot Dashboard</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Buat Akun Baru</h1>
+          <p className="text-sm text-muted-foreground">Mulai kelola bisnis Anda dengan dashboard yang lebih terstruktur.</p>
+        </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 w-full">
             <FormField
               control={form.control}
               name="name"
@@ -69,7 +71,7 @@ const RegisterLayout = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="shadcn" {...field} />
+                    <Input placeholder="Nama bisnis / owner" {...field} className="h-10 bg-background/80" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -82,7 +84,7 @@ const RegisterLayout = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="shadcn" {...field} />
+                    <Input type="email" placeholder="owner@example.com" {...field} className="h-10 bg-background/80" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -95,7 +97,7 @@ const RegisterLayout = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="shadcn" {...field} />
+                    <Input type="password" placeholder="Minimal 6 karakter" {...field} className="h-10 bg-background/80" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -108,7 +110,7 @@ const RegisterLayout = () => {
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="shadcn" {...field} />
+                    <Input type="password" placeholder="Ulangi password" {...field} className="h-10 bg-background/80" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

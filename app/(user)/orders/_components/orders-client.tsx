@@ -42,27 +42,31 @@ export function OrdersClient({ initialData }: OrdersClientProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Orders</h1>
-          <p className="text-sm text-muted-foreground">Daftar semua order dari pelanggan.</p>
-        </div>
+      <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Orders</h1>
+            <p className="text-sm text-muted-foreground">Daftar semua order dari pelanggan.</p>
+          </div>
 
-        <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as OrderStatus | 'ALL')}>
-          <SelectTrigger className="w-full sm:w-56">
-            <SelectValue placeholder="Filter status" />
-          </SelectTrigger>
-          <SelectContent>
-            {ORDER_FILTERS.map((filter) => (
-              <SelectItem key={filter.value} value={filter.value}>
-                {filter.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as OrderStatus | 'ALL')}>
+            <SelectTrigger className="w-full border-border/70 bg-background/80 sm:w-56">
+              <SelectValue placeholder="Filter status" />
+            </SelectTrigger>
+            <SelectContent>
+              {ORDER_FILTERS.map((filter) => (
+                <SelectItem key={filter.value} value={filter.value}>
+                  {filter.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <DataTable columns={columns} data={filteredOrders} onRowClick={(order) => setSelectedOrder(order)} />
+      <div className="rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm">
+        <DataTable columns={columns} data={filteredOrders} onRowClick={(order) => setSelectedOrder(order)} />
+      </div>
 
       <OrderDetailDialog
         order={selectedOrder}
