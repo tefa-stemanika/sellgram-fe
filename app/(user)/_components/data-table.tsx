@@ -1,32 +1,57 @@
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table'
-import { Checkbox } from '@/components/ui/checkbox'
-const DataTable = () => {
-  return (
-    <Table className="border border-input">
-      <TableHeader>
-        <TableRow>
-          <TableHead className="rounded-md">
-            <Checkbox />
-          </TableHead>
-          <TableHead>No</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead>Email</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {Array.from({ length: 10 }).map((_, index) => (
-          <TableRow key={index}>
-            <TableCell>
-              <Checkbox />
-            </TableCell>
-            <TableCell>{index + 1}</TableCell>
-            <TableCell>John Doe</TableCell>
-            <TableCell>john.doe@example.com</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
+'use client'
+
+import { flexRender, getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table'
+
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
+type DataTableProps<TData, TValue> = {
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+  onRowClick?: (row: TData) => void
 }
 
-export default DataTable
+export function DataTable<TData, TValue>({ columns, data, onRowClick }: DataTableProps<TData, TValue>) {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel()
+  })
+
+  return (
+    <div className="rounded-md border border-input">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                className={onRowClick ? 'cursor-pointer' : undefined}
+                onClick={() => onRowClick?.(row.original)}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell className="h-24 text-center text-muted-foreground" colSpan={columns.length}>
+                Tidak ada data
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}

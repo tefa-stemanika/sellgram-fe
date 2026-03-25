@@ -1,56 +1,34 @@
-import { AxiosRequestConfig, AxiosError } from "axios";
-import { API } from "./index";
-
-interface FetcherOptions extends AxiosRequestConfig {
-  onSuccess?: (response: { data: any; pagination: any }) => void;
-  onError?: (error: string) => void;
-  onFinally?: () => void;
-  setLoading?: (loading: boolean) => void;
-  setFetching?: (fetching: boolean) => void;
+type FetcherOptions = Omit<RequestInit, 'headers'> & {
+  token?: string
+  headers?: HeadersInit
 }
 
-export const Fetcher = async (options: FetcherOptions) => {
-  const {
-    onSuccess,
-    onError,
-    onFinally,
-    setLoading,
-    setFetching,
-    ...axiosOptions
-  } = options;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api'
 
-  // Loading state handling
-  if (setLoading && setFetching) {
-    setFetching(true);
+function normalizeToken(token?: string): string | undefined {
+  if (!token) return undefined
+  return token.startsWith('Bearer ') ? token : `Bearer ${token}`
+}
+
+export async function fetcher<T>(path: string, options: FetcherOptions = {}): Promise<T> {
+  const { token, headers, ...init } = options
+  const authToken = normalizeToken(token)
+
+  const response = await fetch(`${BASE_URL}/api${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authToken ? { Authorization: authToken } : {}),
+      ...headers
+    },
+    cache: init.cache ?? 'no-store'
+  })
+
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    const message = (data as { message?: string }).message ?? 'Terjadi kesalahan pada server'
+    throw new Error(message)
   }
 
-  try {
-    const response = await API(axiosOptions);
-
-    // Handle success
-    if (!!onSuccess) {
-      onSuccess({
-        data: response.data.data,
-        pagination: response.data.pagination,
-      });
-    }
-
-    return response;
-  } catch (error) {
-    // Handle error
-    if (onError && error instanceof AxiosError) {
-      onError(error.response?.data.message);
-    }
-    throw error;
-  } finally {
-    // Handle finally
-    if (!!onFinally) {
-      onFinally();
-    }
-
-    // Reset loading states
-    if (setLoading && setFetching) {
-      setFetching(false);
-    }
-  }
-};
+  return data as T
+}

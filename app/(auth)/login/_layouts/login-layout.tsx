@@ -1,5 +1,8 @@
 'use client'
 
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,10 +11,15 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { loginSchema } from '@/schemas/auth'
-import { saveToken } from '@/actions/auth'
+import { setToken } from '@/actions/auth'
 import { Checkbox } from '@/components/ui/checkbox'
+import { login } from '@/services/user'
+import { toast } from 'sonner'
 
 const LoginLayout = () => {
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -21,10 +29,23 @@ const LoginLayout = () => {
     }
   })
 
-  const onSubmit = (data: z.infer<typeof loginSchema>) => {
-    console.log(data)
-    //? this should be token
-    saveToken(JSON.stringify(data), data.remember)
+  const onSubmit = async (data: z.infer<typeof loginSchema>) => {
+    setIsLoading(true)
+    try {
+      const response = await login(data.email, data.password)
+      const rawToken = response.data.token
+      const token = rawToken.startsWith('Bearer ') ? rawToken.slice(7) : rawToken
+
+      await setToken(token, data.remember)
+      toast.success('Login berhasil')
+      router.replace('/dashboard')
+      router.refresh()
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Gagal login'
+      toast.error(message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -76,7 +97,17 @@ const LoginLayout = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <div className="space-y-3">
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Memproses...' : 'Masuk'}
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                Belum punya akun?{' '}
+                <Link href="/register" className="font-medium text-primary hover:underline">
+                  Daftar di sini
+                </Link>
+              </p>
+            </div>
           </form>
         </Form>
       </div>

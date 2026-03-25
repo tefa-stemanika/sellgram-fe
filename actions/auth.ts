@@ -1,25 +1,29 @@
-"use server";
+'use server'
 
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { cookies } from 'next/headers'
 
-export const saveToken = async (token: string, remember?: boolean) => {
-  const cookieStore = await cookies();
-  return new Promise((resolve) => {
-    cookieStore.set({
-      name: "token",
-      value: token,
-      httpOnly: true,
-      maxAge: remember ? 60 * 60 * 24 * 7 : undefined,
-    });
+export const setToken = async (token: string, remember?: boolean) => {
+  const cookieStore = await cookies()
+  cookieStore.set({
+    name: 'token',
+    value: token,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: remember ? 60 * 60 * 24 * 7 : undefined,
+    path: '/'
+  })
+}
 
-    resolve("Successfully saved");
-  });
-};
+// Backward compatibility for existing imports.
+export const saveToken = setToken
 
 export const removeToken = async () => {
-  const cookieStore = await cookies();
-  cookieStore.delete("token");
+  const cookieStore = await cookies()
+  cookieStore.delete('token')
+}
 
-  redirect("/login");
-};
+export const getToken = async (): Promise<string | undefined> => {
+  const cookieStore = await cookies()
+  return cookieStore.get('token')?.value
+}
