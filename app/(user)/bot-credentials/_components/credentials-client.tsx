@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CheckCircle2, CircleDashed, Eye, EyeOff, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { CREDENTIAL_KEYS, type CredentialKey } from '@/schemas/bot-credentials'
 import {
   createBotCredential,
+  getBotCredentials,
   updateBotCredential,
   type BotCredential,
   type CreateCredentialPayload
@@ -17,7 +18,6 @@ import {
 
 type CredentialsClientProps = {
   token: string
-  initialData: BotCredential[]
 }
 
 type CredentialRowState = {
@@ -41,12 +41,40 @@ const buildInitialState = (credentials: BotCredential[]): Record<CredentialKey, 
   )
 }
 
-export function CredentialsClient({ token, initialData }: CredentialsClientProps) {
+export function CredentialsClient({ token }: CredentialsClientProps) {
   const [credentialState, setCredentialState] = useState<Record<CredentialKey, CredentialRowState>>(
-    buildInitialState(initialData)
+    buildInitialState([])
   )
   const [showValueMap, setShowValueMap] = useState<Record<CredentialKey, boolean>>({} as Record<CredentialKey, boolean>)
   const [savingKey, setSavingKey] = useState<CredentialKey | null>(null)
+
+  useEffect(() => {
+    const fetchCredentials = async () => {
+      if (!token) {
+        setCredentialState(buildInitialState([]))
+        return
+      }
+
+      try {
+        const credentials = await getBotCredentials(token)
+        setCredentialState((prev) => {
+          const next = buildInitialState(credentials)
+
+          CREDENTIAL_KEYS.forEach((key) => {
+            if (prev[key]?.value) {
+              next[key].value = prev[key].value
+            }
+          })
+
+          return next
+        })
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Gagal memuat credential')
+      }
+    }
+
+    void fetchCredentials()
+  }, [token])
 
   const keyStatus = useMemo(() => {
     return CREDENTIAL_KEYS.reduce(

@@ -1,15 +1,17 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { toast } from 'sonner'
 
 import { DataTable } from '../../_components/data-table'
 import { getOrderColumns } from './order-columns'
 import { OrderDetailDialog } from './order-detail-dialog'
-import type { Order, OrderStatus } from '@/services/orders'
+import { getOrders, type Order, type OrderStatus } from '@/services/orders'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 type OrdersClientProps = {
-  initialData: Order[]
+  token: string
 }
 
 const ORDER_FILTERS: Array<{ label: string; value: OrderStatus | 'ALL' }> = [
@@ -23,14 +25,54 @@ const ORDER_FILTERS: Array<{ label: string; value: OrderStatus | 'ALL' }> = [
   { label: 'Processing', value: 'PROCESSING' }
 ]
 
-export function OrdersClient({ initialData }: OrdersClientProps) {
+export function OrdersClient({ token }: OrdersClientProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const [orders, setOrders] = useState<Order[]>([])
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [statusFilter, setStatusFilter] = useState<OrderStatus | 'ALL'>('ALL')
+
+  const statusParam = searchParams.get('status')
+  const statusFilter: OrderStatus | 'ALL' =
+    statusParam && ORDER_FILTERS.some((filter) => filter.value === statusParam)
+      ? (statusParam as OrderStatus | 'ALL')
+      : 'ALL'
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!token) {
+        setOrders([])
+        return
+      }
+
+      try {
+        const latest = await getOrders(token, 50)
+        setOrders(latest)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Gagal memuat orders')
+      }
+    }
+
+    void fetchData()
+  }, [token])
+
+  const handleStatusChange = (value: OrderStatus | 'ALL') => {
+    const nextParams = new URLSearchParams(searchParams.toString())
+    if (value === 'ALL') {
+      nextParams.delete('status')
+    } else {
+      nextParams.set('status', value)
+    }
+
+    const query = nextParams.toString()
+    router.replace(query ? `${pathname}?${query}` : pathname)
+  }
 
   const filteredOrders = useMemo(() => {
-    if (statusFilter === 'ALL') return initialData
-    return initialData.filter((order) => order.status === statusFilter)
-  }, [initialData, statusFilter])
+    if (statusFilter === 'ALL') return orders
+    return orders.filter((order) => order.status === statusFilter)
+  }, [orders, statusFilter])
 
   const columns = useMemo(
     () =>
@@ -49,7 +91,7 @@ export function OrdersClient({ initialData }: OrdersClientProps) {
             <p className="text-sm text-muted-foreground">Daftar semua order dari pelanggan.</p>
           </div>
 
-          <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as OrderStatus | 'ALL')}>
+          <Select value={statusFilter} onValueChange={(value) => handleStatusChange(value as OrderStatus | 'ALL')}>
             <SelectTrigger className="w-full border-border/70 bg-background/80 sm:w-56">
               <SelectValue placeholder="Filter status" />
             </SelectTrigger>

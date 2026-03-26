@@ -1,20 +1,44 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Activity, Boxes, HandCoins, Sparkles } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatDate, formatIDRCurrency } from '@/lib/utils'
-import type { Order } from '@/services/orders'
-import type { Product } from '@/services/products'
+import { getOrders, type Order } from '@/services/orders'
+import { getProducts, type Product } from '@/services/products'
 
 type DashboardOverviewProps = {
-  products: Product[]
-  recentOrders: Order[]
+  token: string
 }
 
-export function DashboardOverview({ products, recentOrders }: DashboardOverviewProps) {
+export function DashboardOverview({ token }: DashboardOverviewProps) {
+  const [products, setProducts] = useState<Product[]>([])
+  const [recentOrders, setRecentOrders] = useState<Order[]>([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!token) {
+        setProducts([])
+        setRecentOrders([])
+        return
+      }
+
+      try {
+        const [productsData, ordersData] = await Promise.all([getProducts(token), getOrders(token, 5)])
+        setProducts(productsData)
+        setRecentOrders(ordersData)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Gagal memuat ringkasan dashboard')
+      }
+    }
+
+    void fetchData()
+  }, [token])
+
   const activeProducts = products.filter((product) => product.isAvailable).length
   const totalOrders = recentOrders.length
   const totalRevenue = recentOrders

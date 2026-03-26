@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -23,11 +23,10 @@ import { ProductForm } from './product-form'
 
 type ProductsClientProps = {
   token: string
-  initialData: Product[]
 }
 
-export function ProductsClient({ token, initialData }: ProductsClientProps) {
-  const [products, setProducts] = useState<Product[]>(initialData)
+export function ProductsClient({ token }: ProductsClientProps) {
+  const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -35,6 +34,27 @@ export function ProductsClient({ token, initialData }: ProductsClientProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   const isEditMode = Boolean(selectedProduct)
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      if (!token) {
+        setProducts([])
+        return
+      }
+
+      setIsLoading(true)
+      try {
+        const latest = await getProducts(token)
+        setProducts(latest)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Gagal memuat produk')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    void fetchInitialData()
+  }, [token])
 
   const refreshProducts = async () => {
     if (!token) return
