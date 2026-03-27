@@ -1,20 +1,48 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, Bot, CreditCard, KeyRound, LayoutDashboard, Package, ShieldCheck, ShoppingCart } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
+export const metadata: Metadata = {
+  title: 'Buat Bot Order Telegram Bisnis Kamu',
+  description:
+    'Sellgram membantu bisnis mengelola order Telegram dengan dashboard modern untuk produk, pembayaran Midtrans, dan monitoring operasional.',
+  alternates: {
+    canonical: '/'
+  },
+  openGraph: {
+    title: 'Sellgram | Buat Bot Order Telegram Bisnis Kamu',
+    description: 'Platform all-in-one untuk manajemen produk, order, credential, dan integrasi pembayaran di bot Telegram.',
+    url: '/',
+    images: [
+      {
+        url: '/images/sellgram_seo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Sellgram - Buat Bot Order Telegram Bisnis Kamu'
+      }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sellgram | Buat Bot Order Telegram Bisnis Kamu',
+    description:
+      'Dashboard modern untuk mengelola bot order Telegram bisnis dengan integrasi Midtrans dan workflow operasional.',
+    images: ['/images/sellgram_seo.png']
+  }
+}
+
 const features = [
   {
     title: 'Dashboard Operasional Real-time',
-    description:
-      'Pantau performa bisnis dari satu layar: produk aktif, volume order, dan pendapatan terbaru secara cepat.',
+    description: 'Pantau performa bisnis dari satu layar: produk aktif, volume order, dan pendapatan terbaru secara cepat.',
     icon: LayoutDashboard
   },
   {
     title: 'Manajemen Produk Fleksibel',
-    description:
-      'Tambah, ubah, dan nonaktifkan produk kapan saja dengan alur CRUD yang sederhana untuk tim operasional.',
+    description: 'Tambah, ubah, dan nonaktifkan produk kapan saja dengan alur CRUD yang sederhana untuk tim operasional.',
     icon: Package
   },
   {
@@ -25,8 +53,7 @@ const features = [
   },
   {
     title: 'Credential Aman',
-    description:
-      'Simpan kunci integrasi Telegram, Gemini, dan Midtrans secara terkelola dengan tampilan yang aman.',
+    description: 'Simpan kunci integrasi Telegram, Gemini, dan Midtrans secara terkelola dengan tampilan yang aman.',
     icon: KeyRound
   },
   {
@@ -37,8 +64,7 @@ const features = [
   },
   {
     title: 'Siap Monetisasi',
-    description:
-      'Integrasi Midtrans Sandbox/Production memudahkan bisnis Anda menerima pembayaran lebih cepat.',
+    description: 'Integrasi Midtrans Sandbox/Production memudahkan bisnis Anda menerima pembayaran lebih cepat.',
     icon: CreditCard
   }
 ]
@@ -58,8 +84,8 @@ export default function LandingPage() {
           </h1>
 
           <p className="mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
-            Platform ini membantu Anda mengatur katalog produk, konfigurasi bot, credential integrasi,
-            dan pelacakan order dalam satu alur kerja terstruktur untuk operasional harian.
+            Platform ini membantu Anda mengatur katalog produk, konfigurasi bot, credential integrasi, dan pelacakan order
+            dalam satu alur kerja terstruktur untuk operasional harian.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -100,15 +126,9 @@ export default function LandingPage() {
         <section className="mt-12 rounded-3xl border border-border bg-background/90 p-8 shadow-sm md:mt-16 md:p-10">
           <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Kenapa cocok untuk bisnis Anda?</h2>
           <div className="mt-5 grid gap-4 text-sm text-muted-foreground md:grid-cols-3">
-            <p>
-              Operasional lebih rapi karena data produk, order, dan konfigurasi bot terpusat dalam satu platform.
-            </p>
-            <p>
-              Tim bisa bergerak lebih cepat dengan UI yang konsisten dan aksi penting yang langsung bisa dieksekusi.
-            </p>
-            <p>
-              Integrasi kunci bisnis Anda tetap aman, sambil tetap fleksibel untuk pertumbuhan layanan ke depan.
-            </p>
+            <p>Operasional lebih rapi karena data produk, order, dan konfigurasi bot terpusat dalam satu platform.</p>
+            <p>Tim bisa bergerak lebih cepat dengan UI yang konsisten dan aksi penting yang langsung bisa dieksekusi.</p>
+            <p>Integrasi kunci bisnis Anda tetap aman, sambil tetap fleksibel untuk pertumbuhan layanan ke depan.</p>
           </div>
         </section>
       </section>
