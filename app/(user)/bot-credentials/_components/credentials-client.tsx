@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { CheckCircle2, CircleDashed, Eye, EyeOff, Save } from 'lucide-react'
+import { CheckCircle2, CircleDashed, Copy, ExternalLink, Eye, EyeOff, Info, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,41 @@ type CredentialRowState = {
   value: string
 }
 
+const CREDENTIAL_HELPERS: Record<CredentialKey, { title: string; description: string; example?: string }> = {
+  TELEGRAM_BOT_TOKEN: {
+    title: 'Token bot customer',
+    description:
+      'Didapat dari chat @BotFather saat membuat bot customer. Format token biasanya angka panjang, lalu titik dua, lalu secret key.',
+    example: 'Contoh format: 8741169...:AAGKgq-onFo6WudgaZ8gCSjOEAMtbdcI...'
+  },
+  ADMIN_BOT_TOKEN: {
+    title: 'Token bot admin',
+    description:
+      'Didapat dari @BotFather untuk bot khusus admin/operasional. Jika Anda pakai bot yang sama dengan customer, isi dengan token yang sama.',
+    example: 'Contoh format: 1234567...:AAHxxxx...'
+  },
+  ADMIN_CHAT_ID: {
+    title: 'Telegram chat ID admin',
+    description:
+      'Dipakai untuk menerima notifikasi order masuk/berhasil. Ambil dari Telegram Web > Saved Messages, lalu lihat angka chat ID di URL.',
+    example: 'Contoh: 7217964120'
+  },
+  GEMINI_API_KEY: {
+    title: 'Kunci API Gemini',
+    description:
+      'Digunakan jika AI mode diaktifkan. Ambil key dari Google AI Studio, lalu tempelkan key lengkap tanpa spasi tambahan.'
+  },
+  MIDTRANS_SERVER_KEY: {
+    title: 'Midtrans Server Key',
+    description: 'Wajib untuk membuat transaksi dari backend. Ambil dari Midtrans Dashboard > Settings > Access Keys.'
+  },
+  MIDTRANS_CLIENT_KEY: {
+    title: 'Midtrans Client Key',
+    description:
+      'Digunakan untuk proses pembayaran dari sisi frontend/client. Ambil dari halaman Access Keys yang sama dengan Server Key.'
+  }
+}
+
 const buildInitialState = (credentials: BotCredential[]): Record<CredentialKey, CredentialRowState> => {
   const existingByKey = new Map(credentials.map((credential) => [credential.key, credential]))
 
@@ -42,11 +77,14 @@ const buildInitialState = (credentials: BotCredential[]): Record<CredentialKey, 
 }
 
 export function CredentialsClient({ token }: CredentialsClientProps) {
-  const [credentialState, setCredentialState] = useState<Record<CredentialKey, CredentialRowState>>(
-    buildInitialState([])
-  )
+  const [credentialState, setCredentialState] = useState<Record<CredentialKey, CredentialRowState>>(buildInitialState([]))
   const [showValueMap, setShowValueMap] = useState<Record<CredentialKey, boolean>>({} as Record<CredentialKey, boolean>)
   const [savingKey, setSavingKey] = useState<CredentialKey | null>(null)
+
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '')
+  const webhookUrl = apiBaseUrl
+    ? `${apiBaseUrl}/api/webhook/midtrans`
+    : 'https://backend-api-domain.com/api/webhook/midtrans'
 
   useEffect(() => {
     const fetchCredentials = async () => {
@@ -141,6 +179,15 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
     }
   }
 
+  const handleCopyWebhookUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(webhookUrl)
+      toast.success('Webhook URL berhasil disalin')
+    } catch {
+      toast.error('Gagal menyalin URL. Silakan copy manual.')
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
@@ -150,12 +197,73 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
         </p>
       </div>
 
+      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 shadow-sm">
+        <div className="mb-3 flex items-center gap-2 text-primary">
+          <Info className="h-4 w-4" />
+          <h2 className="text-sm font-semibold uppercase tracking-wide">Panduan Setup Wajib</h2>
+        </div>
+
+        <div className="space-y-3 text-sm text-muted-foreground">
+          <p>
+            Jika belum punya akun Midtrans, buat akun terlebih dahulu di Midtrans Dashboard sebelum mengisi key pembayaran.
+          </p>
+
+          <ol className="space-y-2 pl-4">
+            <li>
+              1. Untuk sandbox, gunakan simulator pembayaran Midtrans:{' '}
+              <a
+                className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                href="https://simulator.sandbox.midtrans.com/"
+                target="_blank"
+                rel="noreferrer">
+                simulator.sandbox.midtrans.com
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </li>
+            <li>
+              2. Isi Payment Notification URL di Midtrans Dashboard dengan URL berikut (klik URL atau tombol untuk copy):
+              <div className="mt-2 flex flex-col gap-2 rounded-lg border border-primary/30 bg-background/70 p-2.5 sm:flex-row sm:items-center sm:justify-between">
+                <button
+                  type="button"
+                  onClick={() => void handleCopyWebhookUrl()}
+                  className="truncate text-left font-mono text-xs font-medium text-foreground underline decoration-dotted underline-offset-4 hover:text-primary"
+                  title="Klik untuk copy URL">
+                  {webhookUrl}
+                </button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => void handleCopyWebhookUrl()}
+                  className="w-full shrink-0 sm:w-auto">
+                  <Copy className="h-3.5 w-3.5" />
+                  Copy URL
+                </Button>
+              </div>
+            </li>
+            <li>
+              3. Buka halaman Midtrans Access Keys untuk copy Client Key dan Server Key:{' '}
+              <a
+                className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                href="https://dashboard.sandbox.midtrans.com/settings/access-keys"
+                target="_blank"
+                rel="noreferrer">
+                Midtrans Access Keys
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </li>
+            <li>4. Untuk production, pastikan ganti semua endpoint/key ke environment production Midtrans.</li>
+          </ol>
+        </div>
+      </div>
+
       <div className="space-y-3">
         {CREDENTIAL_KEYS.map((key) => {
           const row = credentialState[key]
           const isSaving = savingKey === key
           const hasValue = row?.value?.trim().length > 0
           const isStored = keyStatus[key]
+          const helper = CREDENTIAL_HELPERS[key]
 
           return (
             <div
@@ -167,9 +275,12 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
                   : 'border-amber-300 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/20'
               ].join(' ')}>
               <div className="mb-2 flex items-center justify-between gap-3">
-                <Label htmlFor={`credential-${key}`} className="font-semibold">
-                  {key}
-                </Label>
+                <div>
+                  <Label htmlFor={`credential-${key}`} className="font-semibold">
+                    {key}
+                  </Label>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{helper.title}</p>
+                </div>
                 <span
                   className={[
                     'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium',
@@ -180,6 +291,11 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
                   {isStored ? <CheckCircle2 className="h-3.5 w-3.5" /> : <CircleDashed className="h-3.5 w-3.5" />}
                   {isStored ? 'Tersimpan' : 'Belum tersimpan'}
                 </span>
+              </div>
+
+              <div className="mb-2 rounded-lg border border-border/70 bg-background/60 p-2.5 text-xs text-muted-foreground">
+                <p>{helper.description}</p>
+                {helper.example ? <p className="mt-1 font-medium text-foreground">{helper.example}</p> : null}
               </div>
 
               <div className="flex flex-col gap-2 sm:flex-row">
