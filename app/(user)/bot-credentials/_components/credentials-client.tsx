@@ -44,11 +44,11 @@ const CREDENTIAL_HELPERS: Record<CredentialKey, { title: string; description: st
       'Dipakai untuk menerima notifikasi order masuk/berhasil. Ambil dari Telegram Web > Saved Messages, lalu lihat angka chat ID di URL.',
     example: 'Contoh: 7217964120'
   },
-  GEMINI_API_KEY: {
-    title: 'Kunci API Gemini',
-    description:
-      'Digunakan jika AI mode diaktifkan. Ambil key dari Google AI Studio, lalu tempelkan key lengkap tanpa spasi tambahan.'
-  },
+  // GEMINI_API_KEY: {
+  //   title: 'Kunci API Gemini',
+  //   description:
+  //     'Digunakan jika AI mode diaktifkan. Ambil key dari Google AI Studio, lalu tempelkan key lengkap tanpa spasi tambahan.'
+  // },
   MIDTRANS_SERVER_KEY: {
     title: 'Midtrans Server Key',
     description: 'Wajib untuk membuat transaksi dari backend. Ambil dari Midtrans Dashboard > Settings > Access Keys.'
