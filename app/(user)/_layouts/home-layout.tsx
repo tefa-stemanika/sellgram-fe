@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { KeyRound, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -20,7 +20,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarSeparator
+  SidebarTrigger,
+  SidebarSeparator,
+  useSidebar
 } from '@/components/ui/sidebar'
 import { logout } from '@/services/user'
 
@@ -37,10 +39,19 @@ const navigation = [
   { title: 'Order', href: '/orders', icon: ShoppingCart }
 ]
 
-const HomeLayout = ({ children, token }: HomeLayoutProps) => {
+type HomeLayoutContentProps = HomeLayoutProps
+
+const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
   const pathname = usePathname()
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const { isMobile, setOpenMobile } = useSidebar()
+
+  useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }, [isMobile, pathname, setOpenMobile])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -60,7 +71,7 @@ const HomeLayout = ({ children, token }: HomeLayoutProps) => {
   }
 
   return (
-    <SidebarProvider>
+    <>
       <Sidebar className="border-r border-sidebar-border/70">
         <SidebarHeader>
           <div className="rounded-xl border border-sidebar-border/80 bg-sidebar-accent/60 p-3">
@@ -117,10 +128,27 @@ const HomeLayout = ({ children, token }: HomeLayoutProps) => {
       </Sidebar>
 
       <SidebarInset>
+        <div className="sticky top-0 z-20 border-b border-border/70 bg-background/90 px-4 py-3 backdrop-blur sm:px-6 md:hidden">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="h-9 w-9 rounded-md border border-border/70" />
+              <p className="text-sm font-semibold">Sellgram Control Center</p>
+            </div>
+          </div>
+        </div>
+
         <div className="min-h-svh p-4 sm:p-6">
           <div className="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur sm:p-6">{children}</div>
         </div>
       </SidebarInset>
+    </>
+  )
+}
+
+const HomeLayout = ({ children, token }: HomeLayoutProps) => {
+  return (
+    <SidebarProvider>
+      <HomeLayoutContent token={token}>{children}</HomeLayoutContent>
     </SidebarProvider>
   )
 }
