@@ -64,7 +64,12 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
             <FormItem>
               <FormLabel>Nama Produk</FormLabel>
               <FormControl>
-                <Input placeholder="Contoh: Nasi Goreng" {...field} value={field.value ?? ''} className="bg-background/80" />
+                <Input
+                  placeholder="Contoh: Nasi Goreng"
+                  {...field}
+                  value={field.value ?? ''}
+                  className="bg-white/20 backdrop-blur-xl border border-white/20"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -78,7 +83,12 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
             <FormItem>
               <FormLabel>Deskripsi</FormLabel>
               <FormControl>
-                <Textarea placeholder="Deskripsi produk" {...field} value={field.value ?? ''} className="bg-background/80" />
+                <Textarea
+                  placeholder="Deskripsi produk"
+                  {...field}
+                  value={field.value ?? ''}
+                  className="bg-white/20 backdrop-blur-xl border border-white/20"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -93,7 +103,13 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
               <FormItem>
                 <FormLabel>Harga</FormLabel>
                 <FormControl>
-                  <Input type="number" min={1} {...field} value={field.value ?? 0} className="bg-background/80" />
+                  <Input
+                    type="number"
+                    min={1}
+                    {...field}
+                    value={field.value ?? 0}
+                    className="bg-white/20 backdrop-blur-xl border border-white/20"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -107,7 +123,12 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
               <FormItem>
                 <FormLabel>Emoji</FormLabel>
                 <FormControl>
-                  <Input placeholder="🍳" {...field} value={field.value ?? ''} className="bg-background/80" />
+                  <Input
+                    placeholder="🍳"
+                    {...field}
+                    value={field.value ?? ''}
+                    className="bg-white/20 backdrop-blur-xl border border-white/20"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

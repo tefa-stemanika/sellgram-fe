@@ -190,15 +190,15 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
+      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-5 transition-all duration-300">
         <h1 className="text-2xl font-semibold">Bot Credentials</h1>
         <p className="text-sm text-muted-foreground">
           Semua credential key ditampilkan langsung di halaman ini dan dapat diedit per item.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 shadow-sm">
-        <div className="mb-3 flex items-center gap-2 text-primary">
+      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-5 transition-all duration-300">
+        <div className="mb-3 flex items-center gap-2 text-blue-600 dark:text-blue-400">
           <Info className="h-4 w-4" />
           <h2 className="text-sm font-semibold uppercase tracking-wide">Panduan Setup Wajib</h2>
         </div>
@@ -212,7 +212,7 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
             <li>
               1. Untuk sandbox, gunakan simulator pembayaran Midtrans:{' '}
               <a
-                className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                className="inline-flex items-center gap-1 font-medium text-primary hover:underline transition-colors duration-200"
                 href="https://simulator.sandbox.midtrans.com/"
                 target="_blank"
                 rel="noreferrer">
@@ -222,11 +222,11 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
             </li>
             <li>
               2. Isi Payment Notification URL di Midtrans Dashboard dengan URL berikut (klik URL atau tombol untuk copy):
-              <div className="mt-2 flex flex-col gap-2 rounded-lg border border-primary/30 bg-background/70 p-2.5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mt-2 flex flex-col gap-2 rounded-lg bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-2.5 sm:flex-row sm:items-center sm:justify-between transition-all duration-200">
                 <button
                   type="button"
                   onClick={() => void handleCopyWebhookUrl()}
-                  className="truncate text-left font-mono text-xs font-medium text-foreground underline decoration-dotted underline-offset-4 hover:text-primary"
+                  className="truncate text-left font-mono text-xs font-medium text-foreground underline decoration-dotted underline-offset-4 hover:text-primary transition-colors duration-200"
                   title="Klik untuk copy URL">
                   {webhookUrl}
                 </button>
@@ -235,7 +235,7 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
                   variant="secondary"
                   size="sm"
                   onClick={() => void handleCopyWebhookUrl()}
-                  className="w-full shrink-0 sm:w-auto">
+                  className="w-full shrink-0 sm:w-auto transition-all duration-200 hover:shadow-l1">
                   <Copy className="h-3.5 w-3.5" />
                   Copy URL
                 </Button>
@@ -244,7 +244,7 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
             <li>
               3. Buka halaman Midtrans Access Keys untuk copy Client Key dan Server Key:{' '}
               <a
-                className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                className="inline-flex items-center gap-1 font-medium text-primary hover:underline transition-colors duration-200"
                 href="https://dashboard.sandbox.midtrans.com/settings/access-keys"
                 target="_blank"
                 rel="noreferrer">
@@ -269,10 +269,10 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
             <div
               key={key}
               className={[
-                'rounded-xl border p-4 shadow-sm transition-colors',
+                'rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-4 transition-all duration-300',
                 isStored
-                  ? 'border-emerald-300 bg-emerald-50/80 dark:border-emerald-800 dark:bg-emerald-950/20'
-                  : 'border-amber-300 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/20'
+                  ? 'bg-green-500/30 dark:bg-green-900/40 border-green-300/40 dark:border-green-800/40'
+                  : 'bg-amber-500/30 dark:bg-amber-900/40 border-amber-300/40 dark:border-amber-800/40'
               ].join(' ')}>
               <div className="mb-2 flex items-center justify-between gap-3">
                 <div>
@@ -283,7 +283,7 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
                 </div>
                 <span
                   className={[
-                    'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium',
+                    'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all duration-200',
                     isStored
                       ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
                       : 'bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-300'
@@ -293,7 +293,7 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
                 </span>
               </div>
 
-              <div className="mb-2 rounded-lg border border-border/70 bg-background/60 p-2.5 text-xs text-muted-foreground">
+              <div className="mb-2 rounded-lg bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-2.5 text-xs text-muted-foreground transition-all duration-200">
                 <p>{helper.description}</p>
                 {helper.example ? <p className="mt-1 font-medium text-foreground">{helper.example}</p> : null}
               </div>
@@ -306,23 +306,28 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
                     placeholder="Masukkan value credential"
                     value={row.value}
                     onChange={(event) => handleChangeValue(key, event.target.value)}
-                    className={
+                    className={[
+                      'transition-all duration-200',
                       isStored
                         ? 'border-emerald-300 bg-white/90 dark:border-emerald-800 dark:bg-background'
                         : 'border-amber-300 bg-white/90 dark:border-amber-800 dark:bg-background'
-                    }
+                    ].join(' ')}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-1 top-1"
+                    className="absolute right-1 top-1 transition-all duration-200 hover:bg-primary/10"
                     onClick={() => toggleShowValue(key)}>
                     {showValueMap[key] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
 
-                <Button type="button" onClick={() => void handleSave(key)} disabled={isSaving || !hasValue}>
+                <Button
+                  type="button"
+                  onClick={() => void handleSave(key)}
+                  disabled={isSaving || !hasValue}
+                  className="transition-all duration-200 hover:shadow-l1">
                   <Save className="h-4 w-4" />
                   {isSaving ? 'Menyimpan...' : 'Simpan'}
                 </Button>

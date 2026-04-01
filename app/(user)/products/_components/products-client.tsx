@@ -129,14 +129,14 @@ export function ProductsClient({ token }: ProductsClientProps) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
+      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-5 transition-all duration-300">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-semibold">Produk</h1>
             <p className="text-sm text-muted-foreground">Kelola daftar produk untuk bot Anda.</p>
           </div>
           <Button
-            className="shadow-sm"
+            className="shadow-sm transition-all duration-200 hover:shadow-l2"
             onClick={() => {
               setSelectedProduct(null)
               setIsFormOpen(true)
@@ -147,7 +147,7 @@ export function ProductsClient({ token }: ProductsClientProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm">
+      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-4 transition-all duration-300">
         <DataTable columns={columns} data={products} />
       </div>
 
@@ -159,7 +159,7 @@ export function ProductsClient({ token }: ProductsClientProps) {
             setSelectedProduct(null)
           }
         }}>
-        <DialogContent className="border-border/70 bg-card/95 backdrop-blur">
+        <DialogContent className="rounded-lg bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl">
           <DialogHeader>
             <DialogTitle>{isEditMode ? 'Edit Produk' : 'Tambah Produk'}</DialogTitle>
             <DialogDescription>

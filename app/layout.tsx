@@ -86,7 +86,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}>
+        <div id="" className="fixed w-screen inset-0 h-screen glass-background-2" />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <TooltipProvider>{children}</TooltipProvider>
           <Toaster richColors position="top-center" />

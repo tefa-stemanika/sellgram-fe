@@ -17,7 +17,7 @@ type OrderDetailDialogProps = {
 export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl border-border/70 bg-card/95 backdrop-blur">
+      <DialogContent className="max-w-2xl rounded-lg bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl">
         <DialogHeader>
           <DialogTitle>Detail Order</DialogTitle>
           <DialogDescription>Informasi lengkap order pelanggan.</DialogDescription>
@@ -25,7 +25,7 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
 
         {!order ? null : (
           <div className="space-y-5 text-sm">
-            <div className="grid gap-3 rounded-xl border border-border/70 bg-background/70 p-4 md:grid-cols-2">
+            <div className="grid gap-3 rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-4 md:grid-cols-2">
               <div>
                 <p className="text-muted-foreground">Nama</p>
                 <p className="font-medium">{order.firstName ?? '-'}</p>
@@ -54,7 +54,7 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
 
             <div className="space-y-2">
               <h3 className="font-medium">Item Pesanan</h3>
-              <div className="rounded-xl border border-border/70 bg-background/70">
+              <div className="rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg">
                 {order.orderItems.length ? (
                   order.orderItems.map((item) => (
                     <div key={item.id} className="flex items-center justify-between border-b p-3 last:border-b-0">

@@ -3,13 +3,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import {
-  createBotConfig,
-  getBotConfig,
-  updateBotConfig,
-  type BotConfig,
-  type BotConfigPayload
-} from '@/services/bot-config'
+import { createBotConfig, getBotConfig, updateBotConfig, type BotConfig, type BotConfigPayload } from '@/services/bot-config'
 
 import { BotConfigForm } from './bot-config-form'
 
@@ -65,12 +59,7 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
 
   return (
     <div className="max-w-2xl space-y-4">
-      <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
-        <h1 className="text-2xl font-semibold">Bot Config</h1>
-        <p className="text-sm text-muted-foreground">Atur mode bot, AI, dan pengaturan pembayaran.</p>
-      </div>
-
-      <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
+      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-5 transition-all duration-300">
         <BotConfigForm defaultValues={config ?? undefined} onSubmit={handleSubmit} isLoading={isLoading} />
       </div>
     </div>

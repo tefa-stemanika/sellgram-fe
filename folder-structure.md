@@ -2,6 +2,7 @@
 ```
 order-bot-dashboard
 ├─ .env
+├─ .env.example
 ├─ .eslintrc.json
 ├─ .prettierignore
 ├─ .prettierrc
@@ -71,7 +72,9 @@ order-bot-dashboard
 │  │  └─ GeistVF.woff
 │  ├─ globals.css
 │  ├─ layout.tsx
-│  └─ page.tsx
+│  ├─ page.tsx
+│  ├─ robots.ts
+│  └─ sitemap.ts
 ├─ commitlint.config.js
 ├─ components
 │  ├─ core
@@ -130,6 +133,7 @@ order-bot-dashboard
 ├─ public
 │  ├─ icons
 │  └─ images
+│     └─ sellgram_seo.png
 ├─ schemas
 │  ├─ auth.ts
 │  ├─ bot-config.ts

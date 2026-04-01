@@ -50,7 +50,7 @@ const LoginLayout = () => {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center p-4">
-      <div className="w-full max-w-md rounded-2xl border border-border/70 bg-card/90 p-6 shadow-xl backdrop-blur sm:p-8">
+      <div className="w-full max-w-md rounded-2xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl p-6 sm:p-8">
         <div className="mb-8 space-y-2 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Order Bot Dashboard</p>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Selamat Datang Kembali</h1>
@@ -65,7 +65,12 @@ const LoginLayout = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="owner@example.com" {...field} className="h-10 bg-background/80" />
+                    <Input
+                      type="email"
+                      placeholder="owner@example.com"
+                      {...field}
+                      className="h-10 bg-white/20 backdrop-blur-xl border border-white/20"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -78,7 +83,12 @@ const LoginLayout = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Masukkan password" {...field} className="h-10 bg-background/80" />
+                    <Input
+                      type="password"
+                      placeholder="Masukkan password"
+                      {...field}
+                      className="h-10 bg-white/20 backdrop-blur-xl border border-white/20"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

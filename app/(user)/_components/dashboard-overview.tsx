@@ -68,11 +68,10 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,hsl(var(--primary)/0.2),transparent_40%)]" />
+      <div className="relative overflow-hidden rounded-2xl bg-white/40 backdrop-blur-xl border border-white/20 shadow-2xl p-6 transition-all duration-300">
         <div className="relative flex items-start justify-between gap-3">
           <div>
-            <Badge variant="secondary" className="mb-3 w-fit rounded-full px-3 py-1 text-xs">
+            <Badge variant="secondary" className="mb-3 w-fit rounded-full px-3 py-1 text-xs transition-all duration-200">
               Ringkasan Harian
             </Badge>
             <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
@@ -80,7 +79,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
               Pantau produk, order, dan performa pendapatan secara real-time.
             </p>
           </div>
-          <div className="hidden rounded-xl bg-primary/10 p-2 text-primary sm:block">
+          <div className="hidden rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl p-2 text-primary sm:block animate-fade-in">
             <Sparkles className="h-5 w-5" />
           </div>
         </div>
@@ -91,24 +90,28 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
           const Icon = metric.icon
 
           return (
-            <Card key={metric.title} className="overflow-hidden border-border/70 bg-card/90 shadow-sm">
-              <CardHeader className={`relative pb-3 bg-gradient-to-br ${metric.accent}`}>
+            <Card
+              key={metric.title}
+              className="overflow-hidden transition-all duration-300 cursor-pointer group bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl">
+              <CardHeader className={`relative pb-3 transition-all duration-300 group-hover:brightness-110`}>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
-                  <div className="rounded-md bg-background/80 p-1.5 text-primary shadow-sm">
+                  <div className="rounded-md p-1.5 text-primary transition-all duration-300">
                     <Icon className="h-4 w-4" />
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-semibold tracking-tight">{metric.value}</p>
+              <CardContent className="transition-all duration-300 ">
+                <p className="text-3xl font-semibold tracking-tight group-hover:text-primary transition-colors duration-300">
+                  {metric.value}
+                </p>
               </CardContent>
             </Card>
           )
         })}
       </div>
 
-      <Card className="border-border/70 bg-card/90 shadow-sm">
+      <Card className="bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl transition-all duration-300">
         <CardHeader>
           <CardTitle>Order Terbaru</CardTitle>
         </CardHeader>
@@ -126,7 +129,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
             <TableBody>
               {recentOrders.length ? (
                 recentOrders.map((order) => (
-                  <TableRow key={order.id}>
+                  <TableRow key={order.id} className="transition-all duration-200">
                     <TableCell className="font-medium">{order.orderId}</TableCell>
                     <TableCell>{order.firstName ?? order.username ?? '-'}</TableCell>
                     <TableCell>{order.status}</TableCell>

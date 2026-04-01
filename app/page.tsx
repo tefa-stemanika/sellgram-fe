@@ -71,10 +71,10 @@ const features = [
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_20%_20%,hsl(212_100%_92%),transparent_35%),radial-gradient(circle_at_80%_0%,hsl(35_100%_90%),transparent_30%),linear-gradient(135deg,hsl(0_0%_100%),hsl(210_40%_98%))]">
+    <main className="min-h-screen">
       <section className="mx-auto max-w-6xl px-6 pb-20 pt-10 md:px-8 md:pb-24 md:pt-14">
-        <header className="rounded-3xl border border-border/70 bg-background/80 p-8 shadow-xl backdrop-blur md:p-12">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground">
+        <header className="rounded-3xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl p-8 md:p-12">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground">
             <ShieldCheck className="h-4 w-4" />
             SAAS Dashboard for Telegram Order Bot
           </div>
@@ -108,9 +108,9 @@ export default function LandingPage() {
           {features.map((feature) => {
             const Icon = feature.icon
             return (
-              <Card key={feature.title} className="border-border/70 bg-background/85 shadow-sm backdrop-blur">
+              <Card key={feature.title} className="bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl">
                 <CardHeader>
-                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background">
+                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl">
                     <Icon className="h-5 w-5" />
                   </div>
                   <CardTitle className="text-lg">{feature.title}</CardTitle>
@@ -123,7 +123,7 @@ export default function LandingPage() {
           })}
         </div>
 
-        <section className="mt-12 rounded-3xl border border-border bg-background/90 p-8 shadow-sm md:mt-16 md:p-10">
+        <section className="mt-12 rounded-3xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl p-8 md:mt-16 md:p-10">
           <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Kenapa cocok untuk bisnis Anda?</h2>
           <div className="mt-5 grid gap-4 text-sm text-muted-foreground md:grid-cols-3">
             <p>Operasional lebih rapi karena data produk, order, dan konfigurasi bot terpusat dalam satu platform.</p>

@@ -72,10 +72,10 @@ const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
 
   return (
     <>
-      <Sidebar className="border-r border-sidebar-border/70">
+      <Sidebar className="border-r border-white/20 dark:border-white/10" variant="floating">
         <SidebarHeader>
-          <div className="rounded-xl border border-sidebar-border/80 bg-sidebar-accent/60 p-3">
-            <div className="flex items-center gap-2 text-sidebar-foreground">
+          <div className="rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-3">
+            <div className="flex items-center gap-2 text-foreground">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <Sparkles className="h-4 w-4" />
               </div>
@@ -127,18 +127,20 @@ const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
         </SidebarFooter>
       </Sidebar>
 
-      <SidebarInset>
-        <div className="sticky top-0 z-20 border-b border-border/70 bg-background/90 px-4 py-3 backdrop-blur sm:px-6 md:hidden">
+      <SidebarInset className="bg-transparent">
+        <div className="sticky top-0 z-20 border-b border-white/20 dark:border-white/10 bg-white/20 backdrop-blur-xl px-4 py-3 sm:px-6 md:hidden">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="h-9 w-9 rounded-md border border-border/70" />
+              <SidebarTrigger className="h-9 w-9 rounded-md bg-white/20 backdrop-blur-xl border border-white/20" />
               <p className="text-sm font-semibold">Sellgram Control Center</p>
             </div>
           </div>
         </div>
 
         <div className="min-h-svh p-4 sm:p-6">
-          <div className="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur sm:p-6">{children}</div>
+          <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-4 sm:p-6">
+            {children}
+          </div>
         </div>
       </SidebarInset>
     </>

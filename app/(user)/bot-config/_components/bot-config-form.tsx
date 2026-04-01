@@ -40,7 +40,7 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
           control={form.control}
           name="midtransIsProduction"
           render={({ field }) => (
-            <FormItem className="rounded-xl border border-border/70 bg-background/70 p-4">
+            <FormItem className="rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <FormLabel>Environment Midtrans</FormLabel>

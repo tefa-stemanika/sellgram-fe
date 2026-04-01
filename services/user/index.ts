@@ -36,6 +36,36 @@ export async function getCurrentUser(token: string): Promise<User> {
   return response.data
 }
 
+export async function isTokenExpired(token: string): Promise<boolean> {
+  try {
+    const w = await fetcher<{ success: boolean; data: User }>('/auth/me', { token })
+    console.log('w', w)
+    return false // Token is valid
+  } catch (error) {
+    const message = error instanceof Error ? error.message : ''
+    console.log('message', message)
+    
+    // Jika error adalah connection refused atau server down
+    if (message.includes('Gagal terhubung')) {
+      // Untuk development, assume token is valid jika server down
+      // Ini memungkinkan development tanpa API server running
+      console.warn('⚠️  API server not running - skipping token validation')
+      return false // Assume token is valid
+    }
+    
+    // Jika error adalah 401 Unauthorized, token expired
+    if (
+      message.includes('401') ||
+      message.toLowerCase().includes('unauthorized') ||
+      message.toLowerCase().includes('expired')
+    ) {
+      return true // Token is expired
+    }
+    
+    throw error // Re-throw other errors
+  }
+}
+
 export async function logout(token: string): Promise<void> {
   await fetcher<{ success: boolean }>('/auth/logout', {
     method: 'POST',

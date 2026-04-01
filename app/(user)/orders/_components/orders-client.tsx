@@ -84,7 +84,7 @@ export function OrdersClient({ token }: OrdersClientProps) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-border/70 bg-card/90 p-5 shadow-sm">
+      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-5 transition-all duration-300">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold">Orders</h1>
@@ -92,7 +92,7 @@ export function OrdersClient({ token }: OrdersClientProps) {
           </div>
 
           <Select value={statusFilter} onValueChange={(value) => handleStatusChange(value as OrderStatus | 'ALL')}>
-            <SelectTrigger className="w-full border-border/70 bg-background/80 sm:w-56">
+            <SelectTrigger className="w-full bg-white/20 backdrop-blur-xl border border-white/20 sm:w-56 transition-all duration-200">
               <SelectValue placeholder="Filter status" />
             </SelectTrigger>
             <SelectContent>
@@ -106,7 +106,7 @@ export function OrdersClient({ token }: OrdersClientProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border/70 bg-card/90 p-4 shadow-sm">
+      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-4 transition-all duration-300">
         <DataTable columns={columns} data={filteredOrders} onRowClick={(order) => setSelectedOrder(order)} />
       </div>
 

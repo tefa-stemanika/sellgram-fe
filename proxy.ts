@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { isTokenExpired } from './services/user'
+import { removeToken } from './actions/auth'
 
 const PUBLIC_ROUTES = ['/']
 const AUTH_ROUTES = ['/login', '/register']
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get('token')?.value
   const { pathname } = request.nextUrl
 
@@ -17,6 +19,21 @@ export function proxy(request: NextRequest) {
 
   if (token && isAuthRoute) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  if (token && !isPublicRoute && !isAuthRoute) {
+    try {
+      const isExpired = await isTokenExpired(token)
+      console.log('ex', isExpired)
+      if (isExpired) {
+        removeToken()
+        return
+      }
+    } catch (error) {
+      console.error('Error checking token:', error)
+      // Jika ada error checking token, izinkan user melanjutkan
+      // Error handling akan ditangani di client-side
+    }
   }
 
   return NextResponse.next()
