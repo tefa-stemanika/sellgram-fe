@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import localFont from 'next/font/local'
+import { IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './_components/theme-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -8,15 +8,10 @@ import { Toaster } from '@/components/ui/sonner'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 const metadataBase = new URL(siteUrl)
 
-const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900'
-})
-const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900'
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  variable: '--font-ibm-plex-mono',
+  weight: ['100', '200', '300', '400', '500', '600', '700']
 })
 
 export const metadata: Metadata = {
@@ -85,9 +80,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}>
-        <div id="" className="fixed w-screen inset-0 h-screen glass-background-2" />
+    <html lang="id">
+      <body className={`${ibmPlexMono.variable} antialiased relative`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <TooltipProvider>{children}</TooltipProvider>
           <Toaster richColors position="top-center" />

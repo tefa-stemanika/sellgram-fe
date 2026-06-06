@@ -3,7 +3,6 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Trash2 } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatIDRCurrency } from '@/lib/utils'
 import type { Product } from '@/services/products'
@@ -18,7 +17,7 @@ export function getProductColumns({ onEdit, onDelete }: ProductColumnsOptions): 
     {
       accessorKey: 'emoji',
       header: '',
-      cell: ({ row }) => <span className="text-lg">{row.original.emoji}</span>
+      cell: ({ row }) => <span className="text-xl">{row.original.emoji}</span>
     },
     {
       accessorKey: 'name',
@@ -27,20 +26,32 @@ export function getProductColumns({ onEdit, onDelete }: ProductColumnsOptions): 
     },
     {
       accessorKey: 'description',
-      header: 'Deskripsi'
+      header: 'Deskripsi',
+      cell: ({ row }) => (
+        <span className="max-w-[200px] truncate text-sm text-muted-foreground">
+          {row.original.description || '-'}
+        </span>
+      )
     },
     {
       accessorKey: 'price',
       header: 'Harga',
-      cell: ({ row }) => formatIDRCurrency(row.original.price)
+      cell: ({ row }) => (
+        <span className="font-mono font-semibold">{formatIDRCurrency(row.original.price)}</span>
+      )
     },
     {
       accessorKey: 'isAvailable',
       header: 'Status',
       cell: ({ row }) => (
-        <Badge variant={row.original.isAvailable ? 'default' : 'secondary'}>
+        <span
+          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+            row.original.isAvailable
+              ? 'border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+              : 'border-red-200 bg-red-100 text-red-700 dark:border-red-800 dark:bg-red-900/40 dark:text-red-300'
+          }`}>
           {row.original.isAvailable ? 'Tersedia' : 'Tidak tersedia'}
-        </Badge>
+        </span>
       )
     },
     {
@@ -50,23 +61,26 @@ export function getProductColumns({ onEdit, onDelete }: ProductColumnsOptions): 
         <div className="flex items-center gap-2">
           <Button
             type="button"
-            size="icon"
+            size="sm"
             variant="outline"
             onClick={(event) => {
               event.stopPropagation()
               onEdit(row.original)
             }}>
-            <Pencil className="h-4 w-4" />
+            <Pencil className="mr-1 h-3.5 w-3.5" />
+            Edit
           </Button>
           <Button
             type="button"
-            size="icon"
+            size="sm"
             variant="destructive"
+            className="text-white"
             onClick={(event) => {
               event.stopPropagation()
               onDelete(row.original)
             }}>
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="mr-1 h-3.5 w-3.5 text-white" />
+            Hapus
           </Button>
         </div>
       )

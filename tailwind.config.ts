@@ -82,7 +82,8 @@ const config: Config = {
         body: ['0.94rem', { lineHeight: '1.6rem', fontWeight: '400' }],
         'body-sm': ['0.875rem', { lineHeight: '1.4rem', fontWeight: '400' }],
         caption: ['0.8rem', { lineHeight: '1.2rem', fontWeight: '500' }],
-        label: ['0.875rem', { lineHeight: '1.25rem', fontWeight: '500' }]
+        label: ['0.875rem', { lineHeight: '1.25rem', fontWeight: '500' }],
+        '32': ['2rem', { lineHeight: '1' }]
       },
       spacing: {
         '4.5': '1.125rem',
@@ -123,9 +124,7 @@ const config: Config = {
         l1: '0 1px 3px rgb(0 0 0 / 0.05)',
         l2: '0 4px 12px rgb(0 0 0 / 0.08)',
         l3: '0 8px 24px rgb(0 0 0 / 0.12)',
-        glass: '0 8px 32px rgb(31 41 55 / 0.1)',
-        'glow-primary': 'inset 0 1px 3px rgb(59 90 248 / 0.1), 0 0 0 3px rgb(59 90 248 / 0.1)',
-        'glow-accent': 'inset 0 1px 3px rgb(0 212 212 / 0.1), 0 0 0 3px rgb(0 212 212 / 0.1)'
+
       },
       keyframes: {
         'accordion-down': {

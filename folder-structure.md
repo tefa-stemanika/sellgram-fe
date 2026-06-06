@@ -6,16 +6,16 @@ order-bot-dashboard
 ├─ .eslintrc.json
 ├─ .prettierignore
 ├─ .prettierrc
-├─ DASHBOARD_API_REFERENCE.md
-├─ DASHBOARD_PAGES.md
-├─ DASHBOARD_PATTERNS.md
-├─ DASHBOARD_PLAN.md
-├─ DASHBOARD_SCHEMAS.md
-├─ DASHBOARD_SERVICES.md
+├─ AGENTS.md
 ├─ README.md
 ├─ actions
 │  └─ auth.ts
 ├─ app
+│  ├─ payment
+│  │  └─ success
+│  │     ├─ _components
+│  │     │  └─ payment-success-client.tsx
+│  │     └─ page.tsx
 │  ├─ (auth)
 │  │  ├─ login
 │  │  │  ├─ _layouts

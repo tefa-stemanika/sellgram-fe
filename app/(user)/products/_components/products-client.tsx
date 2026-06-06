@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Store } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,7 @@ type ProductsClientProps = {
 export function ProductsClient({ token }: ProductsClientProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
@@ -42,14 +43,14 @@ export function ProductsClient({ token }: ProductsClientProps) {
         return
       }
 
-      setIsLoading(true)
+      setIsInitialLoading(true)
       try {
         const latest = await getProducts(token)
         setProducts(latest)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Gagal memuat produk')
       } finally {
-        setIsLoading(false)
+        setIsInitialLoading(false)
       }
     }
 
@@ -128,27 +129,61 @@ export function ProductsClient({ token }: ProductsClientProps) {
   )
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-5 transition-all duration-300">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold">Produk</h1>
-            <p className="text-sm text-muted-foreground">Kelola daftar produk untuk bot Anda.</p>
+    <div className="space-y-6">
+      <header
+        className="animate-in fade-in slide-in-from-top-2 duration-500">
+        <div className="flex items-center gap-2">
+          <div className="h-1 w-8 rounded-full bg-gradient-to-r from-primary to-blue-600" />
+          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Produk
+          </span>
+        </div>
+        <h1 className="mt-4 text-4xl font-black tracking-tight">
+          Daftar{' '}
+          <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            Produk
+          </span>
+        </h1>
+        <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
+          Kelola daftar produk untuk bot Anda.
+        </p>
+      </header>
+
+      <div
+        className="overflow-hidden rounded-2xl border-0 shadow-sm transition-all duration-300 hover:shadow-md"
+        style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.1s' }}>
+        <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 to-teal-600" />
+        <div className="bg-white p-5 dark:bg-card">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-emerald-100 p-2 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300">
+                <Store className="h-4 w-4" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold">Produk</h2>
+                <p className="text-sm text-muted-foreground">{products.length} produk terdaftar</p>
+              </div>
+            </div>
+            <Button
+              className="shadow-sm transition-all duration-200 hover:shadow-md"
+              onClick={() => {
+                setSelectedProduct(null)
+                setIsFormOpen(true)
+              }}>
+              <Plus className="h-4 w-4" />
+              Tambah Produk
+            </Button>
           </div>
-          <Button
-            className="shadow-sm transition-all duration-200 hover:shadow-l2"
-            onClick={() => {
-              setSelectedProduct(null)
-              setIsFormOpen(true)
-            }}>
-            <Plus className="h-4 w-4" />
-            Tambah Produk
-          </Button>
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-4 transition-all duration-300">
-        <DataTable columns={columns} data={products} />
+      <div
+        className="overflow-hidden rounded-2xl border-0 shadow-sm transition-all duration-300 hover:shadow-md"
+        style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.15s' }}>
+        <div className="h-1.5 w-full bg-gradient-to-r from-orange-500 to-amber-600" />
+        <div className="bg-white p-4 dark:bg-card">
+          <DataTable columns={columns} data={products} isLoading={isInitialLoading} />
+        </div>
       </div>
 
       <Dialog
@@ -159,26 +194,31 @@ export function ProductsClient({ token }: ProductsClientProps) {
             setSelectedProduct(null)
           }
         }}>
-        <DialogContent className="rounded-lg bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl">
-          <DialogHeader>
-            <DialogTitle>{isEditMode ? 'Edit Produk' : 'Tambah Produk'}</DialogTitle>
-            <DialogDescription>
-              {isEditMode ? 'Perbarui informasi produk Anda.' : 'Masukkan detail produk baru.'}
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="overflow-hidden border-0 p-0 shadow-2xl sm:max-w-lg">
+          <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 to-teal-600" />
+          <div className="bg-white p-6 dark:bg-card">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black tracking-tight">
+                {isEditMode ? 'Edit Produk' : 'Tambah Produk'}
+              </DialogTitle>
+              <DialogDescription>
+                {isEditMode ? 'Perbarui informasi produk Anda.' : 'Masukkan detail produk baru.'}
+              </DialogDescription>
+            </DialogHeader>
 
-          <ProductForm
-            mode={isEditMode ? 'update' : 'create'}
-            defaultValues={selectedProduct ?? undefined}
-            isLoading={isLoading}
-            onSubmit={(values) => {
-              if (isEditMode) {
-                void handleUpdate(values as UpdateProductPayload)
-                return
-              }
-              void handleCreate(values as CreateProductPayload)
-            }}
-          />
+            <ProductForm
+              mode={isEditMode ? 'update' : 'create'}
+              defaultValues={selectedProduct ?? undefined}
+              isLoading={isLoading}
+              onSubmit={(values) => {
+                if (isEditMode) {
+                  void handleUpdate(values as UpdateProductPayload)
+                  return
+                }
+                void handleCreate(values as CreateProductPayload)
+              }}
+            />
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -191,6 +231,19 @@ export function ProductsClient({ token }: ProductsClientProps) {
           void handleDelete()
         }}
       />
+
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   )
 }

@@ -56,7 +56,7 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="mt-5 space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -68,7 +68,7 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
                   placeholder="Contoh: Nasi Goreng"
                   {...field}
                   value={field.value ?? ''}
-                  className="bg-white/20 backdrop-blur-xl border border-white/20"
+                  className="bg-white dark:bg-card"
                 />
               </FormControl>
               <FormMessage />
@@ -87,7 +87,7 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
                   placeholder="Deskripsi produk"
                   {...field}
                   value={field.value ?? ''}
-                  className="bg-white/20 backdrop-blur-xl border border-white/20"
+                  className="min-h-[80px] bg-white dark:bg-card"
                 />
               </FormControl>
               <FormMessage />
@@ -101,14 +101,14 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
             name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Harga</FormLabel>
+                <FormLabel>Harga (Rp)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
                     min={1}
                     {...field}
                     value={field.value ?? 0}
-                    className="bg-white/20 backdrop-blur-xl border border-white/20"
+                    className="bg-white dark:bg-card"
                   />
                 </FormControl>
                 <FormMessage />
@@ -127,7 +127,7 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
                     placeholder="🍳"
                     {...field}
                     value={field.value ?? ''}
-                    className="bg-white/20 backdrop-blur-xl border border-white/20"
+                    className="bg-white dark:bg-card text-center text-xl"
                   />
                 </FormControl>
                 <FormMessage />
@@ -141,8 +141,8 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
             control={form.control}
             name="isAvailable"
             render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-md border p-3">
-                <FormLabel className="m-0">Produk tersedia</FormLabel>
+              <FormItem className="flex items-center justify-between rounded-lg border bg-white p-3 dark:bg-card">
+                <FormLabel className="m-0 font-medium">Produk tersedia</FormLabel>
                 <FormControl>
                   <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
                 </FormControl>

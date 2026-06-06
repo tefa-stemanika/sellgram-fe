@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { CheckCircle2, CircleDashed, Copy, ExternalLink, Eye, EyeOff, Info, Save } from 'lucide-react'
+import { Bot, CheckCircle2, Copy, ExternalLink, Eye, EyeOff, KeyRound, MessageSquare, Save, ShieldCheck } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Skeleton } from '@/components/ui/skeleton'
 import { CREDENTIAL_KEYS, type CredentialKey } from '@/schemas/bot-credentials'
 import {
   createBotCredential,
@@ -27,28 +28,23 @@ type CredentialRowState = {
 
 const CREDENTIAL_HELPERS: Record<CredentialKey, { title: string; description: string; example?: string }> = {
   TELEGRAM_BOT_TOKEN: {
-    title: 'Token bot customer',
+    title: 'Token Bot Customer',
     description:
       'Didapat dari chat @BotFather saat membuat bot customer. Format token biasanya angka panjang, lalu titik dua, lalu secret key.',
-    example: 'Contoh format: 8741169...:AAGKgq-onFo6WudgaZ8gCSjOEAMtbdcI...'
+    example: '8741169...:AAGKgq-onFo6WudgaZ8gCSjOEAMtbdcI...'
   },
   ADMIN_BOT_TOKEN: {
-    title: 'Token bot admin',
+    title: 'Token Bot Admin',
     description:
       'Didapat dari @BotFather untuk bot khusus admin/operasional. Jika Anda pakai bot yang sama dengan customer, isi dengan token yang sama.',
-    example: 'Contoh format: 1234567...:AAHxxxx...'
+    example: '1234567...:AAHxxxx...'
   },
   ADMIN_CHAT_ID: {
-    title: 'Telegram chat ID admin',
+    title: 'Chat ID Admin',
     description:
       'Dipakai untuk menerima notifikasi order masuk/berhasil. Ambil dari Telegram Web > Saved Messages, lalu lihat angka chat ID di URL.',
-    example: 'Contoh: 7217964120'
+    example: '7217964120'
   },
-  // GEMINI_API_KEY: {
-  //   title: 'Kunci API Gemini',
-  //   description:
-  //     'Digunakan jika AI mode diaktifkan. Ambil key dari Google AI Studio, lalu tempelkan key lengkap tanpa spasi tambahan.'
-  // },
   MIDTRANS_SERVER_KEY: {
     title: 'Midtrans Server Key',
     description: 'Wajib untuk membuat transaksi dari backend. Ambil dari Midtrans Dashboard > Settings > Access Keys.'
@@ -57,6 +53,34 @@ const CREDENTIAL_HELPERS: Record<CredentialKey, { title: string; description: st
     title: 'Midtrans Client Key',
     description:
       'Digunakan untuk proses pembayaran dari sisi frontend/client. Ambil dari halaman Access Keys yang sama dengan Server Key.'
+  }
+}
+
+const CREDENTIAL_META: Record<CredentialKey, { icon: typeof Bot; gradient: string; iconBg: string }> = {
+  TELEGRAM_BOT_TOKEN: {
+    icon: Bot,
+    gradient: 'from-sky-500 to-cyan-400',
+    iconBg: 'bg-sky-100 text-sky-600 dark:bg-sky-950 dark:text-sky-300'
+  },
+  ADMIN_BOT_TOKEN: {
+    icon: ShieldCheck,
+    gradient: 'from-indigo-500 to-violet-400',
+    iconBg: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300'
+  },
+  ADMIN_CHAT_ID: {
+    icon: MessageSquare,
+    gradient: 'from-teal-500 to-emerald-400',
+    iconBg: 'bg-teal-100 text-teal-600 dark:bg-teal-950 dark:text-teal-300'
+  },
+  MIDTRANS_SERVER_KEY: {
+    icon: KeyRound,
+    gradient: 'from-primary to-amber-400',
+    iconBg: 'bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-300'
+  },
+  MIDTRANS_CLIENT_KEY: {
+    icon: KeyRound,
+    gradient: 'from-amber-500 to-yellow-400',
+    iconBg: 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-300'
   }
 }
 
@@ -80,6 +104,7 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
   const [credentialState, setCredentialState] = useState<Record<CredentialKey, CredentialRowState>>(buildInitialState([]))
   const [showValueMap, setShowValueMap] = useState<Record<CredentialKey, boolean>>({} as Record<CredentialKey, boolean>)
   const [savingKey, setSavingKey] = useState<CredentialKey | null>(null)
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
 
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '')
   const webhookUrl = apiBaseUrl
@@ -90,9 +115,11 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
     const fetchCredentials = async () => {
       if (!token) {
         setCredentialState(buildInitialState([]))
+        setIsInitialLoading(false)
         return
       }
 
+      setIsInitialLoading(true)
       try {
         const credentials = await getBotCredentials(token)
         setCredentialState((prev) => {
@@ -108,6 +135,8 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
         })
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Gagal memuat credential')
+      } finally {
+        setIsInitialLoading(false)
       }
     }
 
@@ -123,6 +152,10 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
       {} as Record<CredentialKey, boolean>
     )
   }, [credentialState])
+
+  const storedCount = useMemo(() => Object.values(keyStatus).filter(Boolean).length, [keyStatus])
+  const totalCount = CREDENTIAL_KEYS.length
+  const progressPercent = Math.round((storedCount / totalCount) * 100)
 
   const toggleShowValue = (key: CredentialKey) => {
     setShowValueMap((prev) => ({
@@ -171,7 +204,7 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
         }))
       }
 
-      toast.success(`Credential ${key} berhasil disimpan`)
+      toast.success(`${CREDENTIAL_HELPERS[key].title} berhasil disimpan`)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Gagal menyimpan credential')
     } finally {
@@ -189,153 +222,256 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-5 transition-all duration-300">
-        <h1 className="text-2xl font-semibold">Bot Credentials</h1>
-        <p className="text-sm text-muted-foreground">
-          Semua credential key ditampilkan langsung di halaman ini dan dapat diedit per item.
-        </p>
-      </div>
-
-      <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-5 transition-all duration-300">
-        <div className="mb-3 flex items-center gap-2 text-blue-600 dark:text-blue-400">
-          <Info className="h-4 w-4" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide">Panduan Setup Wajib</h2>
+    <div className="space-y-10">
+      <header className="animate-in fade-in slide-in-from-top-2 duration-500">
+        <div className="flex items-center gap-2">
+          <div className="h-1 w-8 rounded-full bg-gradient-to-r from-primary to-blue-600" />
+          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Credentials
+          </span>
         </div>
 
-        <div className="space-y-3 text-sm text-muted-foreground">
-          <p>
-            Jika belum punya akun Midtrans, buat akun terlebih dahulu di Midtrans Dashboard sebelum mengisi key pembayaran.
-          </p>
+        <h1 className="mt-4 text-4xl font-black tracking-tight">
+          Kredensial Bot
+        </h1>
+        <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
+          Hubungkan layanan eksternal dengan memasukkan token API dan key yang dibutuhkan bot Anda.
+        </p>
 
-          <ol className="space-y-2 pl-4">
-            <li>
-              1. Untuk sandbox, gunakan simulator pembayaran Midtrans:{' '}
-              <a
-                className="inline-flex items-center gap-1 font-medium text-primary hover:underline transition-colors duration-200"
-                href="https://simulator.sandbox.midtrans.com/"
-                target="_blank"
-                rel="noreferrer">
-                simulator.sandbox.midtrans.com
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-            </li>
-            <li>
-              2. Isi Payment Notification URL di Midtrans Dashboard dengan URL berikut (klik URL atau tombol untuk copy):
-              <div className="mt-2 flex flex-col gap-2 rounded-lg bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-2.5 sm:flex-row sm:items-center sm:justify-between transition-all duration-200">
-                <button
-                  type="button"
-                  onClick={() => void handleCopyWebhookUrl()}
-                  className="truncate text-left font-mono text-xs font-medium text-foreground underline decoration-dotted underline-offset-4 hover:text-primary transition-colors duration-200"
-                  title="Klik untuk copy URL">
-                  {webhookUrl}
-                </button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => void handleCopyWebhookUrl()}
-                  className="w-full shrink-0 sm:w-auto transition-all duration-200 hover:shadow-l1">
-                  <Copy className="h-3.5 w-3.5" />
-                  Copy URL
-                </Button>
-              </div>
-            </li>
-            <li>
-              3. Buka halaman Midtrans Access Keys untuk copy Client Key dan Server Key:{' '}
-              <a
-                className="inline-flex items-center gap-1 font-medium text-primary hover:underline transition-colors duration-200"
-                href="https://dashboard.sandbox.midtrans.com/settings/access-keys"
-                target="_blank"
-                rel="noreferrer">
-                Midtrans Access Keys
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-            </li>
-            <li>4. Untuk production, pastikan ganti semua endpoint/key ke environment production Midtrans.</li>
-          </ol>
+        <div className="mt-6 flex flex-wrap items-center gap-6 rounded-xl border bg-card p-5">
+          <div className="flex items-center gap-3">
+            <div className="relative h-14 w-14">
+              <svg className="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" className="stroke-muted" strokeWidth="3" />
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="15.5"
+                  fill="none"
+                  className="stroke-primary"
+                  strokeWidth="3"
+                  strokeDasharray={`${progressPercent * 0.973} 100`}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke-dasharray 0.6s ease' }}
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">
+                {storedCount}/{totalCount}
+              </span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold">Progress Setup</p>
+              <p className="text-xs text-muted-foreground">
+                {storedCount === 0
+                  ? 'Belum ada kredensial tersimpan'
+                  : storedCount === totalCount
+                    ? 'Semua kredensial lengkap!'
+                    : `${storedCount} dari ${totalCount} tersimpan`}
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden h-10 w-px bg-border sm:block" />
+
+          <div className="flex flex-wrap gap-3">
+            {CREDENTIAL_KEYS.map((key) => {
+              const isStored = keyStatus[key]
+              return (
+                <span
+                  key={key}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ${
+                    isStored
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                  {isStored ? <CheckCircle2 className="h-3 w-3" /> : <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/40" />}
+                  {key === 'TELEGRAM_BOT_TOKEN'
+                    ? 'Bot Customer'
+                    : key === 'ADMIN_BOT_TOKEN'
+                      ? 'Bot Admin'
+                      : key === 'ADMIN_CHAT_ID'
+                        ? 'Chat ID'
+                        : key === 'MIDTRANS_SERVER_KEY'
+                          ? 'Srv Key'
+                          : 'Clt Key'}
+                </span>
+              )
+            })}
+          </div>
+        </div>
+      </header>
+
+      <div
+        className="overflow-hidden rounded-xl border-l-4 border-l-primary bg-gradient-to-r from-orange-50 to-amber-50 p-6 dark:from-orange-950/30 dark:to-amber-950/20"
+        style={{ animation: 'none' }}>
+        <div className="flex items-start gap-3 sm:items-start">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-white shadow-sm">
+            <ExternalLink className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1 space-y-2">
+            <h2 className="text-sm font-bold uppercase tracking-widest">Panduan Setup Midtrans</h2>
+            <ol className="space-y-1 text-sm text-muted-foreground">
+              <li>1. Buat akun di <a className="font-semibold text-primary hover:underline" href="https://dashboard.midtrans.com" target="_blank" rel="noreferrer">Midtrans Dashboard</a> jika belum punya.</li>
+              <li>2. Untuk sandbox, gunakan <a className="font-semibold text-primary hover:underline" href="https://simulator.sandbox.midtrans.com/" target="_blank" rel="noreferrer">simulator.sandbox.midtrans.com</a>.</li>
+              <li>3. Isi Payment Notification URL di dashboard Midtrans dengan URL di bawah ini.</li>
+              <li>4. Buka <a className="font-semibold text-primary hover:underline" href="https://dashboard.sandbox.midtrans.com/settings/access-keys" target="_blank" rel="noreferrer">Midtrans Access Keys</a> untuk mendapatkan Client Key dan Server Key.</li>
+            </ol>
+          </div>
         </div>
       </div>
 
       <div className="space-y-3">
-        {CREDENTIAL_KEYS.map((key) => {
-          const row = credentialState[key]
-          const isSaving = savingKey === key
-          const hasValue = row?.value?.trim().length > 0
-          const isStored = keyStatus[key]
-          const helper = CREDENTIAL_HELPERS[key]
-
-          return (
-            <div
-              key={key}
-              className={[
-                'rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-4 transition-all duration-300',
-                isStored
-                  ? 'bg-green-500/30 dark:bg-green-900/40 border-green-300/40 dark:border-green-800/40'
-                  : 'bg-amber-500/30 dark:bg-amber-900/40 border-amber-300/40 dark:border-amber-800/40'
-              ].join(' ')}>
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <div>
-                  <Label htmlFor={`credential-${key}`} className="font-semibold">
-                    {key}
-                  </Label>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{helper.title}</p>
-                </div>
-                <span
-                  className={[
-                    'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all duration-200',
-                    isStored
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                      : 'bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-300'
-                  ].join(' ')}>
-                  {isStored ? <CheckCircle2 className="h-3.5 w-3.5" /> : <CircleDashed className="h-3.5 w-3.5" />}
-                  {isStored ? 'Tersimpan' : 'Belum tersimpan'}
-                </span>
-              </div>
-
-              <div className="mb-2 rounded-lg bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-2.5 text-xs text-muted-foreground transition-all duration-200">
-                <p>{helper.description}</p>
-                {helper.example ? <p className="mt-1 font-medium text-foreground">{helper.example}</p> : null}
-              </div>
-
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <div className="relative flex-1">
-                  <Input
-                    id={`credential-${key}`}
-                    type={showValueMap[key] ? 'text' : 'password'}
-                    placeholder="Masukkan value credential"
-                    value={row.value}
-                    onChange={(event) => handleChangeValue(key, event.target.value)}
-                    className={[
-                      'transition-all duration-200',
-                      isStored
-                        ? 'border-emerald-300 bg-white/90 dark:border-emerald-800 dark:bg-background'
-                        : 'border-amber-300 bg-white/90 dark:border-amber-800 dark:bg-background'
-                    ].join(' ')}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1 transition-all duration-200 hover:bg-primary/10"
-                    onClick={() => toggleShowValue(key)}>
-                    {showValueMap[key] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
-
-                <Button
-                  type="button"
-                  onClick={() => void handleSave(key)}
-                  disabled={isSaving || !hasValue}
-                  className="transition-all duration-200 hover:shadow-l1">
-                  <Save className="h-4 w-4" />
-                  {isSaving ? 'Menyimpan...' : 'Simpan'}
-                </Button>
-              </div>
-            </div>
-          )
-        })}
+        <div className="flex items-center justify-between gap-4 rounded-xl border bg-card/50 px-5 py-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Payment Notification URL
+            </p>
+            <code
+              className="mt-1 block truncate font-mono text-sm font-medium text-foreground"
+              title={webhookUrl}>
+              {webhookUrl}
+            </code>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => void handleCopyWebhookUrl()}
+            className="shrink-0 gap-1.5">
+            <Copy className="h-3.5 w-3.5" />
+            Salin
+          </Button>
+        </div>
       </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        {isInitialLoading ? (
+          Array.from({ length: totalCount }).map((_, i) => (
+            <Card key={i} className="overflow-hidden border-0 shadow-sm" style={{ animationDelay: `${i * 80}ms` }}>
+              <div className="h-1.5 w-full bg-gradient-to-r from-slate-200 to-slate-300" />
+              <CardContent className="space-y-4 p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <Skeleton className="h-5 w-36" />
+                    <Skeleton className="h-3 w-56" />
+                  </div>
+                  <Skeleton className="h-6 w-20 shrink-0 rounded-full" />
+                </div>
+                <Skeleton className="h-8 w-full rounded-lg" />
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Skeleton className="h-10 flex-1 rounded-lg" />
+                  <Skeleton className="h-10 w-24 shrink-0 rounded-lg" />
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          CREDENTIAL_KEYS.map((key, i) => {
+            const row = credentialState[key]
+            const isSaving = savingKey === key
+            const hasValue = row?.value?.trim().length > 0
+            const isStored = keyStatus[key]
+            const helper = CREDENTIAL_HELPERS[key]
+            const meta = CREDENTIAL_META[key]
+            const Icon = meta.icon
+
+            return (
+              <Card
+                key={key}
+                className="group/card overflow-hidden border-0 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+                style={{
+                  animation: 'fadeInUp 0.4s ease both',
+                  animationDelay: `${i * 80}ms`
+                }}>
+                <div className={`h-1.5 w-full bg-gradient-to-r ${meta.gradient}`} />
+                <CardContent className="space-y-4 p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 flex-1 items-start gap-3">
+                      <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${meta.iconBg}`}>
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate text-sm font-bold">{helper.title}</h3>
+                        <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                          {helper.description}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider transition-all duration-300 ${
+                        isStored
+                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                          : 'bg-muted text-muted-foreground'
+                      }`}>
+                      {isStored ? (
+                        <CheckCircle2 className="h-3 w-3" />
+                      ) : (
+                        <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/40" />
+                      )}
+                      {isStored ? 'Aman' : 'Kosong'}
+                    </span>
+                  </div>
+
+                  {helper.example ? (
+                    <div className="overflow-hidden rounded-lg border bg-muted/30 px-3 py-2">
+                      <code className="block truncate font-mono text-xs text-muted-foreground">
+                        {helper.example}
+                      </code>
+                    </div>
+                  ) : null}
+
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <div className="relative flex-1">
+                      <Input
+                        id={`credential-${key}`}
+                        type={showValueMap[key] ? 'text' : 'password'}
+                        placeholder={`Masukkan ${helper.title.toLowerCase()}`}
+                        value={row.value}
+                        onChange={(event) => handleChangeValue(key, event.target.value)}
+                        className="pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1 h-8 w-8 text-muted-foreground hover:text-foreground"
+                        onClick={() => toggleShowValue(key)}>
+                        {showValueMap[key] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    </div>
+
+                    <Button
+                      type="button"
+                      onClick={() => void handleSave(key)}
+                      disabled={isSaving || !hasValue}
+                      className="shrink-0 gap-1.5 transition-all duration-200 active:scale-[0.97]">
+                      {isSaving ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      ) : (
+                        <Save className="h-4 w-4" />
+                      )}
+                      {isSaving ? 'Simpan...' : 'Simpan'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })
+        )}
+      </div>
+
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   )
 }

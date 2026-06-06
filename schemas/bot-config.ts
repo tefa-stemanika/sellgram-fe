@@ -1,9 +1,6 @@
 import { z } from 'zod'
 
 export const botConfigSchema = z.object({
-  botMode: z.enum(['polling', 'webhook'], {
-    errorMap: () => ({ message: 'Mode harus polling atau webhook' })
-  }),
   aiEnabled: z.boolean(),
   geminiModel: z.enum(['gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-flash-latest'], {
     errorMap: () => ({ message: 'Pilih model Gemini yang valid' })

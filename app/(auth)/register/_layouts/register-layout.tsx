@@ -13,6 +13,7 @@ import { registerSchema } from '@/schemas/auth'
 import { register } from '@/services/user'
 import { setToken } from '@/actions/auth'
 import { toast } from 'sonner'
+import { Bot } from 'lucide-react'
 
 const RegisterLayout = () => {
   const router = useRouter()
@@ -55,100 +56,91 @@ const RegisterLayout = () => {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl p-6 sm:p-8">
-        <div className="mb-8 space-y-2 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Order Bot Dashboard</p>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Buat Akun Baru</h1>
-          <p className="text-sm text-muted-foreground">Mulai kelola bisnis Anda dengan dashboard yang lebih terstruktur.</p>
-        </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 w-full">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Nama bisnis / owner"
-                      {...field}
-                      className="h-10 bg-white/20 backdrop-blur-xl border border-white/20"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="owner@example.com"
-                      {...field}
-                      className="h-10 bg-white/20 backdrop-blur-xl border border-white/20"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Minimal 6 karakter"
-                      {...field}
-                      className="h-10 bg-white/20 backdrop-blur-xl border border-white/20"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Ulangi password"
-                      {...field}
-                      className="h-10 bg-white/20 backdrop-blur-xl border border-white/20"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 p-4">
+      <div className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-blue-200/30 blur-3xl" />
 
-            <div className="space-y-3">
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Memproses...' : 'Daftar'}
-              </Button>
-              <p className="text-sm text-muted-foreground">
-                Sudah punya akun?{' '}
-                <Link href="/login" className="font-medium text-primary hover:underline">
-                  Masuk di sini
-                </Link>
-              </p>
-            </div>
-          </form>
-        </Form>
+      <div className="relative w-full max-w-md">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-blue-600 shadow-lg shadow-primary/20">
+            <Bot className="h-7 w-7 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight">Buat Akun Baru</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Mulai kelola bisnis Anda dengan dashboard yang lebih terstruktur.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nama bisnis / owner" {...field} className="h-10" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="owner@example.com" {...field} className="h-10" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Minimal 6 karakter" {...field} className="h-10" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Ulangi password" {...field} className="h-10" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-3">
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Memproses...' : 'Daftar'}
+                </Button>
+                <p className="text-center text-sm text-muted-foreground">
+                  Sudah punya akun?{' '}
+                  <Link href="/login" className="font-semibold text-primary hover:underline">
+                    Masuk di sini
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </Form>
+        </div>
       </div>
     </div>
   )

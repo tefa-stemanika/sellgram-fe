@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { botConfigSchema, type BotConfigFormValues } from '@/schemas/bot-config'
 
@@ -25,7 +26,6 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
   const form = useForm<BotConfigFormValues>({
     resolver: zodResolver(botConfigSchema),
     defaultValues: {
-      botMode: 'webhook',
       aiEnabled: false,
       geminiModel: 'gemini-2.0-flash',
       midtransIsProduction: false,
@@ -35,27 +35,74 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="midtransIsProduction"
+          name="aiEnabled"
           render={({ field }) => (
-            <FormItem className="rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <FormLabel>Environment Midtrans</FormLabel>
-                  <p className="text-xs text-muted-foreground">Nonaktif berarti Sandbox, aktif berarti Production.</p>
-                </div>
-                <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
+            <FormItem className="flex items-center justify-between rounded-xl border bg-white/20 p-4 backdrop-blur-xl transition-colors hover:bg-white/30 dark:bg-white/5 dark:hover:bg-white/10">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base font-bold">AI Chat</FormLabel>
+                <FormDescription className="text-xs">
+                  Aktifkan AI untuk membalas chat pelanggan secara otomatis menggunakan Gemini.
+                </FormDescription>
               </div>
-              <FormMessage />
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        {form.watch('aiEnabled') && (
+          <FormField
+            control={form.control}
+            name="geminiModel"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>AI Model</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger className="bg-white/20 backdrop-blur-xl border border-white/20">
+                      <SelectValue placeholder="Pilih model Gemini" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {GEMINI_MODELS.map((model) => (
+                      <SelectItem key={model} value={model}>
+                        {model}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription className="text-xs">
+                  Pilih model Google Gemini yang akan digunakan untuk AI chat.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        <FormField
+          control={form.control}
+          name="midtransIsProduction"
+          render={({ field }) => (
+            <FormItem className="flex items-center justify-between rounded-xl border bg-white/20 p-4 backdrop-blur-xl transition-colors hover:bg-white/30 dark:bg-white/5 dark:hover:bg-white/10">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base font-bold">Midtrans Production</FormLabel>
+                <FormDescription className="text-xs">
+                  Nonaktifkan untuk menggunakan environment Sandbox. Aktifkan hanya jika sudah siap production.
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" disabled={isLoading} className="w-full shadow-sm transition-all duration-200 hover:shadow-md">
           {isLoading ? 'Menyimpan...' : 'Simpan Konfigurasi'}
         </Button>
       </form>

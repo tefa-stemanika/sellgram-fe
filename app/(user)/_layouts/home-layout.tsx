@@ -21,7 +21,6 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-  SidebarSeparator,
   useSidebar
 } from '@/components/ui/sidebar'
 import { logout } from '@/services/user'
@@ -33,10 +32,10 @@ type HomeLayoutProps = {
 
 const navigation = [
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { title: 'Order', href: '/orders', icon: ShoppingCart },
   { title: 'Produk', href: '/products', icon: Package },
   { title: 'Bot Config', href: '/bot-config', icon: Settings },
-  { title: 'Credentials', href: '/bot-credentials', icon: KeyRound },
-  { title: 'Order', href: '/orders', icon: ShoppingCart }
+  { title: 'Credentials', href: '/bot-credentials', icon: KeyRound }
 ]
 
 type HomeLayoutContentProps = HomeLayoutProps
@@ -70,55 +69,63 @@ const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
     }
   }
 
+  const navGroups = [
+    {
+      label: 'Menu Utama',
+      items: navigation.slice(0, 3)
+    },
+    {
+      label: 'Pengaturan',
+      items: navigation.slice(3)
+    }
+  ]
+
   return (
     <>
-      <Sidebar className="border-r border-white/20 dark:border-white/10" variant="floating">
-        <SidebarHeader>
-          <div className="rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-lg p-3">
-            <div className="flex items-center gap-2 text-foreground">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <Sparkles className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold leading-tight">Order Bot</p>
-                <p className="text-xs text-sidebar-foreground/70">Control Center</p>
-              </div>
+      <Sidebar collapsible="icon">
+        <SidebarHeader className="p-3">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-3 rounded-lg bg-gradient-to-r from-primary to-blue-600 p-3 transition-all hover:from-primary/90 hover:to-blue-600/90">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-white/20">
+              <Sparkles className="h-5 w-5 text-white" />
             </div>
-          </div>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-bold text-white">Sellgram</span>
+              <span className="truncate text-xs text-white/80">Control Center</span>
+            </div>
+          </Link>
         </SidebarHeader>
-        <SidebarSeparator />
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-[11px] uppercase tracking-[0.15em] text-sidebar-foreground/60">
-              Main Navigation
-            </SidebarGroupLabel>
-            <SidebarMenu>
-              {navigation.map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
-                return (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      className="h-10 rounded-lg transition-all data-[active=true]:shadow-sm data-[active=true]:ring-1 data-[active=true]:ring-sidebar-primary/30">
-                      <Link href={item.href}>
-                        <Icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroup>
+        <SidebarContent>
+          {navGroups.map((group) => (
+            <SidebarGroup key={group.label}>
+              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const Icon = item.icon
+                  const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
+                        <Link href={item.href}>
+                          <Icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroup>
+          ))}
         </SidebarContent>
-        <SidebarSeparator />
-        <SidebarFooter>
+
+        <SidebarFooter className="border-t p-3">
           <Button
             variant="outline"
-            className="h-10 w-full justify-start border-sidebar-border/80 bg-sidebar-accent/30"
+            className="h-10 w-full justify-start text-muted-foreground hover:text-foreground"
             onClick={handleLogout}
             disabled={isLoggingOut}>
             <LogOut />
@@ -128,20 +135,16 @@ const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
       </Sidebar>
 
       <SidebarInset className="bg-transparent">
-        <div className="sticky top-0 z-20 border-b border-white/20 dark:border-white/10 bg-white/20 backdrop-blur-xl px-4 py-3 sm:px-6 md:hidden">
+        <div className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3 sm:px-6 md:hidden">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="h-9 w-9 rounded-md bg-white/20 backdrop-blur-xl border border-white/20" />
-              <p className="text-sm font-semibold">Sellgram Control Center</p>
+              <SidebarTrigger className="h-9 w-9" />
+              <p className="text-sm font-semibold">Sellgram</p>
             </div>
           </div>
         </div>
 
-        <div className="min-h-svh p-4 sm:p-6">
-          <div className="rounded-2xl bg-white/30 backdrop-blur-xl border border-white/20 shadow-2xl p-4 sm:p-6">
-            {children}
-          </div>
-        </div>
+        <div className="min-h-svh p-4 sm:p-6 lg:p-8">{children}</div>
       </SidebarInset>
     </>
   )

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, Bot, CreditCard, KeyRound, LayoutDashboard, Package, ShieldCheck, ShoppingCart } from 'lucide-react'
+import { ArrowRight, Bot, CreditCard, KeyRound, LayoutDashboard, Package, ShieldCheck, ShoppingCart, Sparkles, Zap } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -38,58 +38,68 @@ const features = [
   {
     title: 'Dashboard Operasional Real-time',
     description: 'Pantau performa bisnis dari satu layar: produk aktif, volume order, dan pendapatan terbaru secara cepat.',
-    icon: LayoutDashboard
+    icon: LayoutDashboard,
+    gradient: 'from-primary/10 to-blue-100/50'
   },
   {
     title: 'Manajemen Produk Fleksibel',
     description: 'Tambah, ubah, dan nonaktifkan produk kapan saja dengan alur CRUD yang sederhana untuk tim operasional.',
-    icon: Package
+    icon: Package,
+    gradient: 'from-emerald-50 to-emerald-100/50'
   },
   {
     title: 'Konfigurasi Bot Pintar',
     description:
       'Atur mode bot (polling/webhook), aktifkan AI Gemini, dan sesuaikan environment pembayaran sesuai kebutuhan.',
-    icon: Bot
+    icon: Bot,
+    gradient: 'from-violet-50 to-violet-100/50'
   },
   {
     title: 'Credential Aman',
     description: 'Simpan kunci integrasi Telegram, Gemini, dan Midtrans secara terkelola dengan tampilan yang aman.',
-    icon: KeyRound
+    icon: KeyRound,
+    gradient: 'from-amber-50 to-amber-100/50'
   },
   {
     title: 'Order Tracking End-to-End',
     description:
       'Lihat status order dari pending sampai completed, termasuk detail item dan akses cepat ke link pembayaran.',
-    icon: ShoppingCart
+    icon: ShoppingCart,
+    gradient: 'from-orange-50 to-orange-100/50'
   },
   {
     title: 'Siap Monetisasi',
     description: 'Integrasi Midtrans Sandbox/Production memudahkan bisnis Anda menerima pembayaran lebih cepat.',
-    icon: CreditCard
+    icon: CreditCard,
+    gradient: 'from-cyan-50 to-cyan-100/50'
   }
 ]
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen">
-      <section className="mx-auto max-w-6xl px-6 pb-20 pt-10 md:px-8 md:pb-24 md:pt-14">
-        <header className="rounded-3xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl p-8 md:p-12">
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground">
-            <ShieldCheck className="h-4 w-4" />
-            SAAS Dashboard for Telegram Order Bot
+    <main className="min-h-screen overflow-hidden">
+      <section className="relative mx-auto container px-6 pb-24 pt-16 md:px-8 md:pb-32 md:pt-20">
+        <div className="pointer-events-none absolute -right-60 -top-60 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[120px]" />
+        <div className="pointer-events-none absolute -left-40 top-40 h-[400px] w-[400px] rounded-full bg-blue-200/20 blur-[100px]" />
+
+        <div className="relative">
+          <div className="mx-auto mt-8 max-w-6xl text-center">
+            <h1 className="text-4xl font-black leading-tight tracking-tight md:text-6xl">
+              Kelola order bot bisnis Anda dari{' '}
+              <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                satu dashboard
+              </span>{' '}
+              yang cepat dan intuitif.
+            </h1>
+
+            <p className="mx-auto mt-5 max-w-4xl text-base text-muted-foreground md:text-lg">
+              Platform ini membantu Anda mengatur katalog produk, konfigurasi bot, credential integrasi, dan pelacakan
+              order dalam satu alur kerja terstruktur untuk operasional harian.
+            </p>
           </div>
 
-          <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight tracking-tight md:text-6xl">
-            Kelola order bot bisnis Anda dari satu dashboard yang cepat dan intuitif.
-          </h1>
-
-          <p className="mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
-            Platform ini membantu Anda mengatur katalog produk, konfigurasi bot, credential integrasi, dan pelacakan order
-            dalam satu alur kerja terstruktur untuk operasional harian.
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg" className="gap-2">
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <Button asChild size="lg" className="gap-2 shadow-lg shadow-primary/20">
               <Link href="/register">
                 Mulai Gratis
                 <ArrowRight className="h-4 w-4" />
@@ -102,16 +112,16 @@ export default function LandingPage() {
               <Link href="/dashboard">Lihat App</Link>
             </Button>
           </div>
-        </header>
+        </div>
 
-        <div className="mt-12 grid gap-4 md:mt-16 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => {
             const Icon = feature.icon
             return (
-              <Card key={feature.title} className="bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl">
+              <Card key={feature.title} className="group border-0 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
                 <CardHeader>
-                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl">
-                    <Icon className="h-5 w-5" />
+                  <div className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.gradient}`}>
+                    <Icon className="h-5 w-5 text-foreground" />
                   </div>
                   <CardTitle className="text-lg">{feature.title}</CardTitle>
                 </CardHeader>
@@ -123,14 +133,30 @@ export default function LandingPage() {
           })}
         </div>
 
-        <section className="mt-12 rounded-3xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-2xl p-8 md:mt-16 md:p-10">
-          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Kenapa cocok untuk bisnis Anda?</h2>
-          <div className="mt-5 grid gap-4 text-sm text-muted-foreground md:grid-cols-3">
-            <p>Operasional lebih rapi karena data produk, order, dan konfigurasi bot terpusat dalam satu platform.</p>
-            <p>Tim bisa bergerak lebih cepat dengan UI yang konsisten dan aksi penting yang langsung bisa dieksekusi.</p>
-            <p>Integrasi kunci bisnis Anda tetap aman, sambil tetap fleksibel untuk pertumbuhan layanan ke depan.</p>
+        <div className="mt-16 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
+          <div className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-primary" />
+            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Kenapa Sellgram</span>
           </div>
-        </section>
+          <h2 className="mt-3 text-2xl font-bold tracking-tight md:text-3xl">Cocok untuk bisnis Anda</h2>
+          <div className="mt-6 grid gap-5 text-sm text-muted-foreground md:grid-cols-3">
+            <div className="rounded-xl bg-slate-50 p-5">
+              <div className="mb-2 text-lg">📦</div>
+              <p className="font-medium text-foreground">Data Terpusat</p>
+              <p className="mt-1">Operasional lebih rapi karena data produk, order, dan konfigurasi bot terpusat dalam satu platform.</p>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-5">
+              <div className="mb-2 text-lg">⚡</div>
+              <p className="font-medium text-foreground">Efisiensi Tim</p>
+              <p className="mt-1">Tim bisa bergerak lebih cepat dengan UI yang konsisten dan aksi penting yang langsung bisa dieksekusi.</p>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-5">
+              <div className="mb-2 text-lg">🔒</div>
+              <p className="font-medium text-foreground">Keamanan Terjaga</p>
+              <p className="mt-1">Integrasi kunci bisnis Anda tetap aman, sambil tetap fleksibel untuk pertumbuhan layanan ke depan.</p>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   )

@@ -6,510 +6,242 @@
   .text-balance {
     text-wrap: balance;
   }
-
-  @keyframes ani-glass-background {
-    0% {
-      --c-0: hsla(267, 52%, 83%, 1);
-      --s-start-0: 9%;
-      --s-end-0: 55%;
-      --x-0: 85%;
-      --y-0: 80%;
-      --y-1: 24%;
-      --x-1: 60%;
-      --s-start-1: 5%;
-      --s-end-1: 72%;
-      --c-1: hsla(336, 100%, 82%, 1);
-      --x-2: 13%;
-      --s-start-2: 5%;
-      --s-end-2: 52%;
-      --y-2: 82%;
-      --c-2: hsla(54, 100%, 65%, 0.49);
-      --c-3: hsla(299, 72%, 68%, 1);
-      --x-3: 24%;
-      --s-start-3: 13%;
-      --s-end-3: 68%;
-      --y-3: 7%;
-    }
-
-    100% {
-      --c-0: hsla(267, 52%, 83%, 1);
-      --s-start-0: 9%;
-      --s-end-0: 55%;
-      --x-0: 31%;
-      --y-0: 94%;
-      --y-1: 25%;
-      --x-1: 2%;
-      --s-start-1: 5%;
-      --s-end-1: 72%;
-      --c-1: hsla(337, 82%, 95%, 1);
-      --x-2: 98%;
-      --s-start-2: 5%;
-      --s-end-2: 52%;
-      --y-2: 20%;
-      --c-2: hsla(54, 100%, 65%, 0.49);
-      --c-3: hsla(299, 72%, 68%, 1);
-      --x-3: 95%;
-      --s-start-3: 13%;
-      --s-end-3: 68%;
-      --y-3: 92%;
-    }
-  }
-
-  @property --c-0 {
-    syntax: '<color>';
-    inherits: false;
-    initial-value: hsla(267, 52%, 83%, 1);
-  }
-
-  @property --s-start-0 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 9%;
-  }
-
-  @property --s-end-0 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 55%;
-  }
-
-  @property --x-0 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 85%;
-  }
-
-  @property --y-0 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 80%;
-  }
-
-  @property --y-1 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 24%;
-  }
-
-  @property --x-1 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 60%;
-  }
-
-  @property --s-start-1 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 5%;
-  }
-
-  @property --s-end-1 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 72%;
-  }
-
-  @property --c-1 {
-    syntax: '<color>';
-    inherits: false;
-    initial-value: hsla(336, 100%, 82%, 1);
-  }
-
-  @property --x-2 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 13%;
-  }
-
-  @property --s-start-2 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 5%;
-  }
-
-  @property --s-end-2 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 52%;
-  }
-
-  @property --y-2 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 82%;
-  }
-
-  @property --c-2 {
-    syntax: '<color>';
-    inherits: false;
-    initial-value: hsla(54, 100%, 65%, 0.49);
-  }
-
-  @property --c-3 {
-    syntax: '<color>';
-    inherits: false;
-    initial-value: hsla(299, 72%, 68%, 1);
-  }
-
-  @property --x-3 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 24%;
-  }
-
-  @property --s-start-3 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 13%;
-  }
-
-  @property --s-end-3 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 68%;
-  }
-
-  @property --y-3 {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 7%;
-  }
-
-  #glass-background {
-    --c-0: hsla(267, 52%, 83%, 1);
-    --x-0: 85%;
-    --y-0: 80%;
-    --y-1: 24%;
-    --x-1: 60%;
-    --c-1: hsla(336, 100%, 82%, 1);
-    --x-2: 13%;
-    --y-2: 82%;
-    --c-2: hsla(54, 100%, 65%, 0.49);
-    --c-3: hsla(299, 72%, 68%, 1);
-    --x-3: 24%;
-    --y-3: 7%;
-    background-color: hsla(115, 0%, 100%, 1);
-    background-image:
-      radial-gradient(circle at var(--x-0) var(--y-0), var(--c-0) var(--s-start-0), transparent var(--s-end-0)),
-      radial-gradient(circle at var(--x-1) var(--y-1), var(--c-1) var(--s-start-1), transparent var(--s-end-1)),
-      radial-gradient(circle at var(--x-2) var(--y-2), var(--c-2) var(--s-start-2), transparent var(--s-end-2)),
-      radial-gradient(circle at var(--x-3) var(--y-3), var(--c-3) var(--s-start-3), transparent var(--s-end-3));
-    animation: ani-glass-background 10s linear infinite alternate;
-    background-blend-mode: normal, normal, normal, normal;
-    will-change: transform, opacity;
-    contain: paint;
-  }
-
-  .glass-background-2 {
-    background-color: hsla(259, 100%, 63%, 1);
-    background-image:
-      radial-gradient(circle at 15% 85%, hsla(318, 80%, 97%, 1) 19%, transparent 84%),
-      radial-gradient(circle at 31% 1%, hsla(161, 99%, 84%, 1) 12%, transparent 85%),
-      radial-gradient(circle at 88% 87%, hsla(163, 90%, 78%, 1) 3.6400864520532363%, transparent 75.20902830975928%),
-      radial-gradient(circle at 30% 27%, hsla(314, 91%, 59%, 1) 14%, transparent 90%);
-    background-blend-mode: normal, normal, normal, normal;
-  }
-
-  .background-default {
-    background-color: hsla(0, 0%, 100%, 1);
-    background-image:
-      radial-gradient(circle at 32% 16%, hsla(14, 100%, 64%, 0.33) 17.647148063137625%, transparent 61.5109675345299%),
-      radial-gradient(circle at 75% 1%, hsla(247, 100%, 63%, 0.3) 11.26645584295136%, transparent 63.69587993071477%);
-    background-blend-mode: multiply, multiply;
-  }
-
-  /* Transition utilities */
-  .transition-fast {
-    @apply transition-all duration-100 ease-out;
-  }
-
-  .transition-default {
-    @apply transition-all duration-200 ease-out;
-  }
-
-  .transition-slow {
-    @apply transition-all duration-300 ease-out;
-  }
-
-  /* Glassmorphism utilities */
-  .glass {
-    @apply bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/20 dark:border-white/10;
-  }
-
-  .glass-sm {
-    @apply bg-white/5 dark:bg-black/10 backdrop-blur-lg border border-white/15 dark:border-white/5;
-  }
-
-  .glass-lg {
-    @apply bg-white/15 dark:bg-black/30 backdrop-blur-2xl border border-white/30 dark:border-white/15;
-  }
-
-  /* Shadow depth system - adjusted for glass */
-  .shadow-l1 {
-    @apply shadow-sm;
-  }
-
-  .shadow-l2 {
-    @apply shadow-md;
-  }
-
-  .shadow-l3 {
-    @apply shadow-lg;
-  }
-
-  .shadow-glow {
-    box-shadow: 0 0 0 3px rgb(var(--primary) / 0.1);
-  }
 }
 
 @layer base {
   :root {
-    /* Neutr als: Softer grays for premium feel */
-    --background: 220 20% 97%;
-    --foreground: 220 15% 18%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 15% 18%;
+    --background: 0 0% 100%;
+    --foreground: 220 39% 11%;
+    --card: 0 0% 98%;
+    --card-foreground: 220 39% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 18%;
-
-    /* Primary: Modern vibrant blue (Stripe-inspired) */
-    --primary: 214 100% 47%;
+    --popover-foreground: 220 39% 11%;
+    --primary: 24 95% 53%;
     --primary-foreground: 0 0% 100%;
-
-    /* Secondary: Soft gradient companion */
-    --secondary: 210 100% 47%;
+    --secondary: 221 83% 53%;
     --secondary-foreground: 0 0% 100%;
-
-    /* Accent: Vivid cyan (action/interactive) */
-    --accent: 186 100% 42%;
-    --accent-foreground: 0 0% 100%;
-
-    /* Semantic Colors */
-    --success: 142 71% 45%;
-    --warning: 38 92% 50%;
-    --error: 0 84% 60%;
-    --info: 217 91% 60%;
-
-    /* Subtle Surface & Border */
-    --muted: 220 14% 94%;
-    --muted-foreground: 220 8% 48%;
-    --border: 220 15% 88%;
-    --input: 220 15% 92%;
-    --ring: 214 100% 47%;
-
-    /* Chart colors */
-    --chart-1: 214 100% 47%;
-    --chart-2: 186 100% 42%;
-    --chart-3: 265 58% 56%;
-    --chart-4: 35 92% 52%;
-    --chart-5: 344 72% 52%;
-
-    /* Radius */
-    --radius: 0.75rem;
-
-    /* Sidebar Modern Theme */
-    --sidebar-background: 218 32% 96%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 24 95% 96%;
+    --accent-foreground: 24 95% 31%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 32 92% 44%;
+    --warning-foreground: 0 0% 100%;
+    --error: 0 72% 51%;
+    --info: 221 83% 53%;
+    --info-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 24 95% 53%;
+    --radius: 0.5rem;
+    --chart-1: 24 95% 53%;
+    --chart-2: 221 83% 53%;
+    --chart-3: 142 76% 36%;
+    --chart-4: 32 92% 44%;
+    --chart-5: 0 72% 51%;
+    --sidebar-background: 220 14% 96%;
     --sidebar-foreground: 220 15% 20%;
-    --sidebar-primary: 214 100% 47%;
+    --sidebar-primary: 24 95% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 50% 90%;
+    --sidebar-accent: 24 95% 94%;
     --sidebar-accent-foreground: 220 15% 20%;
-    --sidebar-border: 220 15% 88%;
-    --sidebar-ring: 214 100% 47%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 24 95% 53%;
   }
+
   .dark {
-    /* Dark Mode Neutrals */
     --background: 220 25% 10%;
     --foreground: 220 15% 96%;
     --card: 220 23% 12%;
     --card-foreground: 220 15% 96%;
     --popover: 220 23% 12%;
     --popover-foreground: 220 15% 96%;
-
-    /* Primary: Brighter in dark mode */
     --primary: 214 100% 65%;
     --primary-foreground: 220 25% 10%;
-
-    /* Secondary */
     --secondary: 210 100% 65%;
     --secondary-foreground: 220 25% 10%;
-
-    /* Accent: Bright cyan */
+    --muted: 220 20% 18%;
+    --muted-foreground: 220 10% 60%;
     --accent: 186 100% 55%;
     --accent-foreground: 220 25% 10%;
-
-    /* Semantic Colors */
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 0 0% 100%;
     --success: 142 71% 60%;
+    --success-foreground: 0 0% 100%;
     --warning: 38 92% 60%;
+    --warning-foreground: 0 0% 100%;
     --error: 0 84% 65%;
     --info: 217 91% 70%;
-
-    body {
-      @apply text-foreground;
-      background:
-        radial-gradient(circle at 12% 15%, hsl(210 100% 94% / 0.6), transparent 35%),
-        radial-gradient(circle at 92% 0%, hsl(186 100% 91% / 0.5), transparent 28%),
-        linear-gradient(160deg, hsl(var(--background)), hsl(220 20% 97%));
-      min-height: 100vh;
-    }
-
-    body.dark {
-      background:
-        radial-gradient(circle at 12% 15%, hsl(214 100% 47% / 0.08), transparent 35%),
-        radial-gradient(circle at 92% 0%, hsl(186 100% 55% / 0.06), transparent 28%),
-        linear-gradient(160deg, hsl(var(--background)), hsl(220 25% 11%));
-    }
-
-    ::selection {
-      @apply bg-primary/20 text-foreground;
-    }
-
-    /* Smooth scrolling */
-    html {
-      scroll-behavior: smooth;
-    }
+    --info-foreground: 0 0% 100%;
+    --border: 220 15% 20%;
+    --input: 220 15% 20%;
+    --ring: 214 100% 65%;
+    --chart-1: 214 100% 65%;
+    --chart-2: 186 100% 55%;
+    --chart-3: 265 58% 60%;
+    --chart-4: 35 92% 58%;
+    --chart-5: 344 72% 60%;
+    --sidebar-background: 220 28% 9%;
+    --sidebar-foreground: 220 15% 92%;
+    --sidebar-primary: 214 100% 65%;
+    --sidebar-primary-foreground: 220 25% 10%;
+    --sidebar-accent: 220 15% 20%;
+    --sidebar-accent-foreground: 220 15% 92%;
+    --sidebar-border: 220 15% 30%;
+    --sidebar-ring: 214 100% 65%;
   }
 
-  @layer keyframes {
-    @keyframes fade-in {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-
-    @keyframes fade-out {
-      from {
-        opacity: 1;
-      }
-      to {
-        opacity: 0;
-      }
-    }
-
-    @keyframes slide-in-up {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slide-in-down {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slide-out-up {
-      from {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-    }
-
-    @keyframes pulse-soft {
-      0%,
-      100% {
-        opacity: 0.7;
-      }
-      50% {
-        opacity: 0.4;
-      }
-    }
-
-    @keyframes gradient-shift {
-      0%,
-      100% {
-        background-position: 0% 50%;
-      }
-      50% {
-        background-position: 100% 50%;
-      }
-    }
-
-    @keyframes spin-slow {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
-    }
+  * {
+    @apply border-border;
   }
 
-  @layer utilities {
-    .animate-fade-in {
-      @apply fade-in duration-200;
-    }
-
-    .animate-fade-out {
-      @apply fade-out duration-200;
-    }
-
-    .animate-slide-in-up {
-      animation: slide-in-up 300ms cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .animate-slide-in-down {
-      animation: slide-in-down 300ms cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .animate-pulse-soft {
-      animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    .animate-gradient-shift {
-      background-size: 200% 200%;
-      animation: gradient-shift 15s ease infinite;
-    }
-
-    .animate-spin-slow {
-      animation: spin-slow 2s linear infinite;
-      --chart-4: 35 92% 58%;
-      --chart-5: 344 72% 60%;
-
-      /* Sidebar Dark */
-      --sidebar-background: 220 28% 9%;
-      --sidebar-foreground: 220 15% 92%;
-      --sidebar-primary: 214 100% 65%;
-      --sidebar-primary-foreground: 220 25% 10%;
-      --sidebar-accent: 220 15% 20%;
-      --sidebar-accent-foreground: 220 15% 92%;
-      --sidebar-border: 220 15% 30%;
-      --sidebar-ring: 214 100% 65%;
-    }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-ibm-plex-mono), monospace;
+    background-image:
+      linear-gradient(hsl(var(--primary) / 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--primary) / 0.07) 1px, transparent 1px),
+      radial-gradient(hsl(var(--primary) / 0.2) 1.5px, transparent 1.5px);
+    background-size:
+      48px 48px,
+      48px 48px,
+      48px 48px;
+    background-position:
+      0 0,
+      0 0,
+      24px 24px;
   }
 
-  @layer base {
-    * {
-      @apply border-border;
-    }
-    body {
-      @apply text-foreground;
-      background:
-        radial-gradient(circle at 12% 15%, hsl(210 100% 94% / 0.75), transparent 28%),
-        radial-gradient(circle at 92% 0%, hsl(186 90% 91% / 0.7), transparent 24%),
-        linear-gradient(160deg, hsl(var(--background)), hsl(213 38% 97%));
-      min-height: 100vh;
-    }
+  .dark body {
+    background-image:
+      linear-gradient(hsl(var(--primary) / 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--primary) / 0.08) 1px, transparent 1px),
+      radial-gradient(hsl(var(--primary) / 0.22) 1.5px, transparent 1.5px);
+    background-size:
+      48px 48px,
+      48px 48px,
+      48px 48px;
+    background-position:
+      0 0,
+      0 0,
+      24px 24px;
+  }
 
-    ::selection {
-      background: hsl(var(--primary) / 0.18);
-    }
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+  }
+
+  .animate-fade-out {
+    animation: fade-out 0.2s ease-out;
+  }
+
+  .animate-slide-in-up {
+    animation: slide-in-up 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-slide-in-down {
+    animation: slide-in-down 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-gradient-shift {
+    background-size: 200% 200%;
+    animation: gradient-shift 15s ease infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 2s linear infinite;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-out-up {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
