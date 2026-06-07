@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Bot, Cpu, Globe, Settings2 } from 'lucide-react'
+import { Bot, Globe, Grid3x3, Settings2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -44,7 +44,7 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
 
     setIsLoading(true)
     try {
-      const payload: BotConfigPayload = { ...values, botMode: 'webhook' }
+      const payload: BotConfigPayload = { mode: values.mode, midtransIsProduction: values.midtransIsProduction }
 
       if (!config) {
         const created = await createBotConfig(token, payload)
@@ -65,20 +65,12 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
   const overviewCards = config
     ? [
         {
-          title: 'AI Status',
-          value: config.aiEnabled ? 'Aktif' : 'Nonaktif',
-          icon: Cpu,
-          gradient: config.aiEnabled ? 'from-emerald-500 to-emerald-600' : 'from-slate-400 to-slate-500',
-          iconBg: config.aiEnabled ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
-          desc: config.aiEnabled ? `Model: ${config.geminiModel}` : 'AI tidak digunakan'
-        },
-        {
-          title: 'AI Model',
-          value: config.geminiModel,
-          icon: Bot,
-          gradient: 'from-violet-500 to-violet-600',
-          iconBg: 'bg-violet-100 text-violet-600 dark:bg-violet-900/40 dark:text-violet-300',
-          desc: 'Google Gemini model untuk AI'
+          title: 'Mode Operasi',
+          value: config.mode === 'AI' ? 'AI' : 'Button',
+          icon: config.mode === 'AI' ? Bot : Grid3x3,
+          gradient: config.mode === 'AI' ? 'from-violet-500 to-purple-600' : 'from-cyan-500 to-teal-600',
+          iconBg: config.mode === 'AI' ? 'bg-violet-100 text-violet-600 dark:bg-violet-900/40 dark:text-violet-300' : 'bg-cyan-100 text-cyan-600 dark:bg-cyan-900/40 dark:text-cyan-300',
+          desc: config.mode === 'AI' ? 'AI membalas chat otomatis' : 'Pelanggan pilih dari opsi'
         },
         {
           title: 'Midtrans',
@@ -108,15 +100,15 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
           </span>
         </h1>
         <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Atur mode operasi, kecerdasan buatan, dan environment pembayaran bot Anda.
+          Atur mode operasi dan environment pembayaran bot Anda.
         </p>
       </header>
 
       <div
-        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        className="grid gap-4 sm:grid-cols-2"
         style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.1s' }}>
         {isLoading && !config
-          ? Array.from({ length: 3 }).map((_, i) => (
+          ? Array.from({ length: 2 }).map((_, i) => (
               <Card key={i} className="overflow-hidden border-0 shadow-sm">
                 <div className="h-1.5 w-full bg-gradient-to-r from-slate-200 to-slate-300" />
                 <CardContent className="p-5">
@@ -155,9 +147,9 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
                   </Card>
                 )
               })
-            : (
+                            : (
               <Card
-                className="col-span-full overflow-hidden border-0 shadow-sm"
+                className="sm:col-span-2 overflow-hidden border-0 shadow-sm"
                 style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.15s' }}>
                 <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 to-cyan-600" />
                 <CardContent className="flex items-center gap-3 bg-gradient-to-r from-blue-50/50 to-cyan-50/50 p-5 dark:from-blue-950/20 dark:to-cyan-950/20">
@@ -195,11 +187,10 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
             <BotConfigForm
               defaultValues={
                 config
-                  ? {
-                      aiEnabled: config.aiEnabled,
-                      geminiModel: config.geminiModel,
-                      midtransIsProduction: config.midtransIsProduction
-                    }
+                    ? {
+                        mode: config.mode,
+                        midtransIsProduction: config.midtransIsProduction
+                      }
                   : undefined
               }
               onSubmit={handleSubmit}

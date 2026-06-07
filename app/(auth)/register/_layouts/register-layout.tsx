@@ -56,7 +56,7 @@ const RegisterLayout = () => {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 p-4">
+    <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden p-4">
       <div className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-blue-200/30 blur-3xl" />
 

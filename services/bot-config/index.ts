@@ -2,9 +2,7 @@ import { fetcher } from '../fetcher'
 
 export type BotConfig = {
   id: number
-  botMode: 'polling' | 'webhook'
-  aiEnabled: boolean
-  geminiModel: 'gemini-2.0-flash' | 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-flash-latest'
+  mode: 'AI' | 'BUTTON'
   midtransIsProduction: boolean
   isActive: boolean
   createdAt: string
@@ -12,9 +10,7 @@ export type BotConfig = {
 }
 
 export type BotConfigPayload = {
-  botMode?: 'polling' | 'webhook'
-  aiEnabled?: boolean
-  geminiModel?: 'gemini-2.0-flash' | 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-flash-latest'
+  mode?: 'AI' | 'BUTTON'
   midtransIsProduction?: boolean
 }
 

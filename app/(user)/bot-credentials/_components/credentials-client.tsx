@@ -24,6 +24,7 @@ type CredentialsClientProps = {
 type CredentialRowState = {
   id?: number
   value: string
+  stored: boolean
 }
 
 const CREDENTIAL_HELPERS: Record<CredentialKey, { title: string; description: string; example?: string }> = {
@@ -45,14 +46,31 @@ const CREDENTIAL_HELPERS: Record<CredentialKey, { title: string; description: st
       'Dipakai untuk menerima notifikasi order masuk/berhasil. Ambil dari Telegram Web > Saved Messages, lalu lihat angka chat ID di URL.',
     example: '7217964120'
   },
-  MIDTRANS_SERVER_KEY: {
-    title: 'Midtrans Server Key',
-    description: 'Wajib untuk membuat transaksi dari backend. Ambil dari Midtrans Dashboard > Settings > Access Keys.'
-  },
-  MIDTRANS_CLIENT_KEY: {
-    title: 'Midtrans Client Key',
+  MIDTRANS_SERVER_KEY_SANDBOX: {
+    title: 'Midtrans Server Key (Sandbox)',
     description:
-      'Digunakan untuk proses pembayaran dari sisi frontend/client. Ambil dari halaman Access Keys yang sama dengan Server Key.'
+      'Server Key untuk environment sandbox. Ambil dari Midtrans Dashboard > Settings > Access Keys > Sandbox.'
+  },
+  MIDTRANS_CLIENT_KEY_SANDBOX: {
+    title: 'Midtrans Client Key (Sandbox)',
+    description:
+      'Client Key untuk environment sandbox. Digunakan dari sisi frontend saat mode pengembangan. Ambil dari halaman Access Keys > Sandbox.'
+  },
+  MIDTRANS_SERVER_KEY_PRODUCTION: {
+    title: 'Midtrans Server Key (Production)',
+    description:
+      'Server Key untuk environment production. Wajib untuk membuat transaksi nyata. Ambil dari Midtrans Dashboard > Settings > Access Keys > Production.'
+  },
+  MIDTRANS_CLIENT_KEY_PRODUCTION: {
+    title: 'Midtrans Client Key (Production)',
+    description:
+      'Client Key untuk environment production. Digunakan dari sisi frontend untuk pembayaran sungguhan. Ambil dari halaman Access Keys > Production.'
+  },
+  MIDTRANS_FINISH_URL: {
+    title: 'Midtrans Finish URL',
+    description:
+      'URL redirect setelah pembayaran selesai (sukses/gagal). Isi dengan URL halaman sukses aplikasi Anda.',
+    example: 'https://domain-anda.com/payment/success'
   }
 }
 
@@ -72,15 +90,30 @@ const CREDENTIAL_META: Record<CredentialKey, { icon: typeof Bot; gradient: strin
     gradient: 'from-teal-500 to-emerald-400',
     iconBg: 'bg-teal-100 text-teal-600 dark:bg-teal-950 dark:text-teal-300'
   },
-  MIDTRANS_SERVER_KEY: {
+  MIDTRANS_SERVER_KEY_SANDBOX: {
     icon: KeyRound,
-    gradient: 'from-primary to-amber-400',
+    gradient: 'from-amber-400 to-yellow-300',
+    iconBg: 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-300'
+  },
+  MIDTRANS_CLIENT_KEY_SANDBOX: {
+    icon: KeyRound,
+    gradient: 'from-yellow-400 to-orange-300',
+    iconBg: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-950 dark:text-yellow-300'
+  },
+  MIDTRANS_SERVER_KEY_PRODUCTION: {
+    icon: KeyRound,
+    gradient: 'from-primary to-amber-500',
     iconBg: 'bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-300'
   },
-  MIDTRANS_CLIENT_KEY: {
+  MIDTRANS_CLIENT_KEY_PRODUCTION: {
     icon: KeyRound,
-    gradient: 'from-amber-500 to-yellow-400',
-    iconBg: 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-300'
+    gradient: 'from-rose-500 to-pink-400',
+    iconBg: 'bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-300'
+  },
+  MIDTRANS_FINISH_URL: {
+    icon: ExternalLink,
+    gradient: 'from-slate-500 to-gray-400',
+    iconBg: 'bg-slate-100 text-slate-600 dark:bg-slate-950 dark:text-slate-300'
   }
 }
 
@@ -92,7 +125,8 @@ const buildInitialState = (credentials: BotCredential[]): Record<CredentialKey, 
       const existing = existingByKey.get(key)
       acc[key] = {
         id: existing?.id,
-        value: ''
+        value: '',
+        stored: Boolean(existing?.value)
       }
       return acc
     },
@@ -146,7 +180,7 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
   const keyStatus = useMemo(() => {
     return CREDENTIAL_KEYS.reduce(
       (acc, key) => {
-        acc[key] = Boolean(credentialState[key]?.id)
+        acc[key] = credentialState[key]?.stored ?? false
         return acc
       },
       {} as Record<CredentialKey, boolean>
@@ -199,7 +233,8 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
           ...prev,
           [key]: {
             id: created.id,
-            value
+            value,
+            stored: true
           }
         }))
       }
@@ -291,9 +326,15 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
                       ? 'Bot Admin'
                       : key === 'ADMIN_CHAT_ID'
                         ? 'Chat ID'
-                        : key === 'MIDTRANS_SERVER_KEY'
-                          ? 'Srv Key'
-                          : 'Clt Key'}
+                        : key === 'MIDTRANS_SERVER_KEY_SANDBOX'
+                          ? 'Srv Sbx'
+                          : key === 'MIDTRANS_CLIENT_KEY_SANDBOX'
+                            ? 'Clt Sbx'
+                            : key === 'MIDTRANS_SERVER_KEY_PRODUCTION'
+                              ? 'Srv Prd'
+                              : key === 'MIDTRANS_CLIENT_KEY_PRODUCTION'
+                                ? 'Clt Prd'
+                                : 'Finish URL'}
                 </span>
               )
             })}
@@ -321,7 +362,7 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
       </div>
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between gap-4 rounded-xl border bg-card/50 px-5 py-3">
+        <div className="flex items-center justify-between gap-4 rounded-xl border bg-card px-5 py-3">
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Payment Notification URL

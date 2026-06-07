@@ -3,6 +3,7 @@ import { fetcher } from '../fetcher'
 export type BotCredential = {
   id: number
   key: string
+  value: string | null
   createdAt: string
   updatedAt: string
 }

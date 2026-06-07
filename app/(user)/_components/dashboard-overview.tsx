@@ -1,15 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Activity, ArrowUpRight, Boxes, HandCoins, ShoppingCart, TrendingUp } from 'lucide-react'
+import { Activity, Boxes, HandCoins, ShoppingCart, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatDate, formatIDRCurrency } from '@/lib/utils'
-import { getOrders, type Order } from '@/services/orders'
-import { getProducts, type Product } from '@/services/products'
+import { getDashboard, type DashboardData } from '@/services/dashboard'
 
 type DashboardOverviewProps = {
   token: string
@@ -26,24 +25,21 @@ const statusBadge: Record<string, string> = {
 }
 
 export function DashboardOverview({ token }: DashboardOverviewProps) {
-  const [products, setProducts] = useState<Product[]>([])
-  const [recentOrders, setRecentOrders] = useState<Order[]>([])
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       if (!token) {
-        setProducts([])
-        setRecentOrders([])
+        setDashboard(null)
         setIsLoading(false)
         return
       }
 
       setIsLoading(true)
       try {
-        const [productsData, ordersData] = await Promise.all([getProducts(token), getOrders(token, 5)])
-        setProducts(productsData)
-        setRecentOrders(ordersData)
+        const data = await getDashboard(token)
+        setDashboard(data)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Gagal memuat ringkasan dashboard')
       } finally {
@@ -54,37 +50,34 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
     void fetchData()
   }, [token])
 
-  const activeProducts = products.filter((product) => product.isAvailable).length
-  const totalOrders = recentOrders.length
-  const totalRevenue = recentOrders
-    .filter((order) => order.status === 'COMPLETED')
-    .reduce((acc, order) => acc + order.totalPrice, 0)
-  const pendingOrders = recentOrders.filter(
-    (order) => order.status === 'PENDING' || order.status === 'PAYMENT_PENDING'
-  ).length
-  const prevRevenue = 0
-  const revenueChange = totalRevenue > 0 ? 100 : 0
+  const revenueBadge = dashboard
+    ? dashboard.revenueChange.trend === 'up'
+      ? `+${dashboard.revenueChange.percentage}% dari bulan lalu`
+      : dashboard.revenueChange.trend === 'down'
+        ? `${dashboard.revenueChange.percentage}% dari bulan lalu`
+        : 'Stabil'
+    : ''
 
   const metricCards = [
     {
       title: 'Produk Aktif',
-      value: activeProducts,
+      value: dashboard?.activeProducts ?? 0,
       icon: Boxes,
       gradient: 'from-emerald-500 to-emerald-600',
       iconBg: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300',
-      badge: `${activeProducts} total`
+      badge: `${dashboard?.activeProducts ?? 0} total`
     },
     {
       title: 'Total Order',
-      value: totalOrders,
+      value: dashboard?.totalOrders ?? 0,
       icon: ShoppingCart,
       gradient: 'from-blue-500 to-blue-600',
       iconBg: 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300',
-      badge: '5 terbaru'
+      badge: 'total keseluruhan'
     },
     {
       title: 'Pending',
-      value: pendingOrders,
+      value: dashboard?.pendingOrders ?? 0,
       icon: Activity,
       gradient: 'from-amber-500 to-amber-600',
       iconBg: 'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300',
@@ -92,11 +85,11 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
     },
     {
       title: 'Pendapatan',
-      value: formatIDRCurrency(totalRevenue),
+      value: formatIDRCurrency(dashboard?.totalRevenue ?? 0),
       icon: HandCoins,
       gradient: 'from-primary to-purple-600',
       iconBg: 'bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-300',
-      badge: revenueChange > 0 ? `${revenueChange}% dari sebelumnya` : 'belum ada data'
+      badge: dashboard ? revenueBadge : 'belum ada data'
     }
   ]
 
@@ -178,7 +171,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
             </div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
               <TrendingUp className="h-3 w-3" />
-              {recentOrders.length} order
+              {dashboard?.recentOrders.length ?? 0} order
             </span>
           </div>
           <Table>
@@ -202,8 +195,8 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
                     <TableCell className="pr-6"><Skeleton className="h-4 w-20" /></TableCell>
                   </TableRow>
                 ))
-              ) : recentOrders.length ? (
-                recentOrders.map((order, i) => (
+              ) : dashboard?.recentOrders.length ? (
+                dashboard.recentOrders.map((order, i) => (
                   <TableRow
                     key={order.id}
                     className="transition-colors hover:bg-muted/50"
