@@ -1,6 +1,6 @@
 'use client'
 
-import { ExternalLink, Hash, PackageOpen, User } from 'lucide-react'
+import { ExternalLink, Hash, PackageOpen, Phone, User } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -37,22 +37,41 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
           {!order ? null : (
             <div className="mt-5 space-y-5 text-sm">
               <div className="grid gap-3 md:grid-cols-2">
-                <InfoCard
-                  icon={User}
-                  label="Nama"
-                  value={order.firstName ?? '-'}
-                  gradient="from-blue-500 to-cyan-600"
-                />
-                <InfoCard
-                  icon={User}
-                  label="Username"
-                  value={order.username ?? '-'}
-                  gradient="from-cyan-500 to-teal-600"
-                />
+                {order.source === 'WEBSITE' ? (
+                  <>
+                    <InfoCard
+                      icon={User}
+                      label="Nama Customer"
+                      value={order.customerName ?? '-'}
+                      gradient="from-blue-500 to-cyan-600"
+                    />
+                    <InfoCard
+                      icon={Phone}
+                      label="No. WhatsApp"
+                      value={order.customerPhone ?? '-'}
+                      gradient="from-cyan-500 to-teal-600"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <InfoCard
+                      icon={User}
+                      label="Nama"
+                      value={order.firstName ?? '-'}
+                      gradient="from-blue-500 to-cyan-600"
+                    />
+                    <InfoCard
+                      icon={User}
+                      label="Username"
+                      value={order.username ?? '-'}
+                      gradient="from-cyan-500 to-teal-600"
+                    />
+                  </>
+                )}
                 <InfoCard
                   icon={Hash}
                   label="Telegram ID"
-                  value={order.telegramId}
+                  value={order.telegramId ?? '-'}
                   gradient="from-teal-500 to-emerald-600"
                 />
                 <InfoCard

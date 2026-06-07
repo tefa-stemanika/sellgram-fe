@@ -11,6 +11,16 @@ order-bot-dashboard
 ├─ actions
 │  └─ auth.ts
 ├─ app
+│  ├─ (public)
+│  │  └─ store
+│  │     └─ [userId]
+│  │        ├─ order
+│  │        │  └─ [orderId]
+│  │        │     └─ page.tsx
+│  │        ├─ product
+│  │        │  └─ [productId]
+│  │        │     └─ page.tsx
+│  │        └─ page.tsx
 │  ├─ payment
 │  │  └─ success
 │  │     ├─ _components
@@ -142,6 +152,8 @@ order-bot-dashboard
 │  ├─ products.ts
 │  └─ user.ts
 ├─ services
+│  ├─ public
+│  │  └─ index.ts
 │  ├─ bot-config
 │  │  └─ index.ts
 │  ├─ bot-credentials

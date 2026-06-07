@@ -4,6 +4,7 @@ import { isTokenExpired } from './services/user'
 import { removeToken } from './actions/auth'
 
 const PUBLIC_ROUTES = ['/']
+const PUBLIC_PREFIXES = ['/store', '/payment']
 const AUTH_ROUTES = ['/login', '/register']
 
 export async function proxy(request: NextRequest) {
@@ -11,9 +12,10 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname)
+  const isPublicPrefixRoute = PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route))
 
-  if (!token && !isPublicRoute && !isAuthRoute) {
+  if (!token && !isPublicRoute && !isPublicPrefixRoute && !isAuthRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 

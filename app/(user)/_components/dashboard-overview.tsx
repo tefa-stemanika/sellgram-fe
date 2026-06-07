@@ -1,14 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Activity, Boxes, HandCoins, ShoppingCart, TrendingUp } from 'lucide-react'
+import { Activity, Boxes, Copy, Globe, HandCoins, MessageCircle, ShoppingCart, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
 import { formatDate, formatIDRCurrency } from '@/lib/utils'
 import { getDashboard, type DashboardData } from '@/services/dashboard'
+import { getCurrentUser } from '@/services/user'
 
 type DashboardOverviewProps = {
   token: string
@@ -26,7 +28,9 @@ const statusBadge: Record<string, string> = {
 
 export function DashboardOverview({ token }: DashboardOverviewProps) {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null)
+  const [userId, setUserId] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [linkCopied, setLinkCopied] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,8 +42,12 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
 
       setIsLoading(true)
       try {
-        const data = await getDashboard(token)
+        const [data, user] = await Promise.all([
+          getDashboard(token),
+          getCurrentUser(token)
+        ])
         setDashboard(data)
+        setUserId(user.id)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Gagal memuat ringkasan dashboard')
       } finally {
@@ -156,6 +164,120 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
             })}
       </div>
 
+      {!isLoading && dashboard && (
+        <div
+          className="grid gap-4 sm:grid-cols-2"
+          style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.15s' }}>
+          <Card className="overflow-hidden border-0 shadow-sm">
+            <div className="h-1.5 w-full bg-gradient-to-r from-sky-500 to-blue-600" />
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Globe className="size-4" />
+                Sumber Order
+              </div>
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Globe className="size-4 text-sky-600" />
+                    <span className="text-sm font-medium">Website</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold">{dashboard.ordersBySource.WEBSITE}</span>
+                    <span className="text-xs text-muted-foreground">
+                      ({dashboard.totalOrders > 0
+                        ? Math.round((dashboard.ordersBySource.WEBSITE / dashboard.totalOrders) * 100)
+                        : 0}
+                      %)
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="size-4 text-emerald-600" />
+                    <span className="text-sm font-medium">Telegram</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold">{dashboard.ordersBySource.TELEGRAM}</span>
+                    <span className="text-xs text-muted-foreground">
+                      ({dashboard.totalOrders > 0
+                        ? Math.round((dashboard.ordersBySource.TELEGRAM / dashboard.totalOrders) * 100)
+                        : 0}
+                      %)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="overflow-hidden border-0 shadow-sm">
+            <div className="h-1.5 w-full bg-gradient-to-r from-primary to-purple-600" />
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <HandCoins className="size-4" />
+                Pendapatan per Sumber
+              </div>
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Globe className="size-4 text-sky-600" />
+                    <span className="text-sm font-medium">Website</span>
+                  </div>
+                  <span className="text-lg font-bold">{formatIDRCurrency(dashboard.revenueBySource.WEBSITE)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="size-4 text-emerald-600" />
+                    <span className="text-sm font-medium">Telegram</span>
+                  </div>
+                  <span className="text-lg font-bold">{formatIDRCurrency(dashboard.revenueBySource.TELEGRAM)}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {userId && (
+        <Card
+          className="overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-md"
+          style={{
+            animation: 'fadeInUp 0.4s ease both',
+            animationDelay: '0.2s'
+          }}>
+          <div className="h-1.5 w-full bg-gradient-to-r from-primary to-blue-600" />
+          <CardContent className="p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-muted-foreground">Tautan Toko Publik</p>
+                <p className="mt-1 truncate text-sm font-semibold text-foreground">
+                  {typeof window !== 'undefined' ? `${window.location.origin}/store/${userId}` : ''}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground/70">
+                Bagikan tautan ini agar customer bisa order lewat website
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0 gap-2"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${window.location.origin}/store/${userId}`
+                  )
+                  setLinkCopied(true)
+                  toast.success('Tautan berhasil disalin')
+                  setTimeout(() => setLinkCopied(false), 2000)
+                }}
+                disabled={linkCopied}
+              >
+                <Copy className="h-4 w-4" />
+                {linkCopied ? 'Tersalin' : 'Salin Tautan'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card
         className="overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-md"
         style={{
@@ -178,6 +300,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
             <TableHeader>
               <TableRow>
                 <TableHead className="pl-6">Order ID</TableHead>
+                <TableHead>Sumber</TableHead>
                 <TableHead>Pelanggan</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Total</TableHead>
@@ -187,13 +310,14 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="pl-6"><Skeleton className="h-4 w-28" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="ml-auto h-4 w-16" /></TableCell>
-                    <TableCell className="pr-6"><Skeleton className="h-4 w-20" /></TableCell>
-                  </TableRow>
+                    <TableRow key={i}>
+                      <TableCell className="pl-6"><Skeleton className="h-4 w-28" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-14 rounded-full" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
+                      <TableCell className="text-right"><Skeleton className="ml-auto h-4 w-16" /></TableCell>
+                      <TableCell className="pr-6"><Skeleton className="h-4 w-20" /></TableCell>
+                    </TableRow>
                 ))
               ) : dashboard?.recentOrders.length ? (
                 dashboard.recentOrders.map((order, i) => (
@@ -205,7 +329,20 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
                       animationDelay: `${0.4 + i * 0.05}s`
                     }}>
                     <TableCell className="pl-6 font-mono text-xs font-medium">{order.orderId}</TableCell>
-                    <TableCell className="font-medium">{order.firstName ?? order.username ?? '-'}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${
+                          order.source === 'WEBSITE'
+                            ? 'border-sky-200 bg-sky-100 text-sky-700 dark:border-sky-900/40 dark:bg-sky-900/40 dark:text-sky-300'
+                            : 'border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-900/40 dark:text-emerald-300'
+                        }`}>
+                        {order.source === 'WEBSITE' ? <Globe className="size-3" /> : <MessageCircle className="size-3" />}
+                        {order.source === 'WEBSITE' ? 'Web' : 'Tele'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {order.customerName ?? order.firstName ?? order.username ?? '-'}
+                    </TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusBadge[order.status] || 'bg-gray-100 text-gray-700 border-gray-200'}`}>
@@ -222,7 +359,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
                     <div className="flex flex-col items-center gap-1">
                       <ShoppingCart className="h-8 w-8 text-muted-foreground/40" />
                       <p>Belum ada order.</p>

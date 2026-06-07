@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { Eye } from 'lucide-react'
+import { Eye, Globe, MessageCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { formatDate, formatIDRCurrency } from '@/lib/utils'
@@ -29,11 +29,31 @@ export function getOrderColumns({ onDetail }: OrderColumnsOptions): ColumnDef<Or
       cell: ({ row }) => <span className="font-mono text-xs font-medium">{row.original.orderId}</span>
     },
     {
+      id: 'source',
+      header: 'Sumber',
+      cell: ({ row }) => {
+        const isWebsite = row.original.source === 'WEBSITE'
+        return (
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+              isWebsite
+                ? 'border-sky-200 bg-sky-100 text-sky-700 dark:border-sky-900/40 dark:bg-sky-900/40 dark:text-sky-300'
+                : 'border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-900/40 dark:text-emerald-300'
+            }`}>
+            {isWebsite ? <Globe className="size-3.5" /> : <MessageCircle className="size-3.5" />}
+            {isWebsite ? 'Website' : 'Telegram'}
+          </span>
+        )
+      }
+    },
+    {
       id: 'customer',
       header: 'Pelanggan',
-      cell: ({ row }) => (
-        <span className="font-medium">{row.original.firstName ?? row.original.username ?? '-'}</span>
-      )
+      cell: ({ row }) => {
+        const o = row.original
+        const name = o.source === 'WEBSITE' ? o.customerName : (o.firstName ?? o.username)
+        return <span className="font-medium">{name ?? '-'}</span>
+      }
     },
     {
       accessorKey: 'totalPrice',

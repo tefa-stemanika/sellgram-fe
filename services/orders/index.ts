@@ -40,9 +40,12 @@ export type Order = {
   id: number
   userId: number
   orderId: string
-  telegramId: string
+  source: string
+  telegramId: string | null
   username: string | null
   firstName: string | null
+  customerName: string | null
+  customerPhone: string | null
   totalPrice: number
   status: OrderStatus
   paymentUrl: string | null
