@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { KeyRound, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Sparkles } from 'lucide-react'
+import { KeyRound, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Sparkles, TicketCheck } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { removeToken } from '@/actions/auth'
@@ -34,6 +34,7 @@ const navigation = [
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { title: 'Order', href: '/orders', icon: ShoppingCart },
   { title: 'Produk', href: '/products', icon: Package },
+  { title: 'Tiket', href: '/tickets', icon: TicketCheck },
   { title: 'Bot Config', href: '/bot-config', icon: Settings },
   { title: 'Credentials', href: '/bot-credentials', icon: KeyRound }
 ]
@@ -144,7 +145,7 @@ const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
           </div>
         </div>
 
-        <div className="min-h-svh p-4 sm:p-6 lg:p-8">{children}</div>
+        <div className="flex flex-1 min-h-0 min-w-0 flex-col p-4 sm:p-6 lg:p-8">{children}</div>
       </SidebarInset>
     </>
   )

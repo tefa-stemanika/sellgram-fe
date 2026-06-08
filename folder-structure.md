@@ -74,6 +74,13 @@ order-bot-dashboard
 │  │  │  │  └─ products-client.tsx
 │  │  │  └─ page.tsx
 │  │  └─ types.ts
+│  ├─ tickets
+│  │  ├─ _components
+│  │  │  ├─ ticket-card.tsx
+│  │  │  ├─ ticket-detail-dialog.tsx
+│  │  │  ├─ tickets-board.tsx
+│  │  │  └─ tickets-client.tsx
+│  │  └─ page.tsx
 │  ├─ _components
 │  │  └─ theme-provider.tsx
 │  ├─ favicon.ico
