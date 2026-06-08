@@ -1,10 +1,5 @@
 import { fetcher } from '../fetcher'
 
-export type DashboardRevenueChange = {
-  percentage: number
-  trend: 'up' | 'down' | 'stable'
-}
-
 export type DashboardOrder = {
   id: string
   orderId: string
@@ -23,7 +18,7 @@ export type DashboardData = {
   totalOrders: number
   pendingOrders: number
   totalRevenue: number
-  revenueChange: DashboardRevenueChange
+  revenueGrowth: number
   ordersBySource: {
     TELEGRAM: number
     WEBSITE: number
@@ -33,6 +28,11 @@ export type DashboardData = {
     WEBSITE: number
   }
   recentOrders: DashboardOrder[]
+  tickets: {
+    total: number
+    open: number
+    closed: number
+  }
 }
 
 export async function getDashboard(token: string): Promise<DashboardData> {

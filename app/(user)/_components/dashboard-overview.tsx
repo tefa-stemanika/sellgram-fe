@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Activity, Boxes, Copy, Globe, HandCoins, MessageCircle, ShoppingCart, TrendingUp } from 'lucide-react'
+import { Activity, Boxes, Copy, Globe, HandCoins, MessageCircle, ShoppingCart, TicketCheck, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -58,14 +58,6 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
     void fetchData()
   }, [token])
 
-  const revenueBadge = dashboard
-    ? dashboard.revenueChange.trend === 'up'
-      ? `+${dashboard.revenueChange.percentage}% dari bulan lalu`
-      : dashboard.revenueChange.trend === 'down'
-        ? `${dashboard.revenueChange.percentage}% dari bulan lalu`
-        : 'Stabil'
-    : ''
-
   const metricCards = [
     {
       title: 'Produk Aktif',
@@ -97,7 +89,15 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
       icon: HandCoins,
       gradient: 'from-primary to-purple-600',
       iconBg: 'bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-300',
-      badge: dashboard ? revenueBadge : 'belum ada data'
+      badge: dashboard ? `+${dashboard.revenueGrowth}% pertumbuhan` : 'belum ada data'
+    },
+    {
+      title: 'Tiket',
+      value: dashboard?.tickets.total ?? 0,
+      icon: TicketCheck,
+      gradient: 'from-rose-500 to-pink-600',
+      iconBg: 'bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-300',
+      badge: dashboard ? `${dashboard.tickets.open} terbuka, ${dashboard.tickets.closed} tertutup` : 'belum ada data'
     }
   ]
 
@@ -122,9 +122,9 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
         </p>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => (
+          ? Array.from({ length: 5 }).map((_, i) => (
               <Card key={i} className="overflow-hidden border-0 shadow-sm" style={{ animationDelay: `${i * 80}ms` }}>
                 <div className="h-1.5 w-full bg-gradient-to-r from-slate-200 to-slate-300" />
                 <CardContent className="p-5">
