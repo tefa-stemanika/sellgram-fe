@@ -7,6 +7,10 @@ export type Product = {
   price: number
   emoji: string
   isAvailable: boolean
+  stock: number
+  stockEnabled: boolean
+  allowOversell: boolean
+  lowStockAlert: number
   createdAt: string
   updatedAt: string
 }
@@ -16,6 +20,10 @@ export type CreateProductPayload = {
   description: string
   price: number
   emoji: string
+  stock?: number
+  stockEnabled?: boolean
+  allowOversell?: boolean
+  lowStockAlert?: number
 }
 
 export type UpdateProductPayload = Partial<CreateProductPayload> & {
@@ -95,4 +103,67 @@ export async function deleteProduct(token: string, id: number): Promise<void> {
     method: 'DELETE',
     token
   })
+}
+
+export type StockLog = {
+  id: number
+  productId: number
+  type: 'RESTOCK' | 'SALE' | 'ADJUSTMENT'
+  delta: number
+  stockAfter: number
+  note: string | null
+  orderId: number | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type ListStockLogsResponse = {
+  success: boolean
+  message: string
+  data: StockLog[]
+  metadata: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
+}
+
+export async function restockProduct(token: string, id: number, payload: { quantity: number; note?: string }): Promise<Product> {
+  const response = await fetcher<{ success: boolean; data: Product }>(`/products/${id}/restock`, {
+    method: 'POST',
+    token,
+    body: JSON.stringify(payload)
+  })
+  return response.data
+}
+
+export async function adjustStock(token: string, id: number, payload: { quantity: number; note?: string }): Promise<Product> {
+  const response = await fetcher<{ success: boolean; data: Product }>(`/products/${id}/stock`, {
+    method: 'PATCH',
+    token,
+    body: JSON.stringify(payload)
+  })
+  return response.data
+}
+
+export async function getStockLogs(
+  token: string,
+  id: number,
+  params: { page?: number; limit?: number } = {}
+): Promise<{
+  data: StockLog[]
+  meta: { total: number; page: number; limit: number; totalPages: number }
+}> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+
+  const qs = query.toString()
+  const response = await fetcher<ListStockLogsResponse>(`/products/${id}/stock-logs${qs ? `?${qs}` : ''}`, { token })
+
+  return {
+    data: response.data,
+    meta: response.metadata
+  }
 }

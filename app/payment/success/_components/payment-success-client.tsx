@@ -1,8 +1,9 @@
 'use client'
 
-import { CircleCheck, Loader2, AlertCircle } from 'lucide-react'
+import { CircleCheck, Loader2, AlertCircle, Eye, ListOrdered } from 'lucide-react'
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { getOrderDetail, type PublicOrderDetail } from '@/services/public'
 import { formatIDRCurrency } from '@/lib/utils'
 
@@ -40,12 +41,17 @@ function PaymentSuccessContent() {
   const [data, setData] = useState<PublicOrderDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [storeUserId, setStoreUserId] = useState<string | null>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const searchParams = useSearchParams()
   const orderId = searchParams.get('order_id')
 
   useEffect(() => {
     setMounted(true)
+    const uid = localStorage.getItem('customer_userId') || sessionStorage.getItem('store_userId')
+    setStoreUserId(uid)
+    setIsLoggedIn(!!localStorage.getItem('customer_token'))
   }, [])
 
   useEffect(() => {
@@ -126,8 +132,29 @@ function PaymentSuccessContent() {
           </div>
         )}
 
+        {storeUserId && (
+          <div
+            className={`mt-8 transition-all duration-500 delay-500 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            {isLoggedIn ? (
+              <Link
+                href={`/store/${storeUserId}/profile/orders`}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90">
+                <ListOrdered className="h-5 w-5" />
+                Lihat Pesanan Saya
+              </Link>
+            ) : (
+              <Link
+                href={`/store/${storeUserId}`}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90">
+                <Eye className="h-5 w-5" />
+                Kembali ke Toko
+              </Link>
+            )}
+          </div>
+        )}
+
         <p
-          className={`mt-12 font-mono text-caption text-muted-foreground transition-all duration-500 delay-500 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+          className={`mt-8 font-mono text-caption text-muted-foreground transition-all duration-500 delay-500 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           &copy; {new Date().getFullYear()} Sellgram
         </p>
       </div>

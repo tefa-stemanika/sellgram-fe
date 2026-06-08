@@ -22,6 +22,7 @@ import { DataTable } from '../../_components/data-table'
 import { DeleteProductDialog } from './delete-product-dialog'
 import { getProductColumns } from './product-columns'
 import { ProductForm } from './product-form'
+import { StockDialog } from './stock-dialog'
 
 type ProductsClientProps = {
   token: string
@@ -46,6 +47,7 @@ export function ProductsClient({ token }: ProductsClientProps) {
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [isStockOpen, setIsStockOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   const isEditMode = Boolean(selectedProduct)
@@ -139,6 +141,10 @@ export function ProductsClient({ token }: ProductsClientProps) {
         onDelete: (product) => {
           setSelectedProduct(product)
           setIsDeleteOpen(true)
+        },
+        onManageStock: (product) => {
+          setSelectedProduct(product)
+          setIsStockOpen(true)
         }
       }),
     []
@@ -300,6 +306,14 @@ export function ProductsClient({ token }: ProductsClientProps) {
         onConfirm={() => {
           void handleDelete()
         }}
+      />
+
+      <StockDialog
+        product={selectedProduct}
+        open={isStockOpen}
+        onOpenChange={setIsStockOpen}
+        token={token}
+        onStockUpdated={() => void fetchProducts()}
       />
 
       <style jsx>{`

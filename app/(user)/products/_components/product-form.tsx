@@ -30,9 +30,15 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
       description: defaultValues?.description ?? '',
       price: defaultValues?.price ?? 0,
       emoji: defaultValues?.emoji ?? '',
-      isAvailable: defaultValues?.isAvailable ?? true
+      isAvailable: defaultValues?.isAvailable ?? true,
+      stock: defaultValues?.stock ?? 0,
+      stockEnabled: defaultValues?.stockEnabled ?? false,
+      allowOversell: defaultValues?.allowOversell ?? false,
+      lowStockAlert: defaultValues?.lowStockAlert ?? 5
     }
   })
+
+  const stockEnabled = form.watch('stockEnabled')
 
   const handleFormSubmit = (values: UpdateProductFormValues) => {
     if (mode === 'create') {
@@ -151,6 +157,92 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
             )}
           />
         )}
+
+        <div className="border-t pt-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Manajemen Stok
+          </p>
+
+          <FormField
+            control={form.control}
+            name="stockEnabled"
+            render={({ field }) => (
+              <FormItem className="flex items-center justify-between rounded-lg border bg-white p-3 dark:bg-card">
+                <div>
+                  <FormLabel className="m-0 font-medium">Lacak stok</FormLabel>
+                  <p className="text-xs text-muted-foreground">Aktifkan untuk mengelola stok produk</p>
+                </div>
+                <FormControl>
+                  <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {stockEnabled && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="stock"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Stok awal</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0}
+                          {...field}
+                          value={field.value ?? 0}
+                          className="bg-white dark:bg-card"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="lowStockAlert"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Batas stok rendah</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0}
+                          {...field}
+                          value={field.value ?? 5}
+                          className="bg-white dark:bg-card"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="allowOversell"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between rounded-lg border bg-white p-3 dark:bg-card">
+                    <div>
+                      <FormLabel className="m-0 font-medium">Izinkan oversell</FormLabel>
+                      <p className="text-xs text-muted-foreground">Izinkan pesanan meskipun stok habis</p>
+                    </div>
+                    <FormControl>
+                      <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
+        </div>
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? 'Menyimpan...' : 'Simpan'}

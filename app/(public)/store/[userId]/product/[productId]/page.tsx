@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ShoppingBag } from 'lucide-react'
 import { getPublicProduct, createOrder, type PublicProduct, type CreateOrderResponse } from '@/services/public'
+import { usePortalAuth } from '../../_components/portal-auth-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -22,15 +23,27 @@ export default function ProductDetailPage() {
   const userId = params.userId
   const productId = params.productId
 
+  const { customer } = usePortalAuth()
+
   const [product, setProduct] = useState<PublicProduct | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>({
-    customerName: '',
-    customerPhone: '',
+    customerName: customer?.name ?? '',
+    customerPhone: customer?.phone ?? '',
     quantity: '1'
   })
+
+  useEffect(() => {
+    if (customer) {
+      setForm(f => ({
+        ...f,
+        customerName: customer.name ?? '',
+        customerPhone: customer.phone ?? ''
+      }))
+    }
+  }, [customer])
 
   useEffect(() => {
     getPublicProduct(userId, productId)
@@ -65,6 +78,7 @@ export default function ProductDetailPage() {
         customerPhone: form.customerPhone.trim() || undefined
       })
 
+      sessionStorage.setItem('store_userId', userId)
       window.location.href = result.paymentUrl
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Gagal membuat pesanan')

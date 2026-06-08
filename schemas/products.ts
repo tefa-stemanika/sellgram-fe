@@ -8,7 +8,11 @@ export const productSchema = z.object({
     .min(1, 'Harga minimal Rp 1')
     .max(99_999_999, 'Harga terlalu besar'),
   emoji: z.string().min(1, 'Emoji wajib diisi').max(10, 'Emoji terlalu panjang'),
-  isAvailable: z.boolean().default(true)
+  isAvailable: z.boolean().default(true),
+  stock: z.coerce.number().min(0, 'Stok tidak boleh negatif').default(0),
+  stockEnabled: z.boolean().default(false),
+  allowOversell: z.boolean().default(false),
+  lowStockAlert: z.coerce.number().min(0, 'Minimal 0').default(5)
 })
 
 export const createProductSchema = productSchema.omit({ isAvailable: true })
