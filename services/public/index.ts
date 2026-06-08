@@ -86,6 +86,33 @@ export async function createOrder(
   return response.data
 }
 
+export type PublicOrderItem = {
+  id: string
+  name: string
+  emoji: string
+  price: number
+  quantity: number
+  subtotal: number
+}
+
+export type PublicOrderDetail = {
+  orderId: string
+  status: string
+  totalPrice: number
+  customerName: string | null
+  customerPhone: string | null
+  paidAt: string | null
+  createdAt: string
+  items: PublicOrderItem[]
+}
+
+export async function getOrderDetail(orderId: string): Promise<PublicOrderDetail> {
+  const response = await fetcher<ApiResponse<PublicOrderDetail>>(
+    `/public/orders/${orderId}/detail`
+  )
+  return response.data
+}
+
 export async function getOrderStatus(
   orderId: string
 ): Promise<OrderStatus> {

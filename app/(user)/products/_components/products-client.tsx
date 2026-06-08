@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus, Store } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import InputSearch from '@/components/core/input-search'
 import {
   createProduct,
   deleteProduct,
@@ -25,10 +27,22 @@ type ProductsClientProps = {
   token: string
 }
 
+const AVAILABILITY_FILTERS = [
+  { label: 'Semua', value: 'ALL' },
+  { label: 'Tersedia', value: 'true' },
+  { label: 'Tidak tersedia', value: 'false' },
+]
+
 export function ProductsClient({ token }: ProductsClientProps) {
   const [products, setProducts] = useState<Product[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const [search, setSearch] = useState('')
+  const [availabilityFilter, setAvailabilityFilter] = useState('ALL')
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
@@ -36,80 +50,82 @@ export function ProductsClient({ token }: ProductsClientProps) {
 
   const isEditMode = Boolean(selectedProduct)
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      if (!token) {
-        setProducts([])
-        return
-      }
-
-      setIsInitialLoading(true)
-      try {
-        const latest = await getProducts(token)
-        setProducts(latest)
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Gagal memuat produk')
-      } finally {
-        setIsInitialLoading(false)
-      }
+  const fetchProducts = useCallback(async () => {
+    if (!token) {
+      setProducts([])
+      return
     }
 
-    void fetchInitialData()
-  }, [token])
+    setIsLoading(true)
+    try {
+      const result = await getProducts(token, {
+        page,
+        limit: 20,
+        search: search || undefined,
+        isAvailable: availabilityFilter === 'ALL' ? undefined : availabilityFilter
+      })
+      setProducts(result.data)
+      setTotal(result.meta.total)
+      setTotalPages(result.meta.totalPages)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal memuat produk')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [token, page, search, availabilityFilter])
 
-  const refreshProducts = async () => {
-    if (!token) return
-    const latest = await getProducts(token)
-    setProducts(latest)
-  }
+  useEffect(() => {
+    void fetchProducts()
+  }, [fetchProducts])
 
   const handleCreate = async (payload: CreateProductPayload) => {
     if (!token) return
 
-    setIsLoading(true)
+    setIsSaving(true)
     try {
       await createProduct(token, payload)
-      await refreshProducts()
       toast.success('Produk berhasil ditambahkan')
       setIsFormOpen(false)
+      setPage(1)
+      void fetchProducts()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Gagal menambah produk')
     } finally {
-      setIsLoading(false)
+      setIsSaving(false)
     }
   }
 
   const handleUpdate = async (payload: UpdateProductPayload) => {
     if (!token || !selectedProduct) return
 
-    setIsLoading(true)
+    setIsSaving(true)
     try {
       await updateProduct(token, selectedProduct.id, payload)
-      await refreshProducts()
       toast.success('Produk berhasil diperbarui')
       setSelectedProduct(null)
       setIsFormOpen(false)
+      void fetchProducts()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Gagal memperbarui produk')
     } finally {
-      setIsLoading(false)
+      setIsSaving(false)
     }
   }
 
   const handleDelete = async () => {
     if (!token || !selectedProduct) return
 
-    setIsLoading(true)
+    setIsSaving(true)
     try {
       await deleteProduct(token, selectedProduct.id)
-      await refreshProducts()
       toast.success('Produk berhasil dihapus')
       setSelectedProduct(null)
       setIsDeleteOpen(false)
+      void fetchProducts()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Gagal menghapus produk')
     } finally {
-      setIsLoading(false)
+      setIsSaving(false)
     }
   }
 
@@ -161,7 +177,7 @@ export function ProductsClient({ token }: ProductsClientProps) {
               </div>
               <div>
                 <h2 className="text-lg font-bold">Produk</h2>
-                <p className="text-sm text-muted-foreground">{products.length} produk terdaftar</p>
+                <p className="text-sm text-muted-foreground">{total} produk terdaftar</p>
               </div>
             </div>
             <Button
@@ -182,7 +198,61 @@ export function ProductsClient({ token }: ProductsClientProps) {
         style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.15s' }}>
         <div className="h-1.5 w-full bg-gradient-to-r from-orange-500 to-amber-600" />
         <div className="bg-white p-4 dark:bg-card">
-          <DataTable columns={columns} data={products} isLoading={isInitialLoading} />
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <InputSearch
+              placeholder="Cari produk..."
+              defaultValue={search}
+              onChangeValue={(value) => {
+                setSearch(value)
+                setPage(1)
+              }}
+              wrapperClassname="flex-1"
+              className="bg-white dark:bg-card"
+            />
+            <Select
+              value={availabilityFilter}
+              onValueChange={(value) => {
+                setAvailabilityFilter(value)
+                setPage(1)
+              }}>
+              <SelectTrigger className="w-full bg-white dark:bg-card sm:w-44 transition-all duration-200">
+                <SelectValue placeholder="Filter ketersediaan" />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABILITY_FILTERS.map((filter) => (
+                  <SelectItem key={filter.value} value={filter.value}>
+                    {filter.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <DataTable columns={columns} data={products} isLoading={isLoading} emptyIcon={Store} emptyMessage="Belum ada produk." />
+
+          {totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-between border-t pt-4">
+              <p className="text-sm text-muted-foreground">
+                Halaman {page} dari {totalPages}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}>
+                  Sebelumnya
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => p + 1)}>
+                  Selanjutnya
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -209,7 +279,7 @@ export function ProductsClient({ token }: ProductsClientProps) {
             <ProductForm
               mode={isEditMode ? 'update' : 'create'}
               defaultValues={selectedProduct ?? undefined}
-              isLoading={isLoading}
+              isLoading={isSaving}
               onSubmit={(values) => {
                 if (isEditMode) {
                   void handleUpdate(values as UpdateProductPayload)
@@ -226,7 +296,7 @@ export function ProductsClient({ token }: ProductsClientProps) {
         product={selectedProduct}
         open={isDeleteOpen}
         onOpenChange={setIsDeleteOpen}
-        isLoading={isLoading}
+        isLoading={isSaving}
         onConfirm={() => {
           void handleDelete()
         }}

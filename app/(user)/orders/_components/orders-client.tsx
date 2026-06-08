@@ -1,21 +1,22 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ListFilter, PackageOpen } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { Button } from '@/components/ui/button'
 import { DataTable } from '../../_components/data-table'
 import { getOrderColumns } from './order-columns'
 import { OrderDetailDialog } from './order-detail-dialog'
 import { getOrders, type Order, type OrderStatus } from '@/services/orders'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import InputSearch from '@/components/core/input-search'
 
 type OrdersClientProps = {
   token: string
 }
 
-const ORDER_FILTERS: Array<{ label: string; value: OrderStatus | 'ALL' }> = [
+const STATUS_FILTERS: Array<{ label: string; value: OrderStatus | 'ALL' }> = [
   { label: 'Semua', value: 'ALL' },
   { label: 'Pending', value: 'PENDING' },
   { label: 'Payment Pending', value: 'PAYMENT_PENDING' },
@@ -26,58 +27,52 @@ const ORDER_FILTERS: Array<{ label: string; value: OrderStatus | 'ALL' }> = [
   { label: 'Processing', value: 'PROCESSING' }
 ]
 
-export function OrdersClient({ token }: OrdersClientProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+const SOURCE_FILTERS = [
+  { label: 'Semua', value: 'ALL' },
+  { label: 'Telegram', value: 'TELEGRAM' },
+  { label: 'Website', value: 'WEBSITE' },
+]
 
+export function OrdersClient({ token }: OrdersClientProps) {
   const [orders, setOrders] = useState<Order[]>([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
-  const statusParam = searchParams.get('status')
-  const statusFilter: OrderStatus | 'ALL' =
-    statusParam && ORDER_FILTERS.some((filter) => filter.value === statusParam)
-      ? (statusParam as OrderStatus | 'ALL')
-      : 'ALL'
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('ALL')
+  const [sourceFilter, setSourceFilter] = useState('ALL')
+
+  const fetchOrders = useCallback(async () => {
+    if (!token) {
+      setOrders([])
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const result = await getOrders(token, {
+        page,
+        limit: 20,
+        search: search || undefined,
+        status: statusFilter === 'ALL' ? undefined : statusFilter,
+        source: sourceFilter === 'ALL' ? undefined : sourceFilter
+      })
+      setOrders(result.data)
+      setTotal(result.meta.total)
+      setTotalPages(result.meta.totalPages)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal memuat order')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [token, page, search, statusFilter, sourceFilter])
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!token) {
-        setOrders([])
-        return
-      }
-
-      setIsLoading(true)
-      try {
-        const latest = await getOrders(token, 50)
-        setOrders(latest)
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Gagal memuat orders')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    void fetchData()
-  }, [token])
-
-  const handleStatusChange = (value: OrderStatus | 'ALL') => {
-    const nextParams = new URLSearchParams(searchParams.toString())
-    if (value === 'ALL') {
-      nextParams.delete('status')
-    } else {
-      nextParams.set('status', value)
-    }
-
-    const query = nextParams.toString()
-    router.replace(query ? `${pathname}?${query}` : pathname)
-  }
-
-  const filteredOrders = useMemo(() => {
-    if (statusFilter === 'ALL') return orders
-    return orders.filter((order) => order.status === statusFilter)
-  }, [orders, statusFilter])
+    void fetchOrders()
+  }, [fetchOrders])
 
   const columns = useMemo(
     () =>
@@ -118,24 +113,10 @@ export function OrdersClient({ token }: OrdersClientProps) {
               <div>
                 <h2 className="text-lg font-bold">Filter Order</h2>
                 <p className="text-sm text-muted-foreground">
-                  {filteredOrders.length} order ditemukan
-                  {statusFilter !== 'ALL' ? ` (filter: ${statusFilter})` : ''}
+                  {total} order ditemukan
                 </p>
               </div>
             </div>
-
-            <Select value={statusFilter} onValueChange={(value) => handleStatusChange(value as OrderStatus | 'ALL')}>
-              <SelectTrigger className="w-full bg-white dark:bg-card sm:w-56 transition-all duration-200">
-                <SelectValue placeholder="Filter status" />
-              </SelectTrigger>
-              <SelectContent>
-                {ORDER_FILTERS.map((filter) => (
-                  <SelectItem key={filter.value} value={filter.value}>
-                    {filter.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
         </div>
       </div>
@@ -145,14 +126,85 @@ export function OrdersClient({ token }: OrdersClientProps) {
         style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.15s' }}>
         <div className="h-1.5 w-full bg-gradient-to-r from-teal-500 to-emerald-600" />
         <div className="bg-white p-4 dark:bg-card">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <InputSearch
+              placeholder="Cari order..."
+              defaultValue={search}
+              onChangeValue={(value) => {
+                setSearch(value)
+                setPage(1)
+              }}
+              wrapperClassname="flex-1"
+              className="bg-white dark:bg-card"
+            />
+            <Select
+              value={statusFilter}
+              onValueChange={(value) => {
+                setStatusFilter(value)
+                setPage(1)
+              }}>
+              <SelectTrigger className="w-full bg-white dark:bg-card sm:w-44 transition-all duration-200">
+                <SelectValue placeholder="Filter status" />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_FILTERS.map((filter) => (
+                  <SelectItem key={filter.value} value={filter.value}>
+                    {filter.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={sourceFilter}
+              onValueChange={(value) => {
+                setSourceFilter(value)
+                setPage(1)
+              }}>
+              <SelectTrigger className="w-full bg-white dark:bg-card sm:w-40 transition-all duration-200">
+                <SelectValue placeholder="Filter sumber" />
+              </SelectTrigger>
+              <SelectContent>
+                {SOURCE_FILTERS.map((filter) => (
+                  <SelectItem key={filter.value} value={filter.value}>
+                    {filter.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <DataTable
             columns={columns}
-            data={filteredOrders}
+            data={orders}
             isLoading={isLoading}
             onRowClick={(order) => setSelectedOrder(order)}
             emptyIcon={PackageOpen}
             emptyMessage="Belum ada order."
           />
+
+          {totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-between border-t pt-4">
+              <p className="text-sm text-muted-foreground">
+                Halaman {page} dari {totalPages}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}>
+                  Sebelumnya
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => p + 1)}>
+                  Selanjutnya
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

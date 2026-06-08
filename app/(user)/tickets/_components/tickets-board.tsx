@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -11,7 +11,7 @@ import {
   type DragEndEvent,
   type DragStartEvent
 } from '@dnd-kit/core'
-import { Inbox } from 'lucide-react'
+import { Inbox, Loader2 } from 'lucide-react'
 
 import { TicketCard, TicketCardSkeleton } from './ticket-card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -84,16 +84,57 @@ type TicketsBoardProps = {
   isLoading: boolean
   onStatusChange: (ticketId: string, newStatus: TicketStatus) => void
   onTicketClick: (ticketId: string) => void
+  onLoadMore: (status: TicketStatus) => void
+  isLoadingMore: Record<string, boolean>
+}
+
+function ColumnLoadMore({
+  status,
+  onLoadMore,
+  isLoading
+}: {
+  status: TicketStatus
+  onLoadMore: (status: TicketStatus) => void
+  isLoading: boolean
+}) {
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onLoadMore(status)
+        }
+      },
+      { rootMargin: '100px' }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [status, onLoadMore])
+
+  return (
+    <div ref={sentinelRef} className="flex justify-center py-2">
+      {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+    </div>
+  )
 }
 
 function DroppableColumn({
   column,
   tickets,
-  onTicketClick
+  onTicketClick,
+  onLoadMore,
+  isLoadingMore
 }: {
   column: ColumnConfig
   tickets: Ticket[]
   onTicketClick: (id: string) => void
+  onLoadMore: (status: TicketStatus) => void
+  isLoadingMore: boolean
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.status })
 
@@ -124,12 +165,22 @@ function DroppableColumn({
         ) : (
           tickets.map((ticket) => <TicketCard key={ticket.id} ticket={ticket} onClick={onTicketClick} />)
         )}
+
+        <ColumnLoadMore status={column.status} onLoadMore={onLoadMore} isLoading={isLoadingMore} />
       </div>
     </div>
   )
 }
 
-export function TicketsBoard({ tickets, labels, isLoading, onStatusChange, onTicketClick }: TicketsBoardProps) {
+export function TicketsBoard({
+  tickets,
+  labels,
+  isLoading,
+  onStatusChange,
+  onTicketClick,
+  onLoadMore,
+  isLoadingMore
+}: TicketsBoardProps) {
   const [activeTicket, setActiveTicket] = useState<Ticket | null>(null)
 
   const sensors = useSensors(
@@ -204,6 +255,8 @@ export function TicketsBoard({ tickets, labels, isLoading, onStatusChange, onTic
             column={column}
             tickets={grouped[column.status]}
             onTicketClick={onTicketClick}
+            onLoadMore={onLoadMore}
+            isLoadingMore={Boolean(isLoadingMore[column.status])}
           />
         ))}
       </div>

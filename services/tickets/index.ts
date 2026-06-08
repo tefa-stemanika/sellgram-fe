@@ -103,11 +103,11 @@ export type TicketDetail = Ticket & {
   }
 }
 
-type PaginatedResponse<T> = {
+type TicketsListResponse = {
   success: boolean
   message: string
-  data: {
-    tickets: T[]
+  data: Ticket[]
+  metadata: {
     total: number
     page: number
     limit: number
@@ -124,20 +124,28 @@ type ListTicketsParams = {
   limit?: number
 }
 
-export async function getTickets(token: string, params?: ListTicketsParams): Promise<Ticket[]> {
+export async function getTicketsByStatus(
+  token: string,
+  status: TicketStatus,
+  params?: { page?: number; limit?: number }
+): Promise<{
+  data: Ticket[]
+  meta: { total: number; page: number; limit: number; totalPages: number }
+}> {
   const query = new URLSearchParams()
-  if (params?.status) query.set('status', params.status)
-  if (params?.priority) query.set('priority', params.priority)
-  if (params?.labelId) query.set('labelId', params.labelId)
-  if (params?.search) query.set('search', params.search)
   if (params?.page) query.set('page', String(params.page))
   if (params?.limit) query.set('limit', String(params.limit))
+  if (!params?.limit) query.set('limit', '20')
 
   const qs = query.toString()
-  const response = await fetcher<PaginatedResponse<Ticket>>(`/tickets${qs ? `?${qs}` : ''}`, {
+  const response = await fetcher<TicketsListResponse>(`/tickets/status/${status}${qs ? `?${qs}` : ''}`, {
     token
   })
-  return response.data.tickets
+
+  return {
+    data: response.data,
+    meta: response.metadata
+  }
 }
 
 export async function getTicketDetail(token: string, ticketId: string): Promise<TicketDetail> {

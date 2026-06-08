@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { KeyRound, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Sparkles, TicketCheck } from 'lucide-react'
+import { KeyRound, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Sparkles, TicketCheck, Users } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { removeToken } from '@/actions/auth'
@@ -34,6 +34,7 @@ const navigation = [
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { title: 'Order', href: '/orders', icon: ShoppingCart },
   { title: 'Produk', href: '/products', icon: Package },
+  { title: 'Pelanggan', href: '/customers', icon: Users },
   { title: 'Tiket', href: '/tickets', icon: TicketCheck },
   { title: 'Bot Config', href: '/bot-config', icon: Settings },
   { title: 'Credentials', href: '/bot-credentials', icon: KeyRound }
@@ -73,11 +74,11 @@ const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
   const navGroups = [
     {
       label: 'Menu Utama',
-      items: navigation.slice(0, 3)
+      items: navigation.slice(0, 5)
     },
     {
       label: 'Pengaturan',
-      items: navigation.slice(3)
+      items: navigation.slice(5)
     }
   ]
 

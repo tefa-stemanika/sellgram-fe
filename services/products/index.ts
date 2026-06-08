@@ -22,9 +22,49 @@ export type UpdateProductPayload = Partial<CreateProductPayload> & {
   isAvailable?: boolean
 }
 
-export async function getProducts(token: string): Promise<Product[]> {
-  const response = await fetcher<{ success: boolean; data: Product[] }>('/products', { token })
-  return response.data
+export type ListProductsParams = {
+  page?: number
+  limit?: number
+  search?: string
+  isAvailable?: string
+  sortBy?: string
+  sortDir?: string
+}
+
+export type ListProductsResponse = {
+  success: boolean
+  message: string
+  data: Product[]
+  metadata: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
+}
+
+export async function getProducts(
+  token: string,
+  params: ListProductsParams = {}
+): Promise<{
+  data: Product[]
+  meta: { total: number; page: number; limit: number; totalPages: number }
+}> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  if (params.search) query.set('search', params.search)
+  if (params.isAvailable) query.set('isAvailable', params.isAvailable)
+  if (params.sortBy) query.set('sortBy', params.sortBy)
+  if (params.sortDir) query.set('sortDir', params.sortDir)
+
+  const qs = query.toString()
+  const response = await fetcher<ListProductsResponse>(`/products${qs ? `?${qs}` : ''}`, { token })
+
+  return {
+    data: response.data,
+    meta: response.metadata
+  }
 }
 
 export async function getProductById(token: string, id: number): Promise<Product> {

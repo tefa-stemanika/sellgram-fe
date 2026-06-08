@@ -57,11 +57,51 @@ export type Order = {
   orderItems: OrderItem[]
 }
 
-export async function getOrders(token: string, limit = 50): Promise<Order[]> {
-  const response = await fetcher<{ success: boolean; data: Order[] }>(`/orders?limit=${limit}`, {
-    token
-  })
-  return response.data
+export type ListOrdersParams = {
+  page?: number
+  limit?: number
+  search?: string
+  status?: string
+  source?: string
+  sortBy?: string
+  sortDir?: string
+}
+
+export type ListOrdersResponse = {
+  success: boolean
+  message: string
+  data: Order[]
+  metadata: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
+}
+
+export async function getOrders(
+  token: string,
+  params: ListOrdersParams = {}
+): Promise<{
+  data: Order[]
+  meta: { total: number; page: number; limit: number; totalPages: number }
+}> {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.limit) query.set('limit', String(params.limit))
+  if (params.search) query.set('search', params.search)
+  if (params.status && params.status !== 'ALL') query.set('status', params.status)
+  if (params.source && params.source !== 'ALL') query.set('source', params.source)
+  if (params.sortBy) query.set('sortBy', params.sortBy)
+  if (params.sortDir) query.set('sortDir', params.sortDir)
+
+  const qs = query.toString()
+  const response = await fetcher<ListOrdersResponse>(`/orders${qs ? `?${qs}` : ''}`, { token })
+
+  return {
+    data: response.data,
+    meta: response.metadata
+  }
 }
 
 export async function getOrderById(token: string, id: number): Promise<Order> {

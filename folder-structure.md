@@ -73,6 +73,13 @@ order-bot-dashboard
 │  │  │  │  ├─ product-form.tsx
 │  │  │  │  └─ products-client.tsx
 │  │  │  └─ page.tsx
+│  │  ├─ customers
+│  │  │  ├─ _components
+│  │  │  │  ├─ customer-columns.tsx
+│  │  │  │  ├─ customer-detail-dialog.tsx
+│  │  │  │  ├─ customer-form-dialog.tsx
+│  │  │  │  └─ customers-client.tsx
+│  │  │  └─ page.tsx
 │  │  └─ types.ts
 │  ├─ tickets
 │  │  ├─ _components
@@ -156,6 +163,7 @@ order-bot-dashboard
 │  ├─ bot-config.ts
 │  ├─ bot-credentials.ts
 │  ├─ cashflow.ts
+│  ├─ customers.ts
 │  ├─ products.ts
 │  └─ user.ts
 ├─ services
@@ -166,6 +174,8 @@ order-bot-dashboard
 │  ├─ bot-credentials
 │  │  └─ index.ts
 │  ├─ cashflow
+│  │  └─ index.ts
+│  ├─ customers
 │  │  └─ index.ts
 │  ├─ fetcher.ts
 │  ├─ index.ts
