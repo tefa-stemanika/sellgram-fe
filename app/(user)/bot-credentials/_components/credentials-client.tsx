@@ -146,36 +146,36 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
     : 'https://backend-api-domain.com/api/webhook/midtrans'
 
   useEffect(() => {
-    const fetchCredentials = async () => {
-      if (!token) {
-        setCredentialState(buildInitialState([]))
-        setIsInitialLoading(false)
-        return
-      }
+    void fetchCredentials()
+  }, [token]) // eslint-disable-line react-hooks/exhaustive-deps
 
-      setIsInitialLoading(true)
-      try {
-        const credentials = await getBotCredentials(token)
-        setCredentialState((prev) => {
-          const next = buildInitialState(credentials)
-
-          CREDENTIAL_KEYS.forEach((key) => {
-            if (prev[key]?.value) {
-              next[key].value = prev[key].value
-            }
-          })
-
-          return next
-        })
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Gagal memuat credential')
-      } finally {
-        setIsInitialLoading(false)
-      }
+  const fetchCredentials = async () => {
+    if (!token) {
+      setCredentialState(buildInitialState([]))
+      setIsInitialLoading(false)
+      return
     }
 
-    void fetchCredentials()
-  }, [token])
+    setIsInitialLoading(true)
+    try {
+      const credentials = await getBotCredentials(token)
+      setCredentialState((prev) => {
+        const next = buildInitialState(credentials)
+
+        CREDENTIAL_KEYS.forEach((key) => {
+          if (prev[key]?.value) {
+            next[key].value = prev[key].value
+          }
+        })
+
+        return next
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal memuat credential')
+    } finally {
+      setIsInitialLoading(false)
+    }
+  }
 
   const keyStatus = useMemo(() => {
     return CREDENTIAL_KEYS.reduce(
@@ -228,18 +228,11 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
         await updateBotCredential(token, existingId, { value })
       } else {
         const payload: CreateCredentialPayload = { key, value }
-        const created = await createBotCredential(token, payload)
-        setCredentialState((prev) => ({
-          ...prev,
-          [key]: {
-            id: created.id,
-            value,
-            stored: true
-          }
-        }))
+        await createBotCredential(token, payload)
       }
 
       toast.success(`${CREDENTIAL_HELPERS[key].title} berhasil disimpan`)
+      await fetchCredentials()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Gagal menyimpan credential')
     } finally {
