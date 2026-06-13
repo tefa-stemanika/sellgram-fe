@@ -66,9 +66,12 @@ order-bot-dashboard
 │  │  │  │  ├─ order-detail-dialog.tsx
 │  │  │  │  └─ orders-client.tsx
 │  │  │  └─ page.tsx
+│  │  ├─ fulfillment
+│  │  │  └─ page.tsx
 │  │  ├─ products
 │  │  │  ├─ _components
 │  │  │  │  ├─ delete-product-dialog.tsx
+│  │  │  │  ├─ fulfillment-config-dialog.tsx
 │  │  │  │  ├─ product-columns.tsx
 │  │  │  │  ├─ product-form.tsx
 │  │  │  │  └─ products-client.tsx
@@ -176,6 +179,8 @@ order-bot-dashboard
 │  ├─ cashflow
 │  │  └─ index.ts
 │  ├─ customers
+│  │  └─ index.ts
+│  ├─ fulfillment
 │  │  └─ index.ts
 │  ├─ fetcher.ts
 │  ├─ index.ts

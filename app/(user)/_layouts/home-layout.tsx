@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { KeyRound, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Sparkles, TicketCheck, Users } from 'lucide-react'
+import { KeyRound, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Sparkles, TicketCheck, Users, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { removeToken } from '@/actions/auth'
@@ -36,6 +36,7 @@ const navigation = [
   { title: 'Produk', href: '/products', icon: Package },
   { title: 'Pelanggan', href: '/customers', icon: Users },
   { title: 'Tiket', href: '/tickets', icon: TicketCheck },
+  { title: 'Fulfillment', href: '/fulfillment', icon: Zap },
   { title: 'Bot Config', href: '/bot-config', icon: Settings },
   { title: 'Credentials', href: '/bot-credentials', icon: KeyRound }
 ]

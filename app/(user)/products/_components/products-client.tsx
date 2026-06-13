@@ -20,6 +20,7 @@ import {
 
 import { DataTable } from '../../_components/data-table'
 import { DeleteProductDialog } from './delete-product-dialog'
+import { FulfillmentConfigDialog } from './fulfillment-config-dialog'
 import { getProductColumns } from './product-columns'
 import { ProductForm } from './product-form'
 import { StockDialog } from './stock-dialog'
@@ -48,6 +49,7 @@ export function ProductsClient({ token }: ProductsClientProps) {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isStockOpen, setIsStockOpen] = useState(false)
+  const [isFulfillmentOpen, setIsFulfillmentOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   const isEditMode = Boolean(selectedProduct)
@@ -145,6 +147,10 @@ export function ProductsClient({ token }: ProductsClientProps) {
         onManageStock: (product) => {
           setSelectedProduct(product)
           setIsStockOpen(true)
+        },
+        onManageFulfillment: (product) => {
+          setSelectedProduct(product)
+          setIsFulfillmentOpen(true)
         }
       }),
     []
@@ -315,6 +321,19 @@ export function ProductsClient({ token }: ProductsClientProps) {
         token={token}
         onStockUpdated={() => void fetchProducts()}
       />
+
+      {selectedProduct && (
+        <FulfillmentConfigDialog
+          productId={selectedProduct.id}
+          productName={selectedProduct.name}
+          open={isFulfillmentOpen}
+          onOpenChange={(open) => {
+            setIsFulfillmentOpen(open)
+            if (!open) setSelectedProduct(null)
+          }}
+          token={token}
+        />
+      )}
 
       <style jsx>{`
         @keyframes fadeInUp {

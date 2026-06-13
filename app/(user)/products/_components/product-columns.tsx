@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { Package, Pencil, Trash2 } from 'lucide-react'
+import { Package, Pencil, Trash2, Zap } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { formatIDRCurrency } from '@/lib/utils'
@@ -11,9 +11,10 @@ type ProductColumnsOptions = {
   onEdit: (product: Product) => void
   onDelete: (product: Product) => void
   onManageStock: (product: Product) => void
+  onManageFulfillment: (product: Product) => void
 }
 
-export function getProductColumns({ onEdit, onDelete, onManageStock }: ProductColumnsOptions): ColumnDef<Product>[] {
+export function getProductColumns({ onEdit, onDelete, onManageStock, onManageFulfillment }: ProductColumnsOptions): ColumnDef<Product>[] {
   return [
     {
       accessorKey: 'emoji',
@@ -103,6 +104,18 @@ export function getProductColumns({ onEdit, onDelete, onManageStock }: ProductCo
             }}>
             <Package className="mr-1 h-3.5 w-3.5" />
             Stok
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="border-orange-200 text-orange-700 hover:bg-orange-50 hover:text-orange-800 dark:border-orange-800 dark:text-orange-300 dark:hover:bg-orange-900/40"
+            onClick={(event) => {
+              event.stopPropagation()
+              onManageFulfillment(row.original)
+            }}>
+            <Zap className="mr-1 h-3.5 w-3.5" />
+            Fulfillment
           </Button>
           <Button
             type="button"

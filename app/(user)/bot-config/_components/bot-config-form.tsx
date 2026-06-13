@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Bot, Grid3x3 } from 'lucide-react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
@@ -42,6 +43,12 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
       ...defaultValues
     }
   })
+
+  useEffect(() => {
+    if (defaultValues) {
+      form.reset(defaultValues)
+    }
+  }, [defaultValues, form])
 
   return (
     <Form {...form}>

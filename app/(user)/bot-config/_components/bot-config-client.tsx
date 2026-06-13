@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Bot, Globe, Grid3x3, Settings2 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -82,6 +82,14 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
         }
       ]
     : []
+
+  const defaultValues = useMemo(() => {
+    if (!config) return undefined
+    return {
+      mode: config.mode,
+      midtransIsProduction: config.midtransIsProduction,
+    }
+  }, [config])
 
   return (
     <div className="space-y-8">
@@ -185,14 +193,7 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
           </div>
           <div className="mt-6">
             <BotConfigForm
-              defaultValues={
-                config
-                    ? {
-                        mode: config.mode,
-                        midtransIsProduction: config.midtransIsProduction
-                      }
-                  : undefined
-              }
+              defaultValues={defaultValues}
               onSubmit={handleSubmit}
               isLoading={isLoading}
             />
