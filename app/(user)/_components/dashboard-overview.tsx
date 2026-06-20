@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { formatDate, formatIDRCurrency } from '@/lib/utils'
-import { getDashboard, type DashboardData } from '@/services/dashboard'
+import { getDashboard, getQuota, type DashboardData, type QuotaData } from '@/services/dashboard'
 import { getCurrentUser } from '@/services/user'
 
 type DashboardOverviewProps = {
@@ -28,6 +28,7 @@ const statusBadge: Record<string, string> = {
 
 export function DashboardOverview({ token }: DashboardOverviewProps) {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null)
+  const [quota, setQuota] = useState<QuotaData | null>(null)
   const [userId, setUserId] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [linkCopied, setLinkCopied] = useState(false)
@@ -42,11 +43,13 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
 
       setIsLoading(true)
       try {
-        const [data, user] = await Promise.all([
+        const [data, q, user] = await Promise.all([
           getDashboard(token),
+          getQuota(token),
           getCurrentUser(token)
         ])
         setDashboard(data)
+        setQuota(q)
         setUserId(user.id)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Gagal memuat ringkasan dashboard')
@@ -278,6 +281,43 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
         </Card>
       )}
 
+      {quota && (
+        <Card
+          className="overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-md"
+          style={{
+            animation: 'fadeInUp 0.4s ease both',
+            animationDelay: '0.25s'
+          }}>
+          <div className="h-1.5 w-full bg-gradient-to-r from-violet-500 to-purple-600" />
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Activity className="size-4" />
+              Pemakaian Paket <strong className="text-foreground">{quota.plan}</strong>
+            </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+              <QuotaBar
+                label="Produk"
+                used={quota.products.used}
+                total={quota.products.total}
+                gradient="from-emerald-500 to-emerald-600"
+              />
+              <QuotaBar
+                label="Broadcast/bulan"
+                used={quota.broadcastsPerMonth.used}
+                total={quota.broadcastsPerMonth.total}
+                gradient="from-blue-500 to-indigo-600"
+              />
+              <QuotaBar
+                label="Order/bulan"
+                used={quota.ordersPerMonth.used}
+                total={quota.ordersPerMonth.total}
+                gradient="from-amber-500 to-orange-600"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card
         className="overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-md"
         style={{
@@ -384,6 +424,42 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
           }
         }
       `}</style>
+    </div>
+  )
+}
+
+function QuotaBar({
+  label,
+  used,
+  total,
+  gradient,
+}: {
+  label: string
+  used: number
+  total: number | 'Unlimited'
+  gradient: string
+}) {
+  const isUnlimited = total === 'Unlimited'
+  const pct = isUnlimited ? 100 : Math.min(Math.round((used / total) * 100), 100)
+
+  return (
+    <div>
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="font-semibold">
+          {used}
+          {isUnlimited ? '' : ` / ${total}`}
+        </span>
+      </div>
+      <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-gray-100">
+        <div
+          className={`h-full rounded-full bg-gradient-to-r ${gradient} transition-all duration-500`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      {!isUnlimited && (
+        <p className="mt-0.5 text-xs text-muted-foreground/70">{pct}% terpakai</p>
+      )}
     </div>
   )
 }

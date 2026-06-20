@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Bot, Globe, Grid3x3, Settings2 } from 'lucide-react'
+import { Bot, Globe, Grid3x3, RefreshCw, Settings2 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { createBotConfig, getBotConfig, updateBotConfig, type BotConfig, type BotConfigPayload } from '@/services/bot-config'
+import { createBotConfig, getBotConfig, updateBotConfig, reconnectBot, type BotConfig, type BotConfigPayload } from '@/services/bot-config'
 
 import { BotConfigForm } from './bot-config-form'
 
@@ -17,6 +18,7 @@ type BotConfigClientProps = {
 export function BotConfigClient({ token }: BotConfigClientProps) {
   const [config, setConfig] = useState<BotConfig | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isReconnecting, setIsReconnecting] = useState(false)
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -59,6 +61,21 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
       toast.error(error instanceof Error ? error.message : 'Gagal menyimpan konfigurasi')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleReconnect = async () => {
+    if (!token) return
+    setIsReconnecting(true)
+    try {
+      const data = await reconnectBot(token)
+      toast.success('Bot berhasil direconnect', {
+        description: `Webhook: ${data.webhookUrl}`,
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal reconnect bot')
+    } finally {
+      setIsReconnecting(false)
     }
   }
 
@@ -172,6 +189,39 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
               </Card>
             )}
       </div>
+
+      {config && (
+        <Card
+          className="overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-md"
+          style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.18s' }}>
+          <div className="h-1.5 w-full bg-gradient-to-r from-red-500 to-rose-600" />
+          <CardContent className="bg-white/30 p-5 backdrop-blur-xl dark:bg-white/5">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-red-100 p-2 text-red-600 dark:bg-red-900/40 dark:text-red-300">
+                  <RefreshCw className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Koneksi Bot Telegram</p>
+                  <p className="text-xs text-muted-foreground">
+                    Reconnect jika bot tidak merespon atau terjadi masalah webhook.
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="destructive"
+                size="sm"
+                className="shrink-0 text-white"
+                disabled={isReconnecting}
+                onClick={() => void handleReconnect()}
+              >
+                <RefreshCw className={`mr-1.5 h-4 w-4 ${isReconnecting ? 'animate-spin' : ''}`} />
+                {isReconnecting ? 'Mereconnect...' : 'Reconnect Bot'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card
         className="overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-md"

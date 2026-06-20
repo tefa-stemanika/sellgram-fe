@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { CreditCard, KeyRound, LayoutDashboard, LogOut, Package, Settings, ShoppingCart, Sparkles, TicketCheck, Users, Zap } from 'lucide-react'
+import { CreditCard, KeyRound, LayoutDashboard, LogOut, Megaphone, Package, Settings, ShoppingCart, Sparkles, TicketCheck, Users, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { removeToken } from '@/actions/auth'
@@ -35,6 +35,7 @@ const navigation = [
   { title: 'Order', href: '/orders', icon: ShoppingCart },
   { title: 'Produk', href: '/products', icon: Package },
   { title: 'Pelanggan', href: '/customers', icon: Users },
+  { title: 'Broadcast', href: '/broadcasts', icon: Megaphone },
   { title: 'Tiket', href: '/tickets', icon: TicketCheck },
   { title: 'Fulfillment', href: '/fulfillment', icon: Zap },
   { title: 'Langganan', href: '/plan', icon: CreditCard },

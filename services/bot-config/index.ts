@@ -42,3 +42,11 @@ export async function updateBotConfig(token: string, id: number, payload: BotCon
   })
   return response.data
 }
+
+export async function reconnectBot(token: string): Promise<{ userId: string; webhookUrl: string }> {
+  const response = await fetcher<{ success: boolean; message: string; data: { userId: string; webhookUrl: string } }>('/bots/reconnect', {
+    method: 'POST',
+    token,
+  })
+  return response.data
+}
