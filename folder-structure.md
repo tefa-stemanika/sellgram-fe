@@ -45,6 +45,16 @@ order-bot-dashboard
 │  │  │  └─ home-layout.tsx
 │  │  ├─ _stores
 │  │  │  └─ use-user-store.ts
+│  │  ├─ broadcasts
+│  │  │  ├─ [id]
+│  │  │  │  ├─ _components
+│  │  │  │  │  └─ broadcast-detail-page.tsx
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ _components
+│  │  │  │  ├─ broadcast-columns.tsx
+│  │  │  │  ├─ broadcast-create-dialog.tsx
+│  │  │  │  └─ broadcasts-client.tsx
+│  │  │  └─ page.tsx
 │  │  ├─ bot-config
 │  │  │  ├─ _components
 │  │  │  │  ├─ bot-config-client.tsx
@@ -169,6 +179,7 @@ order-bot-dashboard
 │     └─ sellgram_seo.png
 ├─ schemas
 │  ├─ auth.ts
+│  ├─ broadcast.ts
 │  ├─ bot-config.ts
 │  ├─ bot-credentials.ts
 │  ├─ cashflow.ts
@@ -176,6 +187,8 @@ order-bot-dashboard
 │  ├─ products.ts
 │  └─ user.ts
 ├─ services
+│  ├─ broadcast
+│  │  └─ index.ts
 │  ├─ public
 │  │  └─ index.ts
 │  ├─ bot-config
