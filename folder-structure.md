@@ -66,8 +66,14 @@ order-bot-dashboard
 │  │  │  │  ├─ order-detail-dialog.tsx
 │  │  │  │  └─ orders-client.tsx
 │  │  │  └─ page.tsx
-│  │  ├─ fulfillment
-│  │  │  └─ page.tsx
+ │  │  ├─ fulfillment
+ │  │  │  ├─ _components
+ │  │  │  │  └─ fulfillment-client.tsx
+ │  │  │  └─ page.tsx
+ │  │  ├─ plan
+ │  │  │  ├─ _components
+ │  │  │  │  └─ plan-client.tsx
+ │  │  │  └─ page.tsx
 │  │  ├─ products
 │  │  │  ├─ _components
 │  │  │  │  ├─ delete-product-dialog.tsx

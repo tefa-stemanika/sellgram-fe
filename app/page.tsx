@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, Bot, CreditCard, KeyRound, LayoutDashboard, Package, ShieldCheck, ShoppingCart, Sparkles, Zap } from 'lucide-react'
+import { ArrowRight, Bot, Check, CreditCard, KeyRound, LayoutDashboard, Package, ShieldCheck, ShoppingCart, Sparkles, X, Zap } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatIDRCurrency } from '@/lib/utils'
+import { getPlanLabel, PLAN_MATRIX } from '@/schemas/subscription'
 
 export const metadata: Metadata = {
   title: 'Buat Bot Order Telegram Bisnis Kamu',
@@ -78,7 +80,7 @@ const features = [
 export default function LandingPage() {
   return (
     <main className="min-h-screen overflow-hidden">
-      <section className="relative mx-auto container px-6 pb-24 pt-16 md:px-8 md:pb-32 md:pt-20">
+      <section className="relative mx-auto container md:max-w-6xl px-6 pb-24 pt-16 md:px-8 md:pb-32 md:pt-20">
         <div className="pointer-events-none absolute -right-60 -top-60 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[120px]" />
         <div className="pointer-events-none absolute -left-40 top-40 h-[400px] w-[400px] rounded-full bg-blue-200/20 blur-[100px]" />
 
@@ -131,6 +133,86 @@ export default function LandingPage() {
               </Card>
             )
           })}
+        </div>
+
+        <div className="mt-16">
+          <div className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5 text-primary" />
+            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Harga
+            </span>
+          </div>
+          <h2 className="mt-3 text-2xl font-bold tracking-tight md:text-3xl">
+            Pilih paket yang sesuai
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Semua paket sudah termasuk akses penuh ke dashboard, manajemen produk, dan pelacakan
+            order. Upgrade kapan saja sesuai kebutuhan.
+          </p>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {PLAN_MATRIX.map((plan) => {
+              const planLabel = getPlanLabel(plan.name as any)
+              const isFree = plan.name === 'FREE'
+              const features = [
+                `Bot Config: ${plan.botConfigs}`,
+                `Produk: ${plan.products === 'Tak terbatas' ? 'Tak terbatas' : `${plan.products} produk`}`,
+                `Broadcast/bln: ${plan.maxBroadcasts === 'Tak terbatas' ? 'Tak terbatas' : plan.maxBroadcasts === 0 ? 'Tidak ada' : `${plan.maxBroadcasts}x`}`,
+                `Max Order/bln: ${plan.maxOrders === 'Tak terbatas' ? 'Tak terbatas' : `${plan.maxOrders} order`}`,
+                'Fulfillment',
+              ]
+              return (
+              <Card
+                key={plan.name}
+                className={`group relative border-0 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${plan.popular ? 'ring-2 ring-primary' : ''}`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="inline-flex items-center rounded-full bg-primary px-4 py-1 text-xs font-semibold text-white shadow-lg">
+                      Terpopuler
+                    </span>
+                  </div>
+                )}
+
+                <CardHeader>
+                  <CardTitle className="text-lg">{planLabel}</CardTitle>
+                  <div className="mt-2">
+                    <span className="text-3xl font-bold">
+                      {isFree ? 'Gratis' : formatIDRCurrency(plan.monthlyPrice)}
+                    </span>
+                    {!isFree && <span className="text-sm text-muted-foreground">/bln</span>}
+                  </div>
+                  {!isFree && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      atau {formatIDRCurrency(plan.yearlyPrice)}/thn (hemat 2 bln)
+                    </p>
+                  )}
+                </CardHeader>
+
+                <CardContent className="space-y-3">
+                  {features.map((feature) => {
+                    const isUnavailable = feature.includes('Tidak ada')
+                    return (
+                    <div key={feature} className="flex items-center gap-2 text-sm">
+                      {isUnavailable ? (
+                        <X className="h-4 w-4 text-red-400" />
+                      ) : (
+                        <Check className="h-4 w-4 text-emerald-500" />
+                      )}
+                      <span>{feature}</span>
+                    </div>
+                  )})}
+
+                  <Button asChild className="mt-4 w-full" variant={isFree ? 'default' : 'outline'}>
+                    <Link href={isFree ? '/register' : '/plan'}>
+                      {isFree ? 'Mulai Gratis' : `Pilih ${planLabel}`}
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )})}
+          </div>
         </div>
 
         <div className="mt-16 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
