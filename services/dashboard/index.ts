@@ -39,3 +39,15 @@ export async function getDashboard(token: string): Promise<DashboardData> {
   const response = await fetcher<{ success: boolean; data: DashboardData }>('/dashboard', { token })
   return response.data
 }
+
+export type QuotaData = {
+  plan: string
+  products: { used: number; total: number | 'Unlimited' }
+  broadcastsPerMonth: { used: number; total: number | 'Unlimited' }
+  ordersPerMonth: { used: number; total: number | 'Unlimited' }
+}
+
+export async function getQuota(token: string): Promise<QuotaData> {
+  const response = await fetcher<{ success: boolean; data: QuotaData }>('/bots/quota', { token })
+  return response.data
+}
