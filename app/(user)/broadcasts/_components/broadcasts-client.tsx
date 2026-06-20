@@ -18,8 +18,9 @@ import {
   createBroadcast,
   previewBroadcast
 } from '@/services/broadcast'
-import type { BroadcastCampaign } from '@/schemas/broadcast'
+import type { BroadcastCampaign, BroadcastFilters } from '@/schemas/broadcast'
 import { BROADCAST_STATUSES, getBroadcastStatusLabel } from '@/schemas/broadcast'
+import type { CreateBroadcastFormValues } from '@/schemas/broadcast'
 
 import { DataTable } from '../../_components/data-table'
 import { getBroadcastColumns } from './broadcast-columns'
@@ -84,7 +85,7 @@ export function BroadcastsClient({ token }: BroadcastsClientProps) {
     void fetchBroadcasts()
   }, [fetchBroadcasts])
 
-  const handleAction = async (broadcast: BroadcastCampaign, action: string) => {
+  const handleAction = useCallback(async (broadcast: BroadcastCampaign, action: string) => {
     if (!token) return
     try {
       const actions: Record<string, () => Promise<any>> = {
@@ -109,13 +110,13 @@ export function BroadcastsClient({ token }: BroadcastsClientProps) {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Gagal memproses broadcast')
     }
-  }
+  }, [token, fetchBroadcasts])
 
-  const handleDetail = (broadcast: BroadcastCampaign) => {
+  const handleDetail = useCallback((broadcast: BroadcastCampaign) => {
     router.push(`/broadcasts/${broadcast.id}`)
-  }
+  }, [router])
 
-  const handleCreate = async (values: any) => {
+  const handleCreate = async (values: CreateBroadcastFormValues & { filters?: BroadcastFilters }) => {
     if (!token) return
     setIsSaving(true)
     try {
@@ -131,11 +132,11 @@ export function BroadcastsClient({ token }: BroadcastsClientProps) {
     }
   }
 
-  const handlePreview = async (filters: Record<string, unknown>) => {
+  const handlePreview = async (filters: BroadcastFilters) => {
     if (!token) return null
     setIsPreviewLoading(true)
     try {
-      const result = await previewBroadcast(token, filters as any)
+      const result = await previewBroadcast(token, filters)
       setPreviewTotal(result.total)
       return result
     } catch (error) {
@@ -152,7 +153,7 @@ export function BroadcastsClient({ token }: BroadcastsClientProps) {
         onAction: handleAction,
         onDetail: handleDetail
       }),
-    [handleAction]
+    [handleAction, handleDetail]
   )
 
   return (

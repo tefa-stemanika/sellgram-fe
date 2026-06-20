@@ -12,14 +12,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
-import { createBroadcastSchema, type CreateBroadcastFormValues } from '@/schemas/broadcast'
+import { createBroadcastSchema, type BroadcastFilters, type CreateBroadcastFormValues } from '@/schemas/broadcast'
 import type { BroadcastCampaign } from '@/schemas/broadcast'
 
 type BroadcastCreateDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSubmit: (values: CreateBroadcastFormValues & { filters?: Record<string, unknown> }) => void
-  onPreview: (filters: Record<string, unknown>) => Promise<{ total: number } | null>
+  onSubmit: (values: CreateBroadcastFormValues & { filters?: BroadcastFilters }) => void
+  onPreview: (filters: BroadcastFilters) => Promise<{ total: number } | null>
   broadcast?: BroadcastCampaign | null
   isLoading?: boolean
   isPreviewLoading?: boolean
@@ -57,7 +57,7 @@ export function BroadcastCreateDialog({
       form.reset({
         name: broadcast?.name ?? '',
         message: broadcast?.message ?? '',
-        channel: (broadcast?.channel as any) ?? 'TELEGRAM',
+        channel: broadcast?.channel ?? 'TELEGRAM',
         scheduledAt: broadcast?.scheduledAt
           ? broadcast.scheduledAt.slice(0, 16)
           : '',
@@ -70,8 +70,8 @@ export function BroadcastCreateDialog({
     }
   }, [open, broadcast, form])
 
-  const buildFilters = () => {
-    const filters: Record<string, unknown> = {}
+  const buildFilters = (): BroadcastFilters => {
+    const filters: BroadcastFilters = {}
     if (filterHasTelegram) filters.hasTelegram = 'true'
     if (filterSearch) filters.search = filterSearch
     if (filterTotalSpentMin) filters.totalSpentMin = Number(filterTotalSpentMin)

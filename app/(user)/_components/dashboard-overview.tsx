@@ -410,7 +410,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
             </TableBody>
           </Table>
         </CardContent>
-        </Card>
+      </Card>
 
       <style jsx>{`
         @keyframes fadeInUp {
