@@ -218,7 +218,14 @@ export function ModePreviewDialog({ defaultMode = 'AI', children }: ModePreviewD
           </button>
         </div>
 
-        <div className="flex max-h-[440px] min-h-[360px] flex-col overflow-y-auto bg-gradient-to-b from-slate-50 to-slate-100/80 p-4 dark:from-slate-900 dark:to-slate-800/80">
+        <div
+          className="flex max-h-[440px] min-h-[360px] flex-col overflow-y-auto p-4"
+          style={{
+            backgroundImage: 'url(/images/telegram-chat-background.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
           <ChatPreview messages={mode === 'AI' ? AI_MESSAGES : BUTTON_FLOW} />
 
           <div className="mt-4 flex items-center gap-2 rounded-xl border bg-white px-4 py-2.5 shadow-sm dark:bg-slate-800">

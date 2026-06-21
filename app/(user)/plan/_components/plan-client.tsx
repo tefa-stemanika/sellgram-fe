@@ -61,13 +61,14 @@ function PlanCardSkeleton() {
 type PlanCardProps = {
   plan: Plan
   currentPlan: Plan
+  interval: 'MONTHLY' | 'YEARLY'
   isPopular?: boolean
   hasActiveSub: boolean
   onUpgrade: (plan: Plan) => void
   upgrading: Plan | null
 }
 
-function PlanCard({ plan, currentPlan, isPopular, hasActiveSub, onUpgrade, upgrading }: PlanCardProps) {
+function PlanCard({ plan, currentPlan, interval, isPopular, hasActiveSub, onUpgrade, upgrading }: PlanCardProps) {
   const info = PLAN_MATRIX.find((p) => p.name === plan)!
   const isCurrent = currentPlan === plan
   const isDowngrade = !isCurrent && PLAN_MATRIX.findIndex((p) => p.name === plan) < PLAN_MATRIX.findIndex((p) => p.name === currentPlan)
@@ -101,13 +102,21 @@ function PlanCard({ plan, currentPlan, isPopular, hasActiveSub, onUpgrade, upgra
         </div>
 
         <div className="mt-2">
-          <span className="text-3xl font-bold">{formatIDRCurrency(info.monthlyPrice)}</span>
-          <span className="text-sm text-muted-foreground">/bln</span>
+          <span className="text-3xl font-bold">
+            {interval === 'YEARLY' ? formatIDRCurrency(info.yearlyPrice) : formatIDRCurrency(info.monthlyPrice)}
+          </span>
+          <span className="text-sm text-muted-foreground">
+            /{interval === 'YEARLY' ? 'thn' : 'bln'}
+          </span>
         </div>
 
         {info.yearlyPrice > 0 && (
           <p className="mt-1 text-xs text-muted-foreground">
-            atau {formatIDRCurrency(info.yearlyPrice)}/thn (hemat 2 bulan)
+            {interval === 'YEARLY' ? (
+              <>hemat {formatIDRCurrency(info.monthlyPrice * 12 - info.yearlyPrice)}/thn</>
+            ) : (
+              <>atau {formatIDRCurrency(info.yearlyPrice)}/thn (hemat 2 bulan)</>
+            )}
           </p>
         )}
       </CardHeader>
@@ -127,14 +136,14 @@ function PlanCard({ plan, currentPlan, isPopular, hasActiveSub, onUpgrade, upgra
         <div className="flex items-center gap-2 text-sm">
           <Check className="h-4 w-4 text-emerald-500" />
           <span>
-            Bot Config: <strong>{info.botConfigs}</strong>
+            Produk: <strong>{info.products}</strong>
           </span>
         </div>
 
         <div className="flex items-center gap-2 text-sm">
           <Check className="h-4 w-4 text-emerald-500" />
           <span>
-            Produk: <strong>{info.products}</strong>
+            Broadcast Template: <strong>{info.templates}</strong>
           </span>
         </div>
 
@@ -371,7 +380,7 @@ export function PlanClient({ token }: PlanClientProps) {
               {limits && (
                 <div className="flex flex-wrap gap-6 text-sm">
                   <div>
-                    Bot Config: <strong>{limits.botConfigs}</strong>
+                    Broadcast Template: <strong>{limits.templates}</strong>
                   </div>
                   <div>
                     Produk: <strong>{limits.products}</strong>
@@ -423,6 +432,7 @@ export function PlanClient({ token }: PlanClientProps) {
                 key={info.name}
                 plan={info.name as Plan}
                 currentPlan={currentPlan}
+                interval={interval}
                 isPopular={info.popular}
                 hasActiveSub={subscription?.status === 'ACTIVE'}
                 onUpgrade={handleUpgrade}

@@ -55,8 +55,8 @@ export type Subscription = {
 }
 
 export type PlanLimits = {
-  botConfigs: number
   products: number
+  templates: number
   maxBroadcasts: number
   maxOrders: number
   canBroadcast: boolean
@@ -125,8 +125,8 @@ export type PlanInfo = {
   name: string
   monthlyPrice: number
   yearlyPrice: number
-  botConfigs: number | string
   products: number | string
+  templates: number | string
   maxBroadcasts: number | string
   maxOrders: number | string
   canBroadcast: boolean
@@ -139,8 +139,8 @@ export const PLAN_MATRIX: PlanInfo[] = [
     name: 'FREE',
     monthlyPrice: 0,
     yearlyPrice: 0,
-    botConfigs: 1,
     products: 10,
+    templates: 1,
     maxBroadcasts: 0,
     maxOrders: 10,
     canBroadcast: false,
@@ -148,10 +148,10 @@ export const PLAN_MATRIX: PlanInfo[] = [
   },
   {
     name: 'STARTER',
-    monthlyPrice: 35000,
-    yearlyPrice: 350000,
-    botConfigs: 1,
+    monthlyPrice: 39000,
+    yearlyPrice: 390000,
     products: 50,
+    templates: 5,
     maxBroadcasts: 50,
     maxOrders: 200,
     canBroadcast: true,
@@ -160,10 +160,10 @@ export const PLAN_MATRIX: PlanInfo[] = [
   },
   {
     name: 'PRO',
-    monthlyPrice: 100000,
-    yearlyPrice: 1000000,
-    botConfigs: 1,
+    monthlyPrice: 79000,
+    yearlyPrice: 790000,
     products: 'Tak terbatas',
+    templates: 'Tak terbatas',
     maxBroadcasts: 'Tak terbatas',
     maxOrders: 'Tak terbatas',
     canBroadcast: true,
@@ -173,6 +173,6 @@ export const PLAN_MATRIX: PlanInfo[] = [
 
 export const PLAN_PRICES: Record<Plan, Record<PlanInterval, number>> = {
   FREE: { MONTHLY: 0, YEARLY: 0 },
-  STARTER: { MONTHLY: 35000, YEARLY: 350000 },
-  PRO: { MONTHLY: 100000, YEARLY: 1000000 },
+  STARTER: { MONTHLY: 39000, YEARLY: 390000 },
+  PRO: { MONTHLY: 79000, YEARLY: 790000 },
 }

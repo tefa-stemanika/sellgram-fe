@@ -294,12 +294,18 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
               <Activity className="size-4" />
               Pemakaian Paket <strong className="text-foreground">{quota.plan}</strong>
             </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <div className="mt-4 grid gap-4 sm:grid-cols-4">
               <QuotaBar
                 label="Produk"
                 used={quota.products.used}
                 total={quota.products.total}
                 gradient="from-emerald-500 to-emerald-600"
+              />
+              <QuotaBar
+                label="Template"
+                used={quota.templates.used}
+                total={quota.templates.total}
+                gradient="from-teal-500 to-cyan-600"
               />
               <QuotaBar
                 label="Broadcast/bulan"

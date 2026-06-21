@@ -50,9 +50,12 @@ order-bot-dashboard
 │  │  │  │  ├─ _components
 │  │  │  │  │  └─ broadcast-detail-page.tsx
 │  │  │  │  └─ page.tsx
+│  │  │  ├─ create
+│  │  │  │  ├─ _components
+│  │  │  │  │  └─ broadcast-create-page.tsx
+│  │  │  │  └─ page.tsx
 │  │  │  ├─ _components
 │  │  │  │  ├─ broadcast-columns.tsx
-│  │  │  │  ├─ broadcast-create-dialog.tsx
 │  │  │  │  └─ broadcasts-client.tsx
 │  │  │  └─ page.tsx
 │  │  ├─ bot-config
@@ -98,6 +101,21 @@ order-bot-dashboard
 │  │  │  │  ├─ customer-detail-dialog.tsx
 │  │  │  │  ├─ customer-form-dialog.tsx
 │  │  │  │  └─ customers-client.tsx
+│  │  │  └─ page.tsx
+│  │  ├─ templates
+│  │  │  ├─ [id]
+│  │  │  │  ├─ edit
+│  │  │  │  │  ├─ _components
+│  │  │  │  │  │  └─ template-edit-page.tsx
+│  │  │  │  │  └─ page.tsx
+│  │  │  ├─ create
+│  │  │  │  ├─ _components
+│  │  │  │  │  └─ template-create-page.tsx
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ _components
+│  │  │  │  ├─ template-columns.tsx
+│  │  │  │  ├─ template-detail-dialog.tsx
+│  │  │  │  └─ templates-client.tsx
 │  │  │  └─ page.tsx
 │  │  └─ types.ts
 │  ├─ tickets
@@ -189,8 +207,6 @@ order-bot-dashboard
 ├─ services
 │  ├─ broadcast
 │  │  └─ index.ts
-│  ├─ public
-│  │  └─ index.ts
 │  ├─ bot-config
 │  │  └─ index.ts
 │  ├─ bot-credentials
@@ -199,13 +215,17 @@ order-bot-dashboard
 │  │  └─ index.ts
 │  ├─ customers
 │  │  └─ index.ts
-│  ├─ fulfillment
+│  ├─ dashboard
 │  │  └─ index.ts
 │  ├─ fetcher.ts
+│  ├─ fulfillment
+│  │  └─ index.ts
 │  ├─ index.ts
 │  ├─ orders
 │  │  └─ index.ts
 │  ├─ products
+│  │  └─ index.ts
+│  ├─ template
 │  │  └─ index.ts
 │  └─ user
 │     └─ index.ts

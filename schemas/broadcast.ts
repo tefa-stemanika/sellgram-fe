@@ -129,3 +129,62 @@ export const SORT_BY_OPTIONS = [
   { label: 'Terkirim', value: 'sentCount' },
   { label: 'Diperbarui', value: 'updatedAt' },
 ]
+
+export const SOURCE_TYPES = ['CUSTOMER_FIELD', 'STATIC_VALUE', 'DERIVED_FIELD'] as const
+export type SourceType = (typeof SOURCE_TYPES)[number]
+
+export const DERIVED_FIELD_TYPES = ['TOTAL_ORDERS', 'TOTAL_SPENT', 'LAST_ORDER_DATE', 'LAST_PRODUCT_NAME'] as const
+export type DerivedFieldType = (typeof DERIVED_FIELD_TYPES)[number]
+
+export type TemplateVariable = {
+  index: number
+  label: string
+  sample?: string
+}
+
+export type CampaignTemplate = {
+  id: string
+  userId: string
+  name: string
+  channel: BroadcastChannel
+  content: string
+  variableCount: number
+  variables: TemplateVariable[]
+  preview?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type TemplateMapping = {
+  variableIndex: number
+  sourceType: SourceType
+  sourceValue: string
+}
+
+export type PreviewRenderResponse = {
+  rendered: string
+  errors: string[]
+}
+
+export type DryRunItem = {
+  customerId: string
+  name: string | null
+  errors: string[]
+}
+
+export type DryRunResponse = {
+  total: number
+  invalidCount: number
+  invalidSamples: DryRunItem[]
+}
+
+export const createTemplateSchema = z.object({
+  name: z.string().min(1, 'Nama template wajib diisi').max(200, 'Nama maksimal 200 karakter'),
+  content: z.string().min(1, 'Konten template wajib diisi'),
+  channel: z.enum(BROADCAST_CHANNELS).default('TELEGRAM'),
+})
+
+export type CreateTemplateFormValues = z.infer<typeof createTemplateSchema>
+
+export const updateTemplateSchema = createTemplateSchema.partial()
+export type UpdateTemplateFormValues = z.infer<typeof updateTemplateSchema>

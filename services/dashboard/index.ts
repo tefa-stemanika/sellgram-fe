@@ -43,6 +43,7 @@ export async function getDashboard(token: string): Promise<DashboardData> {
 export type QuotaData = {
   plan: string
   products: { used: number; total: number | 'Unlimited' }
+  templates: { used: number; total: number | 'Unlimited' }
   broadcastsPerMonth: { used: number; total: number | 'Unlimited' }
   ordersPerMonth: { used: number; total: number | 'Unlimited' }
 }

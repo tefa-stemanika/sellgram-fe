@@ -15,16 +15,12 @@ import {
   resumeBroadcast,
   cancelBroadcast,
   deleteBroadcast,
-  createBroadcast,
-  previewBroadcast
 } from '@/services/broadcast'
 import type { BroadcastCampaign, BroadcastFilters } from '@/schemas/broadcast'
 import { BROADCAST_STATUSES, getBroadcastStatusLabel } from '@/schemas/broadcast'
-import type { CreateBroadcastFormValues } from '@/schemas/broadcast'
 
 import { DataTable } from '../../_components/data-table'
 import { getBroadcastColumns } from './broadcast-columns'
-import { BroadcastCreateDialog } from './broadcast-create-dialog'
 
 type BroadcastsClientProps = {
   token: string
@@ -45,16 +41,11 @@ export function BroadcastsClient({ token }: BroadcastsClientProps) {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isPreviewLoading, setIsPreviewLoading] = useState(false)
-  const [previewTotal, setPreviewTotal] = useState<number | null>(null)
 
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('ALL')
   const [sortBy, setSortBy] = useState('createdAt')
   const [sortDir, setSortDir] = useState('desc')
-
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   const fetchBroadcasts = useCallback(async () => {
     if (!token) {
@@ -116,37 +107,6 @@ export function BroadcastsClient({ token }: BroadcastsClientProps) {
     router.push(`/broadcasts/${broadcast.id}`)
   }, [router])
 
-  const handleCreate = async (values: CreateBroadcastFormValues & { filters?: BroadcastFilters }) => {
-    if (!token) return
-    setIsSaving(true)
-    try {
-      await createBroadcast(token, values)
-      toast.success('Broadcast berhasil dibuat')
-      setIsCreateOpen(false)
-      setPreviewTotal(null)
-      void fetchBroadcasts()
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Gagal membuat broadcast')
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  const handlePreview = async (filters: BroadcastFilters) => {
-    if (!token) return null
-    setIsPreviewLoading(true)
-    try {
-      const result = await previewBroadcast(token, filters)
-      setPreviewTotal(result.total)
-      return result
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Gagal preview')
-      return null
-    } finally {
-      setIsPreviewLoading(false)
-    }
-  }
-
   const columns = useMemo(
     () =>
       getBroadcastColumns({
@@ -188,10 +148,8 @@ export function BroadcastsClient({ token }: BroadcastsClientProps) {
             </div>
             <Button
               className="shadow-sm transition-all duration-200 hover:shadow-md"
-              onClick={() => {
-                setPreviewTotal(null)
-                setIsCreateOpen(true)
-              }}>
+              onClick={() => router.push('/broadcasts/create')}
+            >
               <Plus className="h-4 w-4" />
               Buat Broadcast
             </Button>
@@ -280,19 +238,6 @@ export function BroadcastsClient({ token }: BroadcastsClientProps) {
           )}
         </div>
       </div>
-
-      <BroadcastCreateDialog
-        open={isCreateOpen}
-        onOpenChange={(open) => {
-          setIsCreateOpen(open)
-          if (!open) setPreviewTotal(null)
-        }}
-        onSubmit={handleCreate}
-        onPreview={handlePreview}
-        isLoading={isSaving}
-        isPreviewLoading={isPreviewLoading}
-        previewTotal={previewTotal}
-      />
 
       <style jsx>{`
         @keyframes fadeInUp {

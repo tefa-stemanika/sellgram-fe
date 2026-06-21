@@ -155,8 +155,8 @@ export default function LandingPage() {
               const planLabel = getPlanLabel(plan.name as any)
               const isFree = plan.name === 'FREE'
               const features = [
-                `Bot Config: ${plan.botConfigs}`,
                 `Produk: ${plan.products === 'Tak terbatas' ? 'Tak terbatas' : `${plan.products} produk`}`,
+                `Broadcast Template: ${plan.templates === 'Tak terbatas' ? 'Tak terbatas' : `${plan.templates} template`}`,
                 `Broadcast/bln: ${plan.maxBroadcasts === 'Tak terbatas' ? 'Tak terbatas' : plan.maxBroadcasts === 0 ? 'Tidak ada' : `${plan.maxBroadcasts}x`}`,
                 `Max Order/bln: ${plan.maxOrders === 'Tak terbatas' ? 'Tak terbatas' : `${plan.maxOrders} order`}`,
                 'Fulfillment',

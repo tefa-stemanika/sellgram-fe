@@ -6,6 +6,9 @@ import type {
   PreviewCustomer,
   PreviewResponse,
   BroadcastFilters,
+  PreviewRenderResponse,
+  DryRunResponse,
+  TemplateMapping,
 } from '@/schemas/broadcast'
 
 export type ListBroadcastsResponse = {
@@ -195,5 +198,46 @@ export async function previewBroadcast(
     token,
     body: JSON.stringify({ filters })
   })
+  return response.data
+}
+
+export async function createBroadcastFromTemplate(
+  token: string,
+  payload: {
+    name: string
+    templateId: string
+    mappings: TemplateMapping[]
+    channel?: string
+    filters?: BroadcastFilters
+    scheduledAt?: string
+  }
+): Promise<BroadcastCampaign> {
+  const response = await fetcher<BroadcastDetailResponse>('/broadcasts/from-template', {
+    method: 'POST',
+    token,
+    body: JSON.stringify(payload)
+  })
+  return response.data
+}
+
+export async function previewRender(
+  token: string,
+  broadcastId: string
+): Promise<PreviewRenderResponse> {
+  const response = await fetcher<{ success: boolean; data: PreviewRenderResponse }>(
+    `/broadcasts/${broadcastId}/preview-render`,
+    { method: 'POST', token }
+  )
+  return response.data
+}
+
+export async function dryRun(
+  token: string,
+  broadcastId: string
+): Promise<DryRunResponse> {
+  const response = await fetcher<{ success: boolean; data: DryRunResponse }>(
+    `/broadcasts/${broadcastId}/dry-run`,
+    { method: 'POST', token }
+  )
   return response.data
 }

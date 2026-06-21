@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   CalendarClock,
   Clock,
+  Eye,
   History,
   Loader2,
   Pause,
@@ -13,7 +14,7 @@ import {
   SendHorizonal,
   Trash2,
   Users,
-  XCircle
+  XCircle,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -33,7 +34,9 @@ import {
   pauseBroadcast,
   resumeBroadcast,
   cancelBroadcast,
-  getRecipients
+  getRecipients,
+  previewRender,
+  dryRun,
 } from '@/services/broadcast'
 import type { BroadcastCampaign, BroadcastRecipient, BroadcastStatus } from '@/schemas/broadcast'
 import { getBroadcastStatusLabel, RECIPIENT_STATUS_LABELS } from '@/schemas/broadcast'
@@ -64,6 +67,11 @@ export function BroadcastDetailPage({ broadcastId, token }: BroadcastDetailPageP
   const [broadcast, setBroadcast] = useState<BroadcastCampaign | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingAction, setIsLoadingAction] = useState<string | null>(null)
+  const [renderPreview, setRenderPreview] = useState<string | null>(null)
+  const [renderErrors, setRenderErrors] = useState<string[]>([])
+  const [isRenderLoading, setIsRenderLoading] = useState(false)
+  const [dryRunResult, setDryRunResult] = useState<{ invalidCount: number; total: number } | null>(null)
+  const [isDryRunLoading, setIsDryRunLoading] = useState(false)
 
   const [recipients, setRecipients] = useState<BroadcastRecipient[]>([])
   const [recipientMeta, setRecipientMeta] = useState({ total: 0, page: 1, totalPages: 1 })
@@ -167,6 +175,39 @@ export function BroadcastDetailPage({ broadcastId, token }: BroadcastDetailPageP
         </Button>
       </div>
     )
+  }
+
+  const handlePreviewRender = async () => {
+    if (!token || !broadcast) return
+    setIsRenderLoading(true)
+    try {
+      const result = await previewRender(token, broadcast.id)
+      setRenderPreview(result.rendered)
+      setRenderErrors(result.errors)
+      toast.success('Preview render berhasil')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal preview render')
+    } finally {
+      setIsRenderLoading(false)
+    }
+  }
+
+  const handleDryRun = async () => {
+    if (!token || !broadcast) return
+    setIsDryRunLoading(true)
+    try {
+      const result = await dryRun(token, broadcast.id)
+      setDryRunResult({ invalidCount: result.invalidCount, total: result.total })
+      if (result.invalidCount > 0) {
+        toast.warning(`${result.invalidCount} dari ${result.total} customer gagal validasi`)
+      } else {
+        toast.success(`Semua ${result.total} customer valid`)
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal dry-run')
+    } finally {
+      setIsDryRunLoading(false)
+    }
   }
 
   const canSend = broadcast.status === 'DRAFT' || broadcast.status === 'SCHEDULED'
@@ -279,8 +320,69 @@ export function BroadcastDetailPage({ broadcastId, token }: BroadcastDetailPageP
                   Hapus
                 </Button>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isRenderLoading}
+                onClick={() => void handlePreviewRender()}
+              >
+                {isRenderLoading ? (
+                  <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Eye className="mr-1 h-3.5 w-3.5" />
+                )}
+                Preview Render
+              </Button>
+              {(canPause || canSend) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isDryRunLoading}
+                  onClick={() => void handleDryRun()}
+                >
+                  {isDryRunLoading ? (
+                    <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Eye className="mr-1 h-3.5 w-3.5" />
+                  )}
+                  Dry-Run
+                </Button>
+              )}
             </div>
           </div>
+
+          {renderPreview && (
+            <div className="mt-4 overflow-hidden rounded-xl">
+              <div className="border-b bg-white/10 px-4 py-2 text-xs font-medium text-muted-foreground bg-white">Preview Render</div>
+              <div
+                className="p-4 min-h-[100px] flex items-start"
+                style={{
+                  backgroundImage: 'url(/images/telegram-chat-background.jpg)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              >
+                <div className="max-w-[85%] rounded-2xl bg-white px-4 py-3 shadow-sm text-gray-900">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed">{renderPreview}</p>
+                  {renderErrors.length > 0 && (
+                    <div className="mt-2 space-y-1 border-t pt-2">
+                      {renderErrors.map((err, i) => (
+                        <p key={i} className="text-xs text-red-500">{err}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {dryRunResult && (
+            <div className="mt-3 flex items-center gap-2 text-xs">
+              <span className={dryRunResult.invalidCount > 0 ? 'text-red-500' : 'text-emerald-600'}>
+                Dry-run: {dryRunResult.invalidCount} invalid dari {dryRunResult.total} sample
+              </span>
+            </div>
+          )}
 
           <Separator className="my-5" />
 
@@ -359,8 +461,17 @@ export function BroadcastDetailPage({ broadcastId, token }: BroadcastDetailPageP
                 <h2 className="text-section-header font-semibold">Pesan Broadcast</h2>
               </AccordionTrigger>
               <AccordionContent className="pt-4">
-                <div className="rounded-xl border bg-white/50 p-4 dark:bg-card/50">
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed">{broadcast.message}</p>
+                <div
+                  className="rounded-xl p-4 min-h-[100px] flex items-start"
+                  style={{
+                    backgroundImage: 'url(/images/telegram-chat-background.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  <div className="max-w-[85%] rounded-2xl bg-white px-4 py-3 shadow-sm text-gray-900">
+                    <p className="whitespace-pre-wrap text-sm leading-relaxed">{broadcast.message}</p>
+                  </div>
                 </div>
               </AccordionContent>
             </AccordionItem>
