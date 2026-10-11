@@ -79,32 +79,45 @@ export function CustomerFormDialog({
           form.reset()
         }
       }}>
-      <DialogContent className="overflow-hidden border-0 p-0 shadow-2xl sm:max-w-lg">
-        <div className="h-1.5 w-full bg-gradient-to-r from-purple-500 to-pink-600" />
-        <div className="bg-white p-6 dark:bg-card">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black tracking-tight">
-              {isEditMode ? 'Edit Pelanggan' : 'Tambah Pelanggan'}
-            </DialogTitle>
-            <DialogDescription>
-              {isEditMode ? 'Perbarui informasi pelanggan.' : 'Masukkan data pelanggan baru.'}
-            </DialogDescription>
-          </DialogHeader>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>
+            {isEditMode ? 'Edit Pelanggan' : 'Tambah Pelanggan'}
+          </DialogTitle>
+          <DialogDescription>
+            {isEditMode ? 'Perbarui informasi pelanggan.' : 'Masukkan data pelanggan baru.'}
+          </DialogDescription>
+        </DialogHeader>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="mt-5 space-y-4">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="mt-1 space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nama</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nama pelanggan" {...field} value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="name"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nama</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Nama pelanggan"
+                        type="email"
+                        placeholder="email@contoh.com"
                         {...field}
                         value={field.value ?? ''}
-                        className="bg-white dark:bg-card"
                       />
                     </FormControl>
                     <FormMessage />
@@ -112,53 +125,30 @@ export function CustomerFormDialog({
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="email@contoh.com"
-                          {...field}
-                          value={field.value ?? ''}
-                          className="bg-white dark:bg-card"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>No. Telepon</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="+628123456789"
+                        {...field}
+                        value={field.value ?? ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>No. Telepon</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="+628123456789"
-                          {...field}
-                          value={field.value ?? ''}
-                          className="bg-white dark:bg-card"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Menyimpan...' : 'Simpan'}
-              </Button>
-            </form>
-          </Form>
-        </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Menyimpan...' : 'Simpan'}
+            </Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )
