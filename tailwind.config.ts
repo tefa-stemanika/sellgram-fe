@@ -5,6 +5,10 @@ const config: Config = {
   content: ['./pages/**/*.{js,ts,jsx,tsx,mdx}', './components/**/*.{js,ts,jsx,tsx,mdx}', './app/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-display)', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -18,7 +22,8 @@ const config: Config = {
         },
         primary: {
           DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))'
+          foreground: 'hsl(var(--primary-foreground))',
+          hover: 'hsl(var(--primary-hover))'
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -33,24 +38,29 @@ const config: Config = {
           foreground: 'hsl(var(--accent-foreground))'
         },
         destructive: {
-          DEFAULT: 'hsl(var(--error))',
-          foreground: 'hsl(var(--primary-foreground))'
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))'
         },
         success: {
           DEFAULT: 'hsl(var(--success))',
-          dark: 'hsl(142 65% 35%)'
+          fg: 'hsl(var(--success-fg))'
         },
         warning: {
           DEFAULT: 'hsl(var(--warning))',
-          dark: 'hsl(38 82% 40%)'
+          fg: 'hsl(var(--warning-fg))'
         },
         error: {
           DEFAULT: 'hsl(var(--error))',
-          dark: 'hsl(0 74% 50%)'
+          fg: 'hsl(var(--error-fg))'
         },
         info: {
           DEFAULT: 'hsl(var(--info))',
-          dark: 'hsl(217 81% 50%)'
+          fg: 'hsl(var(--info-fg))'
+        },
+        status: {
+          processing: 'hsl(var(--processing))',
+          confirmed: 'hsl(var(--confirmed))',
+          neutral: 'hsl(var(--neutral))'
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -60,7 +70,9 @@ const config: Config = {
           '2': 'hsl(var(--chart-2))',
           '3': 'hsl(var(--chart-3))',
           '4': 'hsl(var(--chart-4))',
-          '5': 'hsl(var(--chart-5))'
+          '5': 'hsl(var(--chart-5))',
+          grid: 'hsl(var(--chart-grid))',
+          axis: 'hsl(var(--chart-axis))'
         },
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
@@ -74,16 +86,17 @@ const config: Config = {
         }
       },
       fontSize: {
-        'page-title': ['2.5rem', { lineHeight: '3rem', fontWeight: '700', letterSpacing: '-0.015em' }],
-        'section-header': ['1.875rem', { lineHeight: '2.25rem', fontWeight: '700', letterSpacing: '-0.015em' }],
-        'subsection-header': ['1.5rem', { lineHeight: '2rem', fontWeight: '600', letterSpacing: '-0.01em' }],
-        'card-title': ['1.25rem', { lineHeight: '1.5rem', fontWeight: '600' }],
-        'small-header': ['1rem', { lineHeight: '1.5rem', fontWeight: '600' }],
-        body: ['0.94rem', { lineHeight: '1.6rem', fontWeight: '400' }],
-        'body-sm': ['0.875rem', { lineHeight: '1.4rem', fontWeight: '400' }],
-        caption: ['0.8rem', { lineHeight: '1.2rem', fontWeight: '500' }],
-        label: ['0.875rem', { lineHeight: '1.25rem', fontWeight: '500' }],
-        '32': ['2rem', { lineHeight: '1' }]
+        'page-title': ['2rem', { lineHeight: '2.25rem', fontWeight: '600', letterSpacing: '-0.02em' }],
+        'section-header': ['1.5rem', { lineHeight: '1.875rem', fontWeight: '600', letterSpacing: '-0.02em' }],
+        'subsection-header': ['1.25rem', { lineHeight: '1.5rem', fontWeight: '600', letterSpacing: '-0.015em' }],
+        'card-title': ['1.0625rem', { lineHeight: '1.25rem', fontWeight: '600', letterSpacing: '-0.01em' }],
+        'small-header': ['0.9375rem', { lineHeight: '1.25rem', fontWeight: '600' }],
+        body: ['1rem', { lineHeight: '1.55', fontWeight: '400' }],
+        'body-sm': ['0.875rem', { lineHeight: '1.45', fontWeight: '400' }],
+        caption: ['0.8125rem', { lineHeight: '1.35rem', fontWeight: '500' }],
+        label: ['0.8125rem', { lineHeight: '1.25rem', fontWeight: '600' }],
+        'mono-data': ['0.875rem', { lineHeight: '1.25rem', fontWeight: '500' }],
+        'display-hero': ['clamp(2.25rem, 4vw, 3.5rem)', { lineHeight: '1.05', fontWeight: '600', letterSpacing: '-0.03em' }]
       },
       spacing: {
         '4.5': '1.125rem',
@@ -114,17 +127,24 @@ const config: Config = {
         '96': '24rem'
       },
       borderRadius: {
-        xl: '1rem',
+        '2xl': 'var(--radius-2xl)',
+        xl: 'var(--radius-xl)',
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
-        xs: '0.375rem'
+        md: 'var(--radius-md)',
+        sm: 'var(--radius-sm)',
+        xs: '0.3rem'
       },
-      shadow: {
-        l1: '0 1px 3px rgb(0 0 0 / 0.05)',
-        l2: '0 4px 12px rgb(0 0 0 / 0.08)',
-        l3: '0 8px 24px rgb(0 0 0 / 0.12)',
-
+      boxShadow: {
+        l1: 'var(--shadow-l1)',
+        l2: 'var(--shadow-l2)',
+        l3: 'var(--shadow-l3)',
+        card: 'var(--shadow-l1)',
+        floating: 'var(--shadow-l3)'
+      },
+      container: {
+        center: true,
+        padding: { DEFAULT: '1.5rem' },
+        screens: { lg: '1024px' }
       },
       keyframes: {
         'accordion-down': {
@@ -151,6 +171,16 @@ const config: Config = {
             opacity: '1'
           }
         },
+        'fade-in-up': {
+          from: {
+            opacity: '0',
+            transform: 'translateY(12px)'
+          },
+          to: {
+            opacity: '1',
+            transform: 'translateY(0)'
+          }
+        },
         'slide-in-up': {
           from: {
             opacity: '0',
@@ -160,13 +190,20 @@ const config: Config = {
             opacity: '1',
             transform: 'translateY(0)'
           }
+        },
+        shimmer: {
+          '100%': {
+            transform: 'translateX(100%)'
+          }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.2s ease-out',
-        'slide-in-up': 'slide-in-up 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+        'fade-in-up': 'fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'slide-in-up': 'slide-in-up 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        shimmer: 'shimmer 1.6s ease-in-out infinite'
       },
       transitionDuration: {
         '250': '250ms',

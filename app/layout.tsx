@@ -1,5 +1,5 @@
-import type { Metadata } from 'next'
-import { IBM_Plex_Mono } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
+import { IBM_Plex_Mono, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './_components/theme-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -8,10 +8,18 @@ import { Toaster } from '@/components/ui/sonner'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 const metadataBase = new URL(siteUrl)
 
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-display',
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap'
+})
+
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
-  variable: '--font-ibm-plex-mono',
-  weight: ['100', '200', '300', '400', '500', '600', '700']
+  variable: '--font-mono',
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap'
 })
 
 export const metadata: Metadata = {
@@ -74,14 +82,22 @@ export const metadata: Metadata = {
   }
 }
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F7F7F5' },
+    { media: '(prefers-color-scheme: dark)', color: '#0D0E0C' }
+  ],
+  colorScheme: 'light dark'
+}
+
 export default function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="id">
-      <body className={`${ibmPlexMono.variable} antialiased relative`}>
+    <html lang="id" suppressHydrationWarning>
+      <body className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-sans antialiased relative`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <TooltipProvider>{children}</TooltipProvider>
           <Toaster richColors position="top-center" />
