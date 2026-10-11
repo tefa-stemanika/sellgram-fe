@@ -31,7 +31,9 @@ export function DeleteCredentialDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Hapus credential?</AlertDialogTitle>
-          <AlertDialogDescription>Credential {credentialKey ?? 'ini'} akan dihapus permanen.</AlertDialogDescription>
+          <AlertDialogDescription>
+            Credential <span className="font-mono">{credentialKey ?? 'ini'}</span> akan dihapus permanen.
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>Batal</AlertDialogCancel>

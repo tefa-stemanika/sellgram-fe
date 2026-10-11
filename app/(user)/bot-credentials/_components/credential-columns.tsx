@@ -17,17 +17,22 @@ export function getCredentialColumns({ onEdit, onDelete }: CredentialColumnsOpti
     {
       accessorKey: 'key',
       header: 'Key',
-      cell: ({ row }) => <span className="font-medium">{row.original.key}</span>
+      cell: ({ row }) => <span className="font-mono text-mono-data">{row.original.key}</span>
     },
     {
       id: 'value',
       header: 'Value',
-      cell: () => <span>••••••••</span>
+      cell: () => <span className="font-mono text-mono-data tabular">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span>
     },
     {
       accessorKey: 'updatedAt',
       header: 'Diupdate',
-      cell: ({ row }) => (row.original.updatedAt ? formatDate(new Date(row.original.updatedAt)) : '-')
+      cell: ({ row }) =>
+        row.original.updatedAt ? (
+          <span className="text-caption tabular text-muted-foreground">{formatDate(new Date(row.original.updatedAt))}</span>
+        ) : (
+          '-'
+        )
     },
     {
       id: 'actions',

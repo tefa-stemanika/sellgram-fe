@@ -70,8 +70,8 @@ export function CredentialForm({ mode, credentialKey, onSubmit, isLoading = fals
           />
         ) : (
           <div className="rounded-md border p-3 text-sm">
-            <p className="text-muted-foreground">Key</p>
-            <p className="font-medium">{credentialKey}</p>
+            <p className="text-caption text-muted-foreground">Key</p>
+            <p className="font-mono text-mono-data">{credentialKey}</p>
           </div>
         )}
 
