@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Clock, Info, ListFilter, RefreshCw, RotateCcw, SearchX } from 'lucide-react'
+import { Clock, ListFilter, RotateCcw, SearchX } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
@@ -10,6 +10,10 @@ import InputSearch from '@/components/core/input-search'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
+import { PageHeader } from '@/components/shared/page-header'
+import { DataTablePagination } from '@/components/shared/data-table-pagination'
+import { StatusBadge } from '@/components/shared/status-badge'
+import { Surface } from '@/components/shared/surface'
 import { listFulfillmentLogs, retryFulfillment } from '@/services/fulfillment'
 import type { FulfillmentLog, FulfillmentStatus, FulfillmentType } from '@/schemas/fulfillment'
 import { FULFILLMENT_STATUSES, getFulfillmentStatusLabel, FULFILLMENT_TYPES, getFulfillmentTypeLabel } from '@/schemas/fulfillment'
@@ -17,14 +21,6 @@ import { formatDate } from '@/lib/utils'
 
 type FulfillmentClientProps = {
   token: string
-}
-
-const STATUS_BADGE: Record<FulfillmentStatus, string> = {
-  SUCCESS: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
-  FAILED: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
-  PENDING: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
-  PROCESSING: 'bg-violet-100 text-violet-800 dark:bg-violet-900/40 dark:text-violet-300',
-  SKIPPED: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
 }
 
 export function FulfillmentClient({ token }: FulfillmentClientProps) {
@@ -96,12 +92,7 @@ export function FulfillmentClient({ token }: FulfillmentClientProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-page-title font-bold text-foreground">Log Fulfillment</h1>
-          <p className="text-body-sm text-muted-foreground">Riwayat pengiriman dan pemenuhan pesanan</p>
-        </div>
-      </div>
+      <PageHeader kicker="Operasional" title="Fulfillment" description="Riwayat pengiriman dan pemenuhan pesanan" />
 
       <div className="flex flex-wrap items-center gap-3">
         <InputSearch
@@ -153,7 +144,7 @@ export function FulfillmentClient({ token }: FulfillmentClientProps) {
         </div>
       </div>
 
-      <div className="rounded-md border border-input bg-white dark:bg-card">
+      <Surface className="overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -180,19 +171,19 @@ export function FulfillmentClient({ token }: FulfillmentClientProps) {
               : filteredLogs.length
                 ? filteredLogs.map((log) => (
                     <TableRow key={log.id}>
-                      <TableCell className="font-mono text-xs">{log.orderId}</TableCell>
+                      <TableCell className="font-mono text-mono-data tabular">{log.orderId}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="font-mono text-xs">
+                        <Badge variant="outline" className="font-mono text-caption">
                           {getFulfillmentTypeLabel(log.type)}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge className={`font-mono text-xs ${STATUS_BADGE[log.status]}`}>{getFulfillmentStatusLabel(log.status)}</Badge>
+                        <StatusBadge kind="fulfillment" value={log.status} withDot />
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
+                      <TableCell className="font-mono text-mono-data tabular text-muted-foreground">
                         {log.attempts}/{log.maxAttempts}
                       </TableCell>
-                      <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">
+                      <TableCell className="max-w-[200px] truncate text-body-sm text-muted-foreground">
                         {log.lastError ? (
                           <span title={log.lastError} className="cursor-help">
                             {log.lastError}
@@ -201,7 +192,7 @@ export function FulfillmentClient({ token }: FulfillmentClientProps) {
                           <span className="text-muted-foreground/50">&mdash;</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
+                      <TableCell className="font-mono text-mono-data tabular text-muted-foreground">
                         {log.deliveredAt ? formatDate(log.deliveredAt) : <span className="text-muted-foreground/50">&mdash;</span>}
                       </TableCell>
                       <TableCell>
@@ -233,23 +224,8 @@ export function FulfillmentClient({ token }: FulfillmentClientProps) {
                 )}
           </TableBody>
         </Table>
-      </div>
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-body-sm text-muted-foreground">
-            {total} log &mdash; Halaman {page} dari {totalPages}
-          </p>
-          <div className="flex items-center gap-2">
-            <Button type="button" variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
-              Sebelumnya
-            </Button>
-            <Button type="button" variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
-              Selanjutnya
-            </Button>
-          </div>
-        </div>
-      )}
+        <DataTablePagination page={page} totalPages={totalPages} onPageChange={(p) => setPage(Math.max(1, Math.min(totalPages, p)))} total={total} totalLabel="log" />
+      </Surface>
     </div>
   )
 }
