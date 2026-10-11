@@ -1,21 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import {
-  ArrowRight,
-  Check,
-  ChevronDown,
-  CreditCard,
-  FileText,
-  Loader2,
-  X,
-  ExternalLink,
-} from 'lucide-react'
+import { Check, ChevronDown, CreditCard, ExternalLink, FileText, Loader2, X } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -25,13 +15,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { PageHeader } from '@/components/shared/page-header'
+import { Surface } from '@/components/shared/surface'
+import { EmptyState } from '@/components/shared/empty-state'
+import { StatusBadge } from '@/components/shared/status-badge'
+import { DataTablePagination } from '@/components/shared/data-table-pagination'
 import { formatDate, formatIDRCurrency } from '@/lib/utils'
 import { getSubscription, upgradePlan, getInvoices } from '@/services/subscription'
 import {
   getPlanLabel,
-  getInvoiceStatusLabel,
   PLAN_MATRIX,
-  PLAN_PRICES,
   type Plan,
   type Subscription,
   type PlanLimits,
@@ -44,17 +37,15 @@ type PlanClientProps = {
 
 function PlanCardSkeleton() {
   return (
-    <Card className="border-0 bg-white shadow-sm">
-      <CardHeader>
-        <Skeleton className="h-5 w-16" />
-        <Skeleton className="mt-2 h-8 w-24" />
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <Surface className="p-5">
+      <Skeleton className="h-5 w-16" />
+      <Skeleton className="mt-2 h-8 w-24" />
+      <div className="mt-4 space-y-3">
         {Array.from({ length: 5 }).map((_, i) => (
           <Skeleton key={i} className="h-4 w-full" />
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </Surface>
   )
 }
 
@@ -73,45 +64,35 @@ function PlanCard({ plan, currentPlan, interval, isPopular, hasActiveSub, onUpgr
   const isCurrent = currentPlan === plan
   const isDowngrade = !isCurrent && PLAN_MATRIX.findIndex((p) => p.name === plan) < PLAN_MATRIX.findIndex((p) => p.name === currentPlan)
 
-  let buttonLabel = 'Pilih Paket'
+  let buttonLabel = 'Pilih paket'
   if (isCurrent && !hasActiveSub) buttonLabel = 'Aktif'
-  else if (isCurrent) buttonLabel = 'Paket Saat Ini'
+  else if (isCurrent) buttonLabel = 'Paket saat ini'
   else if (isDowngrade) buttonLabel = 'Downgrade'
 
   return (
-    <Card
-      className={`relative border-0 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md
-        ${isPopular ? 'ring-2 ring-primary' : ''}`}
-    >
-      {isPopular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <Badge className="bg-primary text-white px-4 py-1 text-xs font-semibold shadow-lg">
-            Terpopuler
-          </Badge>
-        </div>
-      )}
-
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{getPlanLabel(plan)}</CardTitle>
+    <Surface className={`flex flex-col gap-4 p-5 ${isPopular ? 'ring-1 ring-primary/40' : ''}`}>
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-card-title">{getPlanLabel(plan)}</h3>
+        <div className="flex items-center gap-2">
+          {isPopular && (
+            <span className="rounded-md bg-primary/12 px-2 py-0.5 text-caption font-medium text-primary">Terpopuler</span>
+          )}
           {isCurrent && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-caption">
               {hasActiveSub ? 'Aktif' : 'Free'}
             </Badge>
           )}
         </div>
+      </div>
 
-        <div className="mt-2">
-          <span className="text-3xl font-bold">
-            {interval === 'YEARLY' ? formatIDRCurrency(info.yearlyPrice) : formatIDRCurrency(info.monthlyPrice)}
-          </span>
-          <span className="text-sm text-muted-foreground">
-            /{interval === 'YEARLY' ? 'thn' : 'bln'}
-          </span>
-        </div>
+      <div>
+        <span className="text-subsection-header font-mono tabular">
+          {interval === 'YEARLY' ? formatIDRCurrency(info.yearlyPrice) : formatIDRCurrency(info.monthlyPrice)}
+        </span>
+        <span className="text-body-sm text-muted-foreground">/{interval === 'YEARLY' ? 'thn' : 'bln'}</span>
 
         {info.yearlyPrice > 0 && (
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-caption text-muted-foreground">
             {interval === 'YEARLY' ? (
               <>hemat {formatIDRCurrency(info.monthlyPrice * 12 - info.yearlyPrice)}/thn</>
             ) : (
@@ -119,59 +100,53 @@ function PlanCard({ plan, currentPlan, interval, isPopular, hasActiveSub, onUpgr
             )}
           </p>
         )}
-      </CardHeader>
+      </div>
 
-      <CardContent className="space-y-3">
-        <div className="flex items-center gap-2 text-sm">
-          {info.canUseFulfillment ? (
-            <Check className="h-4 w-4 text-emerald-500" />
-          ) : (
-            <X className="h-4 w-4 text-red-400" />
-          )}
+      <ul className="space-y-2.5">
+        <li className="flex items-center gap-2 text-body-sm">
+          {info.canUseFulfillment ? <Check className="h-4 w-4 shrink-0 text-success" /> : <X className="h-4 w-4 shrink-0 text-error" />}
           <span>
-            Fulfillment: <strong>{info.canUseFulfillment ? 'Ya' : 'Tidak'}</strong>
+            Fulfillment: <strong className="font-medium text-foreground">{info.canUseFulfillment ? 'Ya' : 'Tidak'}</strong>
           </span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm">
-          <Check className="h-4 w-4 text-emerald-500" />
+        </li>
+        <li className="flex items-center gap-2 text-body-sm">
+          <Check className="h-4 w-4 shrink-0 text-success" />
           <span>
-            Produk: <strong>{info.products}</strong>
+            Produk: <strong className="font-medium text-foreground">{info.products}</strong>
           </span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm">
-          <Check className="h-4 w-4 text-emerald-500" />
+        </li>
+        <li className="flex items-center gap-2 text-body-sm">
+          <Check className="h-4 w-4 shrink-0 text-success" />
           <span>
-            Broadcast Template: <strong>{info.templates}</strong>
+            Broadcast Template: <strong className="font-medium text-foreground">{info.templates}</strong>
           </span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm">
+        </li>
+        <li className="flex items-center gap-2 text-body-sm">
           {typeof info.maxBroadcasts === 'number' && info.maxBroadcasts === 0 ? (
-            <X className="h-4 w-4 text-red-400" />
+            <X className="h-4 w-4 shrink-0 text-error" />
           ) : (
-            <Check className="h-4 w-4 text-emerald-500" />
+            <Check className="h-4 w-4 shrink-0 text-success" />
           )}
           <span>
-            Broadcast/bln: <strong>{info.maxBroadcasts}</strong>
+            Broadcast/bln: <strong className="font-medium text-foreground">{info.maxBroadcasts}</strong>
           </span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm">
-          <Check className="h-4 w-4 text-emerald-500" />
+        </li>
+        <li className="flex items-center gap-2 text-body-sm">
+          <Check className="h-4 w-4 shrink-0 text-success" />
           <span>
-            Max Order/bln: <strong>{info.maxOrders}</strong>
+            Max Order/bln: <strong className="font-medium text-foreground">{info.maxOrders}</strong>
           </span>
-        </div>
+        </li>
+      </ul>
 
+      <div className="mt-auto pt-1">
         {plan === 'FREE' ? (
-          <Button asChild className="mt-4 w-full">
-            <Link href="/register">Mulai Gratis</Link>
+          <Button asChild className="w-full">
+            <Link href="/register">Mulai gratis</Link>
           </Button>
         ) : (
           <Button
-            className="mt-4 w-full"
+            className="w-full"
             variant={isCurrent ? 'outline' : 'default'}
             disabled={isCurrent || isDowngrade || upgrading === plan}
             onClick={() => onUpgrade(plan)}
@@ -186,32 +161,21 @@ function PlanCard({ plan, currentPlan, interval, isPopular, hasActiveSub, onUpgr
             )}
           </Button>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </Surface>
   )
 }
 
 function InvoiceRow({ invoice }: { invoice: InvoiceType }) {
-  const statusBadge: Record<string, string> = {
-    PENDING: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300',
-    PAID: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300',
-    EXPIRED: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300',
-    CANCELLED: 'bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400',
-  }
-
   return (
     <TableRow>
       <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
       <TableCell>{getPlanLabel(invoice.plan)}</TableCell>
-      <TableCell>{formatIDRCurrency(invoice.amount)}</TableCell>
+      <TableCell className="font-mono text-mono-data tabular">{formatIDRCurrency(invoice.amount)}</TableCell>
       <TableCell>
-        <span
-          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusBadge[invoice.status] || 'bg-gray-100 text-gray-700 border-gray-200'}`}
-        >
-          {getInvoiceStatusLabel(invoice.status)}
-        </span>
+        <StatusBadge kind="invoice" value={invoice.status} withDot />
       </TableCell>
-      <TableCell className="text-sm text-muted-foreground">{formatDate(invoice.createdAt)}</TableCell>
+      <TableCell className="text-body-sm text-muted-foreground">{formatDate(invoice.createdAt)}</TableCell>
       <TableCell>
         {invoice.status === 'PENDING' && invoice.paymentUrl ? (
           <Button size="sm" asChild>
@@ -221,7 +185,7 @@ function InvoiceRow({ invoice }: { invoice: InvoiceType }) {
             </a>
           </Button>
         ) : (
-          <span className="text-sm text-muted-foreground">&mdash;</span>
+          <span className="text-body-sm text-muted-foreground">&mdash;</span>
         )}
       </TableCell>
     </TableRow>
@@ -299,10 +263,10 @@ export function PlanClient({ token }: PlanClientProps) {
       const data = await upgradePlan(token, { plan, interval })
 
       if (data.paymentUrl) {
-        toast.success('Tagihan berhasil dibuat! Silakan lakukan pembayaran.')
+        toast.success('Tagihan berhasil dibuat. Silakan lakukan pembayaran.')
         window.open(data.paymentUrl, '_blank')
       } else {
-        toast.success('Paket berhasil diubah!')
+        toast.success('Paket berhasil diubah.')
       }
 
       await Promise.all([fetchSubscription(), fetchInvoices()])
@@ -314,96 +278,88 @@ export function PlanClient({ token }: PlanClientProps) {
   }
 
   return (
-    <div className="space-y-8">
-      <header className="animate-in fade-in slide-in-from-top-2 duration-500">
-        <div className="flex items-center gap-2">
-          <div className="h-1 w-8 rounded-full bg-gradient-to-r from-primary to-blue-600" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Berlangganan
-          </span>
-        </div>
-        <h1 className="mt-3 text-[32px] font-black leading-tight tracking-tight">Paket & Tagihan</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Kelola paket langganan dan lihat riwayat tagihan Anda
-        </p>
-      </header>
+    <div className="space-y-6">
+      <PageHeader kicker="Berlangganan" title="Paket langganan" description="Kelola paket langganan dan lihat riwayat tagihan Anda" />
 
       <section>
-        <h2 className="mb-2 text-section-header font-semibold">Paket Saat Ini</h2>
+        <h2 className="mb-2 text-section-header">Paket saat ini</h2>
         {isLoading ? (
-          <Card className="border-0 bg-white shadow-sm">
-            <CardHeader>
-              <Skeleton className="h-5 w-32" />
-              <Skeleton className="mt-1 h-4 w-48" />
-            </CardHeader>
-            <CardContent className="space-y-2">
+          <Surface className="p-5">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="mt-1 h-4 w-48" />
+            <div className="mt-4 space-y-2">
               <Skeleton className="h-4 w-40" />
               <Skeleton className="h-4 w-36" />
-            </CardContent>
-          </Card>
+            </div>
+          </Surface>
         ) : !token ? (
-          <Card className="border-0 bg-white shadow-sm">
-            <CardContent className="flex flex-col items-center gap-3 py-10">
-              <CreditCard className="h-10 w-10 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Silakan login untuk melihat langganan</p>
-              <Button asChild>
-                <Link href="/login">Masuk</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <Surface className="p-5">
+            <EmptyState
+              icon={CreditCard}
+              title="Silakan login untuk melihat langganan"
+              action={
+                <Button asChild>
+                  <Link href="/login">Masuk</Link>
+                </Button>
+              }
+            />
+          </Surface>
         ) : (
-          <Card className="border-0 bg-white shadow-sm">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>{getPlanLabel(currentPlan)}</CardTitle>
-                  <CardDescription>
-                    {subscription
-                      ? `Berlaku hingga ${formatDate(subscription.currentPeriodEnd)}`
-                      : 'Paket gratis — tidak ada masa berlaku'}
-                  </CardDescription>
-                </div>
-                {subscription && (
-                  <Badge
-                    className={
-                      subscription.status === 'ACTIVE'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-amber-100 text-amber-700'
-                    }
-                  >
-                    {subscription.status === 'ACTIVE' ? 'Aktif' : 'Tidak Aktif'}
-                  </Badge>
-                )}
+          <Surface className="p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-card-title">{getPlanLabel(currentPlan)}</h3>
+                <p className="mt-1 text-body-sm text-muted-foreground">
+                  {subscription
+                    ? `Berlaku hingga ${formatDate(subscription.currentPeriodEnd)}`
+                    : 'Paket gratis — tidak ada masa berlaku'}
+                </p>
               </div>
-            </CardHeader>
-            <CardContent>
-              {limits && (
-                <div className="flex flex-wrap gap-6 text-sm">
-                  <div>
-                    Broadcast Template: <strong>{limits.templates}</strong>
-                  </div>
-                  <div>
-                    Produk: <strong>{limits.products}</strong>
-                  </div>
-                  <div>
-                    Broadcast/bln: <strong>{limits.maxBroadcasts === 0 ? 'Tidak ada' : limits.maxBroadcasts}</strong>
-                  </div>
-                  <div>
-                    Max Order/bln: <strong>{limits.maxOrders}</strong>
-                  </div>
-                  <div>
-                    Fulfillment: <strong>{limits.canUseFulfillment ? 'Ya' : 'Tidak'}</strong>
-                  </div>
-                </div>
+              {subscription && (
+                <span
+                  className={
+                    'inline-flex items-center rounded-full border px-2 py-0.5 text-caption font-medium ' +
+                    (subscription.status === 'ACTIVE'
+                      ? 'border-success/25 bg-success/12 text-success'
+                      : 'border-warning/25 bg-warning/12 text-warning')
+                  }
+                >
+                  {subscription.status === 'ACTIVE' ? 'Aktif' : 'Tidak Aktif'}
+                </span>
               )}
-            </CardContent>
-          </Card>
+            </div>
+
+            {limits && (
+              <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
+                <div className="space-y-0.5">
+                  <p className="text-caption text-muted-foreground">Broadcast Template</p>
+                  <p className="text-body-sm font-medium">{limits.templates}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-caption text-muted-foreground">Produk</p>
+                  <p className="text-body-sm font-medium">{limits.products}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-caption text-muted-foreground">Broadcast/bln</p>
+                  <p className="text-body-sm font-medium">{limits.maxBroadcasts === 0 ? 'Tidak ada' : limits.maxBroadcasts}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-caption text-muted-foreground">Max Order/bln</p>
+                  <p className="text-body-sm font-medium">{limits.maxOrders}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-caption text-muted-foreground">Fulfillment</p>
+                  <p className="text-body-sm font-medium">{limits.canUseFulfillment ? 'Ya' : 'Tidak'}</p>
+                </div>
+              </div>
+            )}
+          </Surface>
         )}
       </section>
 
       <section>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-section-header font-semibold">Bandingkan Paket</h2>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="text-section-header">Bandingkan paket</h2>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -420,13 +376,13 @@ export function PlanClient({ token }: PlanClientProps) {
         </div>
 
         {isLoading ? (
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             <PlanCardSkeleton />
             <PlanCardSkeleton />
             <PlanCardSkeleton />
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid animate-fade-in-up gap-4 md:grid-cols-3">
             {PLAN_MATRIX.map((info) => (
               <PlanCard
                 key={info.name}
@@ -444,79 +400,51 @@ export function PlanClient({ token }: PlanClientProps) {
       </section>
 
       <section>
-        <h2 className="mb-4 text-section-header font-semibold">Riwayat Tagihan</h2>
+        <h2 className="mb-4 text-section-header">Riwayat tagihan</h2>
 
         {isLoadingInvoices ? (
-          <Card className="border-0 bg-white shadow-sm">
-            <CardContent className="py-10">
-              <div className="space-y-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-10 w-full" />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <Surface className="p-5">
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </div>
+          </Surface>
         ) : !token ? (
-          <Card className="border-0 bg-white shadow-sm">
-            <CardContent className="flex flex-col items-center gap-3 py-10">
-              <FileText className="h-10 w-10 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Login untuk melihat riwayat tagihan</p>
-            </CardContent>
-          </Card>
+          <Surface className="p-5">
+            <EmptyState icon={FileText} title="Login untuk melihat riwayat tagihan" />
+          </Surface>
         ) : invoices.length === 0 ? (
-          <Card className="border-0 bg-white shadow-sm">
-            <CardContent className="flex flex-col items-center gap-3 py-10">
-              <FileText className="h-10 w-10 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Belum ada tagihan</p>
-            </CardContent>
-          </Card>
+          <Surface className="p-5">
+            <EmptyState icon={FileText} title="Belum ada tagihan" />
+          </Surface>
         ) : (
-          <Card className="border-0 bg-white shadow-sm">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>No. Invoice</TableHead>
-                    <TableHead>Paket</TableHead>
-                    <TableHead>Jumlah</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Tanggal</TableHead>
-                    <TableHead>Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {invoices.map((invoice) => (
-                    <InvoiceRow key={invoice.id} invoice={invoice} />
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-            {invoiceTotalPages > 1 && (
-              <div className="flex items-center justify-between border-t px-6 py-3">
-                <p className="text-xs text-muted-foreground">
-                  Total {invoiceTotal} tagihan &mdash; Halaman {invoicePage} dari {invoiceTotalPages}
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={invoicePage <= 1}
-                    onClick={() => setInvoicePage((p) => p - 1)}
-                  >
-                    Sebelumnya
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={invoicePage >= invoiceTotalPages}
-                    onClick={() => setInvoicePage((p) => p + 1)}
-                  >
-                    Selanjutnya
-                  </Button>
-                </div>
-              </div>
-            )}
-          </Card>
+          <Surface className="overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>No. Invoice</TableHead>
+                  <TableHead>Paket</TableHead>
+                  <TableHead>Jumlah</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Tanggal</TableHead>
+                  <TableHead>Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {invoices.map((invoice) => (
+                  <InvoiceRow key={invoice.id} invoice={invoice} />
+                ))}
+              </TableBody>
+            </Table>
+            <DataTablePagination
+              page={invoicePage}
+              totalPages={invoiceTotalPages}
+              onPageChange={setInvoicePage}
+              total={invoiceTotal}
+              totalLabel="tagihan"
+            />
+          </Surface>
         )}
       </section>
     </div>
