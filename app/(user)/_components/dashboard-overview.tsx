@@ -1,29 +1,50 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Activity, Boxes, Copy, Globe, HandCoins, MessageCircle, ShoppingCart, TicketCheck, TrendingUp } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import type { ColumnDef } from '@tanstack/react-table'
+import { Activity, Boxes, Copy, HandCoins, ShoppingCart, TicketCheck } from 'lucide-react'
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from 'recharts'
 import { toast } from 'sonner'
 
-import { Card, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { EmptyState } from '@/components/shared/empty-state'
+import { DataTable } from './data-table'
+import { MetricCard } from '@/components/shared/metric-card'
+import { PageHeader } from '@/components/shared/page-header'
+import { QuotaBar } from '@/components/shared/quota-bar'
+import { StatusBadge } from '@/components/shared/status-badge'
+import { Surface } from '@/components/shared/surface'
 import { Button } from '@/components/ui/button'
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
+import { Skeleton } from '@/components/ui/skeleton'
+import { buildDailySeries, type DailyPoint } from '@/lib/analytics'
 import { formatDate, formatIDRCurrency } from '@/lib/utils'
-import { getDashboard, getQuota, type DashboardData, type QuotaData } from '@/services/dashboard'
+import { getDashboard, getQuota, type DashboardData, type DashboardOrder, type QuotaData } from '@/services/dashboard'
+import { getOrders } from '@/services/orders'
 import { getCurrentUser } from '@/services/user'
 
 type DashboardOverviewProps = {
   token: string
 }
 
-const statusBadge: Record<string, string> = {
-  COMPLETED: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300',
-  PENDING: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300',
-  PAYMENT_PENDING: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300',
-  CANCELLED: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300',
-  PAYMENT_FAILED: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300',
-  CONFIRMED: 'bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-900/40 dark:text-sky-300',
-  PROCESSING: 'bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300'
+const SOURCE_CONFIG = {
+  telegram: { label: 'Telegram', color: 'hsl(var(--chart-2))' },
+  website: { label: 'Website', color: 'hsl(var(--chart-4))' },
+  value: { label: 'Jumlah' }
+} satisfies ChartConfig
+
+const TREND_CONFIG = {
+  orders: { label: 'Order', color: 'hsl(var(--chart-1))' }
+} satisfies ChartConfig
+
+const SOURCE_TICK: Record<string, string> = {
+  telegram: 'Telegram',
+  website: 'Website'
+}
+
+function compactIDR(value: number): string {
+  if (value >= 1_000_000) return `Rp${(value / 1_000_000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}jt`
+  if (value >= 1_000) return `Rp${Math.round(value / 1_000)}rb`
+  return `Rp${value}`
 }
 
 export function DashboardOverview({ token }: DashboardOverviewProps) {
@@ -32,6 +53,9 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
   const [userId, setUserId] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [linkCopied, setLinkCopied] = useState(false)
+
+  const [trend, setTrend] = useState<DailyPoint[] | null>(null)
+  const [isTrendLoading, setIsTrendLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,11 +67,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
 
       setIsLoading(true)
       try {
-        const [data, q, user] = await Promise.all([
-          getDashboard(token),
-          getQuota(token),
-          getCurrentUser(token)
-        ])
+        const [data, q, user] = await Promise.all([getDashboard(token), getQuota(token), getCurrentUser(token)])
         setDashboard(data)
         setQuota(q)
         setUserId(user.id)
@@ -61,411 +81,258 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
     void fetchData()
   }, [token])
 
-  const metricCards = [
-    {
-      title: 'Produk Aktif',
-      value: dashboard?.activeProducts ?? 0,
-      icon: Boxes,
-      gradient: 'from-emerald-500 to-emerald-600',
-      iconBg: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300',
-      badge: `${dashboard?.activeProducts ?? 0} total`
-    },
-    {
-      title: 'Total Order',
-      value: dashboard?.totalOrders ?? 0,
-      icon: ShoppingCart,
-      gradient: 'from-blue-500 to-blue-600',
-      iconBg: 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300',
-      badge: 'total keseluruhan'
-    },
-    {
-      title: 'Pending',
-      value: dashboard?.pendingOrders ?? 0,
-      icon: Activity,
-      gradient: 'from-amber-500 to-amber-600',
-      iconBg: 'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300',
-      badge: 'perlu tindakan'
-    },
-    {
-      title: 'Pendapatan',
-      value: formatIDRCurrency(dashboard?.totalRevenue ?? 0),
-      icon: HandCoins,
-      gradient: 'from-primary to-purple-600',
-      iconBg: 'bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-300',
-      badge: dashboard ? `+${dashboard.revenueGrowth}% pertumbuhan` : 'belum ada data'
-    },
-    {
-      title: 'Tiket',
-      value: dashboard?.tickets.total ?? 0,
-      icon: TicketCheck,
-      gradient: 'from-rose-500 to-pink-600',
-      iconBg: 'bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-300',
-      badge: dashboard ? `${dashboard.tickets.open} terbuka, ${dashboard.tickets.closed} tertutup` : 'belum ada data'
+  useEffect(() => {
+    if (!token) {
+      setTrend(null)
+      setIsTrendLoading(false)
+      return
     }
-  ]
+
+    let cancelled = false
+    setIsTrendLoading(true)
+    getOrders(token, { limit: 100, sortBy: 'createdAt', sortDir: 'desc' })
+      .then((res) => {
+        if (!cancelled) setTrend(buildDailySeries(res.data, 14))
+      })
+      .catch(() => {
+        if (!cancelled) setTrend(null)
+      })
+      .finally(() => {
+        if (!cancelled) setIsTrendLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [token])
+
+  const ordersBySource = useMemo(() => {
+    if (!dashboard || dashboard.totalOrders <= 0) return null
+    return [
+      { source: 'telegram', value: dashboard.ordersBySource.TELEGRAM, fill: 'var(--color-telegram)' },
+      { source: 'website', value: dashboard.ordersBySource.WEBSITE, fill: 'var(--color-website)' }
+    ]
+  }, [dashboard])
+
+  const revenueBySource = useMemo(() => {
+    if (!dashboard || dashboard.totalRevenue <= 0) return null
+    return [
+      { source: 'telegram', value: dashboard.revenueBySource.TELEGRAM, fill: 'var(--color-telegram)' },
+      { source: 'website', value: dashboard.revenueBySource.WEBSITE, fill: 'var(--color-website)' }
+    ]
+  }, [dashboard])
+
+  const recentOrderColumns = useMemo<ColumnDef<DashboardOrder>[]>(
+    () => [
+      {
+        accessorKey: 'orderId',
+        header: 'Order',
+        cell: ({ row }) => <span className="font-mono text-mono-data">{row.original.orderId}</span>
+      },
+      {
+        accessorKey: 'source',
+        header: 'Sumber',
+        cell: ({ row }) => <StatusBadge kind="source" value={row.original.source} />
+      },
+      {
+        accessorKey: 'customerName',
+        header: 'Pelanggan',
+        cell: ({ row }) => row.original.customerName ?? row.original.firstName ?? row.original.username ?? '-'
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => <StatusBadge kind="order" value={row.original.status} withDot />
+      },
+      {
+        accessorKey: 'totalPrice',
+        header: 'Total',
+        cell: ({ row }) => <span className="font-mono text-sm tabular text-right block">{formatIDRCurrency(row.original.totalPrice)}</span>
+      },
+      {
+        accessorKey: 'createdAt',
+        header: 'Waktu',
+        cell: ({ row }) => <span className="text-caption text-muted-foreground">{formatDate(row.original.createdAt)}</span>
+      }
+    ],
+    []
+  )
+
+  const growthHint = useMemo(() => {
+    if (!dashboard) return 'belum ada data'
+    const sign = dashboard.revenueGrowth > 0 ? '+' : ''
+    return `${sign}${dashboard.revenueGrowth}% pertumbuhan pendapatan`
+  }, [dashboard])
+
+  const storeUrl = userId && typeof window !== 'undefined' ? `${window.location.origin}/store/${userId}` : ''
 
   return (
     <div className="space-y-8">
-      <header
-        className="animate-in fade-in slide-in-from-top-2 duration-500">
-        <div className="flex items-center gap-2">
-          <div className="h-1 w-8 rounded-full bg-gradient-to-r from-primary to-blue-600" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Dashboard
-          </span>
-        </div>
-        <h1 className="mt-4 text-4xl font-black tracking-tight">
-          Selamat Datang di{' '}
-          <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-            Sellgram
-          </span>
-        </h1>
-        <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Pantau produk, order, dan performa pendapatan secara real-time.
-        </p>
-      </header>
+      <PageHeader
+        kicker="Dashboard"
+        title="Ringkasan bisnis"
+        description="Pantau produk, order, dan performa pendapatan dari satu tempat."
+      />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 animate-fade-in-up sm:grid-cols-2 lg:grid-cols-5">
         {isLoading
           ? Array.from({ length: 5 }).map((_, i) => (
-              <Card key={i} className="overflow-hidden border-0 shadow-sm" style={{ animationDelay: `${i * 80}ms` }}>
-                <div className="h-1.5 w-full bg-gradient-to-r from-slate-200 to-slate-300" />
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-8 w-8 rounded-lg" />
-                  </div>
-                  <Skeleton className="mt-3 h-7 w-20" />
-                  <Skeleton className="mt-2 h-3 w-16" />
-                </CardContent>
-              </Card>
+              <Surface key={i} className="space-y-3 p-5">
+                <Skeleton className="h-3.5 w-24" />
+                <Skeleton className="h-7 w-20" />
+                <Skeleton className="h-3 w-16" />
+              </Surface>
             ))
-          : metricCards.map((metric, i) => {
-              const Icon = metric.icon
-
-              return (
-                <Card
-                  key={metric.title}
-                  className="group/card overflow-hidden border-0 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-                  style={{
-                    animation: 'fadeInUp 0.4s ease both',
-                    animationDelay: `${i * 80}ms`
-                  }}>
-                  <div className={`h-1.5 w-full bg-gradient-to-r ${metric.gradient}`} />
-                  <CardContent className="p-5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-muted-foreground">{metric.title}</span>
-                      <div className={`rounded-lg ${metric.iconBg} p-2 transition-all duration-300 group-hover/card:scale-110`}>
-                        <Icon className="h-4 w-4" />
-                      </div>
-                    </div>
-                    <p className="mt-3 text-2xl font-bold tracking-tight">{metric.value}</p>
-                    <p className="mt-1 text-xs text-muted-foreground/70">{metric.badge}</p>
-                  </CardContent>
-                </Card>
-              )
-            })}
+          : (
+              <>
+                <MetricCard label="Produk aktif" value={dashboard?.activeProducts ?? 0} icon={Boxes} hint="terdaftar di katalog" />
+                <MetricCard label="Total order" value={dashboard?.totalOrders ?? 0} icon={ShoppingCart} hint="sepanjang waktu" />
+                <MetricCard label="Pending" value={dashboard?.pendingOrders ?? 0} icon={Activity} hint="perlu tindakan" />
+                <MetricCard label="Pendapatan" value={formatIDRCurrency(dashboard?.totalRevenue ?? 0)} icon={HandCoins} hint={growthHint} />
+                <MetricCard
+                  label="Tiket"
+                  value={dashboard?.tickets.total ?? 0}
+                  icon={TicketCheck}
+                  hint={dashboard ? `${dashboard.tickets.open} terbuka · ${dashboard.tickets.closed} selesai` : 'belum ada data'}
+                />
+              </>
+            )}
       </div>
 
-      {!isLoading && dashboard && (
-        <div
-          className="grid gap-4 sm:grid-cols-2"
-          style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.15s' }}>
-          <Card className="overflow-hidden border-0 shadow-sm">
-            <div className="h-1.5 w-full bg-gradient-to-r from-sky-500 to-blue-600" />
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <Globe className="size-4" />
-                Sumber Order
-              </div>
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Globe className="size-4 text-sky-600" />
-                    <span className="text-sm font-medium">Website</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold">{dashboard.ordersBySource.WEBSITE}</span>
-                    <span className="text-xs text-muted-foreground">
-                      ({dashboard.totalOrders > 0
-                        ? Math.round((dashboard.ordersBySource.WEBSITE / dashboard.totalOrders) * 100)
-                        : 0}
-                      %)
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="size-4 text-emerald-600" />
-                    <span className="text-sm font-medium">Telegram</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold">{dashboard.ordersBySource.TELEGRAM}</span>
-                    <span className="text-xs text-muted-foreground">
-                      ({dashboard.totalOrders > 0
-                        ? Math.round((dashboard.ordersBySource.TELEGRAM / dashboard.totalOrders) * 100)
-                        : 0}
-                      %)
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="overflow-hidden border-0 shadow-sm">
-            <div className="h-1.5 w-full bg-gradient-to-r from-primary to-purple-600" />
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <HandCoins className="size-4" />
-                Pendapatan per Sumber
-              </div>
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Globe className="size-4 text-sky-600" />
-                    <span className="text-sm font-medium">Website</span>
-                  </div>
-                  <span className="text-lg font-bold">{formatIDRCurrency(dashboard.revenueBySource.WEBSITE)}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="size-4 text-emerald-600" />
-                    <span className="text-sm font-medium">Telegram</span>
-                  </div>
-                  <span className="text-lg font-bold">{formatIDRCurrency(dashboard.revenueBySource.TELEGRAM)}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <div className="grid gap-4 animate-fade-in-up lg:grid-cols-2">
+        <Surface className="p-5">
+          <h2 className="text-small-header">Order per sumber</h2>
+          <p className="text-caption mt-0.5 text-muted-foreground">Bagian order Telegram vs website.</p>
+          {isLoading ? (
+            <Skeleton className="mt-4 h-52" />
+          ) : ordersBySource ? (
+            <ChartContainer config={SOURCE_CONFIG} className="mt-4 h-52">
+              <PieChart>
+                <Pie data={ordersBySource} dataKey="value" nameKey="source" innerRadius={52} outerRadius={78} paddingAngle={2} strokeWidth={0} />
+                <ChartTooltip content={<ChartTooltipContent nameKey="source" />} />
+                <ChartLegend content={<ChartLegendContent nameKey="source" />} />
+              </PieChart>
+            </ChartContainer>
+          ) : (
+            <EmptyState
+              className="h-52"
+              icon={ShoppingCart}
+              title="Belum ada order"
+              description="Order dari Telegram atau website akan muncul di sini."
+            />
+          )}
+        </Surface>
 
-      {userId && (
-        <Card
-          className="overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-md"
-          style={{
-            animation: 'fadeInUp 0.4s ease both',
-            animationDelay: '0.2s'
-          }}>
-          <div className="h-1.5 w-full bg-gradient-to-r from-primary to-blue-600" />
-          <CardContent className="p-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-muted-foreground">Tautan Toko Publik</p>
-                <p className="mt-1 truncate text-sm font-semibold text-foreground">
-                  {typeof window !== 'undefined' ? `${window.location.origin}/store/${userId}` : ''}
-                </p>
-                <p className="mt-0.5 text-xs text-muted-foreground/70">
-                Bagikan tautan ini agar customer bisa order lewat website
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="shrink-0 gap-2"
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    `${window.location.origin}/store/${userId}`
-                  )
-                  setLinkCopied(true)
-                  toast.success('Tautan berhasil disalin')
-                  setTimeout(() => setLinkCopied(false), 2000)
-                }}
-                disabled={linkCopied}
-              >
-                <Copy className="h-4 w-4" />
-                {linkCopied ? 'Tersalin' : 'Salin Tautan'}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        <Surface className="p-5">
+          <h2 className="text-small-header">Pendapatan per sumber</h2>
+          <p className="text-caption mt-0.5 text-muted-foreground">Total nilai order yang selesai, dipecah per kanal.</p>
+          {isLoading ? (
+            <Skeleton className="mt-4 h-52" />
+          ) : revenueBySource ? (
+            <ChartContainer config={SOURCE_CONFIG} className="mt-4 h-52">
+              <BarChart data={revenueBySource} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
+                <CartesianGrid vertical={false} stroke="hsl(var(--chart-grid))" strokeDasharray="3 3" />
+                <XAxis dataKey="source" tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 12 }} tickFormatter={(value: string) => SOURCE_TICK[value] ?? value} />
+                <YAxis width={56} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} tickFormatter={(value: number) => compactIDR(value)} />
+                <ChartTooltip content={<ChartTooltipContent nameKey="source" formatter={(value) => formatIDRCurrency(Number(value))} />} />
+                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                  {revenueBySource.map((entry) => (
+                    <Cell key={entry.source} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+          ) : (
+            <EmptyState
+              className="h-52"
+              icon={HandCoins}
+              title="Belum ada pendapatan"
+              description="Pendapatan per sumber muncul setelah ada order selesai."
+            />
+          )}
+        </Surface>
+      </div>
 
-      {quota && (
-        <Card
-          className="overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-md"
-          style={{
-            animation: 'fadeInUp 0.4s ease both',
-            animationDelay: '0.25s'
-          }}>
-          <div className="h-1.5 w-full bg-gradient-to-r from-violet-500 to-purple-600" />
-          <CardContent className="p-5">
-            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-              <Activity className="size-4" />
-              Pemakaian Paket <strong className="text-foreground">{quota.plan}</strong>
-            </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-4">
-              <QuotaBar
-                label="Produk"
-                used={quota.products.used}
-                total={quota.products.total}
-                gradient="from-emerald-500 to-emerald-600"
-              />
-              <QuotaBar
-                label="Template"
-                used={quota.templates.used}
-                total={quota.templates.total}
-                gradient="from-teal-500 to-cyan-600"
-              />
-              <QuotaBar
-                label="Broadcast/bulan"
-                used={quota.broadcastsPerMonth.used}
-                total={quota.broadcastsPerMonth.total}
-                gradient="from-blue-500 to-indigo-600"
-              />
-              <QuotaBar
-                label="Order/bulan"
-                used={quota.ordersPerMonth.used}
-                total={quota.ordersPerMonth.total}
-                gradient="from-amber-500 to-orange-600"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <Surface className="animate-fade-in-up p-5">
+        <h2 className="text-small-header">Order per hari</h2>
+        <p className="text-caption mt-0.5 text-muted-foreground">Jumlah order yang masuk, 14 hari terakhir.</p>
+        {isTrendLoading ? (
+          <Skeleton className="mt-4 h-64" />
+        ) : trend ? (
+          <ChartContainer config={TREND_CONFIG} className="mt-4 h-64">
+            <AreaChart data={trend} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid vertical={false} stroke="hsl(var(--chart-grid))" strokeDasharray="3 3" />
+              <XAxis dataKey="label" tickLine={false} axisLine={false} minTickGap={16} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} />
+              <YAxis allowDecimals={false} width={34} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} />
+              <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
+              <Area type="monotone" dataKey="orders" stroke="var(--color-orders)" fill="var(--color-orders)" fillOpacity={0.15} strokeWidth={2} dot={false} activeDot={{ r: 3 }} />
+            </AreaChart>
+          </ChartContainer>
+        ) : (
+          <EmptyState
+            className="h-64"
+            icon={Activity}
+            title="Tren gagal dimuat"
+            description="Data order 14 hari terakhir tidak tersedia. Muat ulang halaman untuk mencoba lagi."
+          />
+        )}
+      </Surface>
 
-      <Card
-        className="overflow-hidden border-0 shadow-sm transition-all duration-300 hover:shadow-md"
-        style={{
-          animation: 'fadeInUp 0.4s ease both',
-          animationDelay: '0.35s'
-        }}>
-        <div className="h-1.5 w-full bg-gradient-to-r from-violet-500 to-purple-600" />
-        <CardContent className="p-0">
-          <div className="flex items-center justify-between border-b px-6 py-4">
-            <div>
-              <h2 className="text-lg font-bold">Order Terbaru</h2>
-              <p className="text-sm text-muted-foreground">5 order terakhir yang masuk ke sistem.</p>
+      {userId ? (
+        <Surface className="animate-fade-in-up p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-small-header">Tautan toko publik</h2>
+              <p className="text-body-sm mt-1 truncate font-mono text-muted-foreground">{storeUrl}</p>
+              <p className="text-caption mt-0.5 text-muted-foreground">Bagikan tautan ini agar customer bisa order lewat website.</p>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-              <TrendingUp className="h-3 w-3" />
-              {dashboard?.recentOrders.length ?? 0} order
-            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="shrink-0 gap-2"
+              disabled={linkCopied}
+              onClick={() => {
+                navigator.clipboard.writeText(storeUrl)
+                setLinkCopied(true)
+                toast.success('Tautan berhasil disalin')
+                setTimeout(() => setLinkCopied(false), 2000)
+              }}>
+              <Copy className="size-4" />
+              {linkCopied ? 'Tersalin' : 'Salin tautan'}
+            </Button>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="pl-6">Order ID</TableHead>
-                <TableHead>Sumber</TableHead>
-                <TableHead>Pelanggan</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead className="pr-6">Waktu</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                      <TableCell className="pl-6"><Skeleton className="h-4 w-28" /></TableCell>
-                      <TableCell><Skeleton className="h-5 w-14 rounded-full" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                      <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
-                      <TableCell className="text-right"><Skeleton className="ml-auto h-4 w-16" /></TableCell>
-                      <TableCell className="pr-6"><Skeleton className="h-4 w-20" /></TableCell>
-                    </TableRow>
-                ))
-              ) : dashboard?.recentOrders.length ? (
-                dashboard.recentOrders.map((order, i) => (
-                  <TableRow
-                    key={order.id}
-                    className="transition-colors hover:bg-muted/50"
-                    style={{
-                      animation: 'fadeInUp 0.3s ease both',
-                      animationDelay: `${0.4 + i * 0.05}s`
-                    }}>
-                    <TableCell className="pl-6 font-mono text-xs font-medium">{order.orderId}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${
-                          order.source === 'WEBSITE'
-                            ? 'border-sky-200 bg-sky-100 text-sky-700 dark:border-sky-900/40 dark:bg-sky-900/40 dark:text-sky-300'
-                            : 'border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-900/40 dark:text-emerald-300'
-                        }`}>
-                        {order.source === 'WEBSITE' ? <Globe className="size-3" /> : <MessageCircle className="size-3" />}
-                        {order.source === 'WEBSITE' ? 'Web' : 'Tele'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {order.customerName ?? order.firstName ?? order.username ?? '-'}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusBadge[order.status] || 'bg-gray-100 text-gray-700 border-gray-200'}`}>
-                        {order.status}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm font-semibold">
-                      {formatIDRCurrency(order.totalPrice)}
-                    </TableCell>
-                    <TableCell className="pr-6 text-xs text-muted-foreground">
-                      {formatDate(order.createdAt)}
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center gap-1">
-                      <ShoppingCart className="h-8 w-8 text-muted-foreground/40" />
-                      <p>Belum ada order.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+        </Surface>
+      ) : null}
 
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-    </div>
-  )
-}
+      {quota ? (
+        <Surface className="animate-fade-in-up p-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-small-header">Pemakaian paket</h2>
+            <p className="text-body-sm font-medium">{quota.plan}</p>
+          </div>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <QuotaBar label="Produk" used={quota.products.used} total={quota.products.total} />
+            <QuotaBar label="Template" used={quota.templates.used} total={quota.templates.total} />
+            <QuotaBar label="Broadcast/bulan" used={quota.broadcastsPerMonth.used} total={quota.broadcastsPerMonth.total} />
+            <QuotaBar label="Order/bulan" used={quota.ordersPerMonth.used} total={quota.ordersPerMonth.total} />
+          </div>
+        </Surface>
+      ) : null}
 
-function QuotaBar({
-  label,
-  used,
-  total,
-  gradient,
-}: {
-  label: string
-  used: number
-  total: number | 'Unlimited'
-  gradient: string
-}) {
-  const isUnlimited = total === 'Unlimited'
-  const pct = isUnlimited ? 100 : Math.min(Math.round((used / total) * 100), 100)
-
-  return (
-    <div>
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground">{label}</span>
-        <span className="font-semibold">
-          {used}
-          {isUnlimited ? '' : ` / ${total}`}
-        </span>
-      </div>
-      <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-gray-100">
-        <div
-          className={`h-full rounded-full bg-gradient-to-r ${gradient} transition-all duration-500`}
-          style={{ width: `${pct}%` }}
+      <section className="animate-fade-in-up space-y-3">
+        <div>
+          <h2 className="text-small-header">Order terbaru</h2>
+          <p className="text-caption mt-0.5 text-muted-foreground">Order terakhir yang masuk ke sistem.</p>
+        </div>
+        <DataTable
+          columns={recentOrderColumns}
+          data={dashboard?.recentOrders ?? []}
+          isLoading={isLoading}
+          emptyIcon={ShoppingCart}
+          emptyMessage="Belum ada order."
+          emptyDescription="Order dari Telegram atau toko publik akan tampil di sini."
         />
-      </div>
-      {!isUnlimited && (
-        <p className="mt-0.5 text-xs text-muted-foreground/70">{pct}% terpakai</p>
-      )}
+      </section>
     </div>
   )
 }

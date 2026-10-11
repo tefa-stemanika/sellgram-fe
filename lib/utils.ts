@@ -10,7 +10,7 @@ export const formatIDRCurrency = (amount: number): string => {
   return `Rp${amount.toLocaleString('id-ID')}`
 }
 
-function parseDateValue(value: unknown): Date | null {
+export function parseDateValue(value: unknown): Date | null {
   if (!value) return null
 
   if (value instanceof Date) return value
