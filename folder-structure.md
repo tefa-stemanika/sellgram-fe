@@ -140,6 +140,7 @@ order-bot-dashboard
 ├─ components
 │  ├─ core
 │  ├─ shared
+│  │  ├─ auth-shell.tsx
 │  │  ├─ data-table-pagination.tsx
 │  │  ├─ empty-state.tsx
 │  │  ├─ metric-card.tsx
@@ -193,6 +194,7 @@ order-bot-dashboard
 ├─ json
 │  └─ data.json
 ├─ lib
+│  ├─ analytics.ts
 │  ├─ status-tokens.ts
 │  └─ utils.ts
 ├─ next.config.mjs
