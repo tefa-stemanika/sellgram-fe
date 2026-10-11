@@ -7,6 +7,7 @@ import { Store, ShoppingBag } from 'lucide-react'
 import { getStoreProfile, getPublicProducts, type StoreProfile, type PublicProduct } from '@/services/public'
 import { formatIDRCurrency } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Surface } from '@/components/shared/surface'
 
 function getInitials(name: string): string {
   return name
@@ -60,17 +61,15 @@ export default function CatalogPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-12">
-        <Skeleton className="mx-auto mb-12 h-48 w-full max-w-xl rounded-2xl" />
+        <Skeleton className="mx-auto mb-12 h-48 w-full max-w-xl rounded-lg" />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="overflow-hidden rounded-2xl bg-card">
-              <div className="flex flex-col items-center p-8">
-                <Skeleton className="mb-4 size-20 rounded-2xl" />
-                <Skeleton className="mb-2 h-5 w-28" />
-                <Skeleton className="mb-2 h-4 w-40" />
-                <Skeleton className="mt-2 h-7 w-24 rounded-full" />
-              </div>
-            </div>
+            <Surface key={i} className="flex flex-col items-center p-8">
+              <Skeleton className="mb-4 size-20 rounded-lg" />
+              <Skeleton className="mb-2 h-5 w-28" />
+              <Skeleton className="mb-2 h-4 w-40" />
+              <Skeleton className="mt-2 h-7 w-24 rounded-full" />
+            </Surface>
           ))}
         </div>
       </div>
@@ -81,18 +80,13 @@ export default function CatalogPage() {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="text-center">
-          <div className="mb-6 flex items-center justify-center">
-            <div className="flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20">
-              <Store className="size-8 text-primary" />
-            </div>
+          <div className="mx-auto mb-6 flex size-20 items-center justify-center rounded-lg bg-muted">
+            <Store className="size-8 text-primary" />
           </div>
-          <h1 className="mb-3 text-section-header font-black text-foreground">
-            Toko Tidak Ditemukan
-          </h1>
+          <h1 className="mb-3 text-section-header font-semibold text-foreground">Toko tidak ditemukan</h1>
           <p className="mx-auto max-w-sm text-body text-muted-foreground">
             Tautan toko tidak valid atau toko sudah tidak aktif.
           </p>
-          <div className="mx-auto mt-8 h-1 w-24 rounded-full bg-gradient-to-r from-primary to-secondary" />
         </div>
       </div>
     )
@@ -102,39 +96,26 @@ export default function CatalogPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
-      <div
-        className="relative mb-14 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-1"
-        style={{ animation: 'slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both' }}
-      >
-        <div className="relative rounded-xl bg-white/70 backdrop-blur-xl px-8 py-10 text-center dark:bg-card/80">
-          <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary shadow-lg">
-            {heroLogo.type === 'emoji' ? (
-              <span className="text-4xl">{heroLogo.value}</span>
-            ) : (
-              <span className="text-2xl font-black tracking-tight text-white">{heroLogo.value}</span>
-            )}
-          </div>
-          <h1 className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-4xl font-black tracking-tight text-transparent animate-gradient-shift">
-            {profile!.name}
-          </h1>
-          <div className="mx-auto mt-3 h-0.5 w-16 rounded-full bg-gradient-to-r from-primary to-secondary" />
-          <p className="mt-4 text-body text-muted-foreground">
-            Pilih produk favorit kamu dan pesan langsung lewat website
-          </p>
+      <Surface elevation={1} className="mb-14 animate-fade-in-up px-8 py-10 text-center">
+        <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-lg bg-primary shadow-l1">
+          {heroLogo.type === 'emoji' ? (
+            <span className="text-4xl">{heroLogo.value}</span>
+          ) : (
+            <span className="text-2xl font-semibold tracking-tight text-primary-foreground">{heroLogo.value}</span>
+          )}
         </div>
-      </div>
+        <h1 className="text-page-title font-semibold tracking-tight text-foreground">{profile!.name}</h1>
+        <p className="mt-4 text-body text-muted-foreground">
+          Pilih produk favorit kamu dan pesan langsung lewat website
+        </p>
+      </Surface>
 
       {availableProducts.length === 0 ? (
-        <div
-          className="py-20 text-center"
-          style={{ animation: 'slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both', animationDelay: '0.15s' }}
-        >
-          <div className="mx-auto mb-6 flex size-24 items-center justify-center rounded-full bg-primary/10">
+        <div className="animate-fade-in-up py-20 text-center" style={{ animationDelay: '0.15s' }}>
+          <div className="mx-auto mb-6 flex size-24 items-center justify-center rounded-full bg-muted">
             <ShoppingBag className="size-10 text-primary/60" />
           </div>
-          <h2 className="mb-2 text-section-header font-bold text-foreground">
-            Belum Ada Produk
-          </h2>
+          <h2 className="mb-2 text-section-header font-semibold text-foreground">Belum ada produk</h2>
           <p className="text-body text-muted-foreground">
             Belum ada produk tersedia saat ini.
           </p>
@@ -145,29 +126,23 @@ export default function CatalogPage() {
             <Link
               key={product.id}
               href={`/store/${userId}/product/${product.id}`}
-              className="group block"
-              style={{
-                animation: 'slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both',
-                animationDelay: `${0.1 + i * 0.06}s`
-              }}
+              className="group block animate-fade-in-up"
+              style={{ animationDelay: `${0.1 + i * 0.06}s` }}
             >
-              <div className="group/card relative overflow-hidden rounded-2xl bg-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-transparent to-secondary/0 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100" />
-                <div className="relative flex flex-col items-center p-8 text-center">
-                  <div className="mb-4 flex size-24 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-secondary/15 text-4xl transition-all duration-300 group-hover/card:scale-110 group-hover/card:from-primary/25 group-hover/card:to-secondary/25">
-                    {product.emoji}
-                  </div>
-                  <h3 className="text-card-title font-bold text-foreground">
-                    {product.name}
-                  </h3>
-                  {product.description && (
-                    <p className="mt-1.5 line-clamp-2 text-body-sm text-muted-foreground">
-                      {product.description}
-                    </p>
-                  )}
-                  <div className="mt-4 inline-block rounded-full bg-gradient-to-r from-primary to-primary/80 px-5 py-1.5 text-label font-bold text-primary-foreground shadow-sm">
-                    {formatIDRCurrency(product.price)}
-                  </div>
+              <div className="relative flex flex-col items-center overflow-hidden rounded-lg border border-border bg-card p-8 text-center shadow-l1 transition-shadow duration-200 hover:shadow-l2">
+                <div className="mb-4 flex size-24 items-center justify-center rounded-lg bg-muted text-4xl">
+                  {product.emoji}
+                </div>
+                <h3 className="text-card-title font-semibold text-foreground">
+                  {product.name}
+                </h3>
+                {product.description && (
+                  <p className="mt-1.5 line-clamp-2 text-body-sm text-muted-foreground">
+                    {product.description}
+                  </p>
+                )}
+                <div className="mt-4 inline-block rounded-full border border-primary/25 bg-primary/10 px-4 py-1 font-mono text-label font-semibold tabular text-primary">
+                  {formatIDRCurrency(product.price)}
                 </div>
               </div>
             </Link>
@@ -175,35 +150,13 @@ export default function CatalogPage() {
         </div>
       )}
 
-      <div
-        className="mt-16 text-center"
-        style={{ animation: 'fadeIn 0.5s ease both', animationDelay: '0.5s' }}
-      >
-        <div className="mx-auto h-px w-32 bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="mt-16 animate-fade-in-up text-center" style={{ animationDelay: '0.5s' }}>
+        <div className="mx-auto h-px w-32 bg-border" />
         <p className="mt-4 text-caption text-muted-foreground">
           Powered by{' '}
-          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text font-semibold text-transparent">
-            Sellgram
-          </span>
+          <span className="font-semibold text-foreground">Sellgram</span>
         </p>
       </div>
-
-      <style jsx>{`
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-      `}</style>
     </div>
   )
 }

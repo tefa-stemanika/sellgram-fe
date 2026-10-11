@@ -8,6 +8,9 @@ import { usePortalAuth } from '../_components/portal-auth-provider'
 import { registerSchema, type RegisterInput } from '@/schemas/portal'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Surface } from '@/components/shared/surface'
 
 export default function RegisterPage() {
   const params = useParams<{ userId: string }>()
@@ -56,21 +59,21 @@ export default function RegisterPage() {
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-md items-center px-4 py-12">
-      <div className="w-full" style={{ animation: 'slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
+      <div className="w-full animate-fade-in-up">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary shadow-lg">
-            <Store className="size-6 text-white" />
+          <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-lg bg-primary shadow-l1">
+            <Store className="size-6 text-primary-foreground" />
           </div>
-          <h1 className="text-section-header font-black text-foreground">Daftar</h1>
+          <h1 className="text-section-header font-semibold text-foreground">Daftar</h1>
           <p className="mt-1.5 text-body-sm text-muted-foreground">
             Buat akun customer baru
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border/50 bg-card p-6">
+        <Surface className="p-6">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {serverError && (
-              <div className="rounded-lg bg-error/10 px-4 py-3 text-body-sm font-medium text-error">
+              <div className="rounded-lg border border-error/25 bg-error/10 px-4 py-3 text-body-sm font-medium text-error">
                 {serverError}
                 {serverError.endsWith('. ') && (
                   <Link
@@ -89,16 +92,13 @@ export default function RegisterPage() {
               </label>
               <div className="relative">
                 <User className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <input
+                <Input
                   id="name"
                   type="text"
                   value={form.name}
                   onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                   placeholder="Budi Santoso"
-                  className={cn(
-                    'h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-body-sm text-foreground placeholder:text-muted-foreground/50 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring',
-                    errors.name && 'border-error'
-                  )}
+                  className={cn('pl-9', errors.name && 'border-error')}
                 />
               </div>
               {errors.name && (
@@ -112,16 +112,13 @@ export default function RegisterPage() {
               </label>
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <input
+                <Input
                   id="email"
                   type="email"
                   value={form.email}
                   onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
                   placeholder="budi@example.com"
-                  className={cn(
-                    'h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-body-sm text-foreground placeholder:text-muted-foreground/50 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring',
-                    errors.email && 'border-error'
-                  )}
+                  className={cn('pl-9', errors.email && 'border-error')}
                 />
               </div>
               {errors.email && (
@@ -135,16 +132,13 @@ export default function RegisterPage() {
               </label>
               <div className="relative">
                 <Phone className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <input
+                <Input
                   id="phone"
                   type="tel"
                   value={form.phone}
                   onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
                   placeholder="08xxxxxxxxxx"
-                  className={cn(
-                    'h-10 w-full rounded-lg border border-input bg-background pl-9 pr-3 text-body-sm text-foreground placeholder:text-muted-foreground/50 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring',
-                    errors.phone && 'border-error'
-                  )}
+                  className={cn('pl-9', errors.phone && 'border-error')}
                 />
               </div>
               {errors.phone && (
@@ -158,24 +152,23 @@ export default function RegisterPage() {
               </label>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <input
+                <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
                   onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
                   placeholder="Minimal 6 karakter"
-                  className={cn(
-                    'h-10 w-full rounded-lg border border-input bg-background pl-9 pr-9 text-body-sm text-foreground placeholder:text-muted-foreground/50 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring',
-                    errors.password && 'border-error'
-                  )}
+                  className={cn('pr-9 pl-9', errors.password && 'border-error')}
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setShowPassword(p => !p)}
-                  className="absolute right-2 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center text-muted-foreground hover:text-foreground"
+                  className="absolute right-1 top-1/2 size-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
+                </Button>
               </div>
               {errors.password && (
                 <span className="text-caption text-error">{errors.password}</span>
@@ -188,44 +181,39 @@ export default function RegisterPage() {
               </label>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <input
+                <Input
                   id="confirmPassword"
                   type={showConfirm ? 'text' : 'password'}
                   value={form.confirmPassword}
                   onChange={e => setForm(p => ({ ...p, confirmPassword: e.target.value }))}
                   placeholder="Ulangi kata sandi"
-                  className={cn(
-                    'h-10 w-full rounded-lg border border-input bg-background pl-9 pr-9 text-body-sm text-foreground placeholder:text-muted-foreground/50 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring',
-                    errors.confirmPassword && 'border-error'
-                  )}
+                  className={cn('pr-9 pl-9', errors.confirmPassword && 'border-error')}
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setShowConfirm(p => !p)}
-                  className="absolute right-2 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center text-muted-foreground hover:text-foreground"
+                  className="absolute right-1 top-1/2 size-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
+                </Button>
               </div>
               {errors.confirmPassword && (
                 <span className="text-caption text-error">{errors.confirmPassword}</span>
               )}
             </div>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary text-body-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-            >
+            <Button type="submit" disabled={submitting} className="mt-2 w-full">
               {submitting ? (
                 <div className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
                 <UserPlus className="size-4" />
               )}
               {submitting ? 'Memproses...' : 'Daftar'}
-            </button>
+            </Button>
           </form>
-        </div>
+        </Surface>
 
         <p className="mt-6 text-center text-body-sm text-muted-foreground">
           Sudah punya akun?{' '}
@@ -237,13 +225,6 @@ export default function RegisterPage() {
           </Link>
         </p>
       </div>
-
-      <style jsx>{`
-        @keyframes slideInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   )
 }

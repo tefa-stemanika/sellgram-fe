@@ -9,6 +9,7 @@ import { usePortalAuth } from '../../_components/portal-auth-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Surface } from '@/components/shared/surface'
 import { toast } from 'sonner'
 import { formatIDRCurrency } from '@/lib/utils'
 
@@ -91,8 +92,8 @@ export default function ProductDetailPage() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-12">
         <Skeleton className="mb-8 h-6 w-32" />
-        <Skeleton className="mb-6 h-52 w-full rounded-2xl" />
-        <Skeleton className="h-72 w-full rounded-2xl" />
+        <Skeleton className="mb-6 h-52 w-full rounded-lg" />
+        <Skeleton className="h-72 w-full rounded-lg" />
       </div>
     )
   }
@@ -101,15 +102,15 @@ export default function ProductDetailPage() {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="text-center">
-          <div className="mb-6 text-7xl">(empty)</div>
-          <h1 className="mb-3 text-section-header font-black text-foreground">Produk Tidak Ditemukan</h1>
+          <div className="mb-6 text-7xl font-semibold text-muted-foreground">(empty)</div>
+          <h1 className="mb-3 text-section-header font-semibold text-foreground">Produk tidak ditemukan</h1>
           <p className="mb-8 text-body text-muted-foreground">Produk tidak tersedia atau telah dihapus.</p>
-          <Link
-            href={`/store/${userId}`}
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-label font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95">
-            <ArrowLeft className="size-4" />
-            Kembali ke Katalog
-          </Link>
+          <Button asChild size="xl">
+            <Link href={`/store/${userId}`}>
+              <ArrowLeft className="size-4" />
+              Kembali ke katalog
+            </Link>
+          </Button>
         </div>
       </div>
     )
@@ -119,34 +120,25 @@ export default function ProductDetailPage() {
     <div className="mx-auto max-w-2xl px-4 py-12">
       <Link
         href={`/store/${userId}`}
-        className="group mb-8 inline-flex items-center gap-1.5 text-body-sm text-muted-foreground transition-colors hover:text-foreground"
-        style={{ animation: 'slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
+        className="group mb-8 inline-flex animate-fade-in-up items-center gap-1.5 text-body-sm text-muted-foreground transition-colors hover:text-foreground">
         <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
         Kembali ke Katalog
       </Link>
 
-      <div
-        className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-background to-secondary/5"
-        style={{ animation: 'slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both', animationDelay: '0.05s' }}>
-        <div className="relative bg-white/80 backdrop-blur-sm dark:bg-card/80 p-8">
-          <div className="flex flex-col items-center text-center">
-            <div className="mb-5 flex size-28 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 text-5xl shadow-inner">
-              {product.emoji}
-            </div>
-            <h1 className="text-page-title font-black text-foreground">{product.name}</h1>
-            {product.description && <p className="mt-2 max-w-md text-body text-muted-foreground">{product.description}</p>}
-            <div className="mt-5 inline-block rounded-full bg-gradient-to-r from-primary to-primary/80 px-7 py-2.5 text-card-title font-bold text-primary-foreground shadow-md">
-              {formatIDRCurrency(product.price)}
-            </div>
-          </div>
+      <Surface elevation={1} className="animate-fade-in-up p-8 text-center" style={{ animationDelay: '0.05s' }}>
+        <div className="mx-auto mb-5 flex size-28 items-center justify-center rounded-lg bg-muted text-5xl">
+          {product.emoji}
         </div>
-      </div>
+        <h1 className="text-page-title font-semibold text-foreground">{product.name}</h1>
+        {product.description && <p className="mx-auto mt-2 max-w-md text-body text-muted-foreground">{product.description}</p>}
+        <div className="mt-5 inline-block rounded-full border border-primary/25 bg-primary/10 px-6 py-1.5 font-mono text-card-title font-semibold tabular text-primary">
+          {formatIDRCurrency(product.price)}
+        </div>
+      </Surface>
 
-      <div
-        className="mt-8 overflow-hidden rounded-2xl bg-card"
-        style={{ animation: 'slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both', animationDelay: '0.12s' }}>
+      <Surface elevation={1} className="mt-8 animate-fade-in-up overflow-hidden" style={{ animationDelay: '0.12s' }}>
         <div className="border-b border-border px-8 py-4">
-          <h2 className="text-card-title font-bold text-foreground">Detail Pesanan</h2>
+          <h2 className="text-card-title font-semibold text-foreground">Detail pesanan</h2>
         </div>
         <div className="p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -160,7 +152,7 @@ export default function ProductDetailPage() {
                 onChange={(e) => setForm((f) => ({ ...f, customerName: e.target.value }))}
                 disabled={submitting}
                 required
-                className="h-12 rounded-xl border-border bg-background px-4 text-body"
+                className="text-body"
               />
             </div>
 
@@ -173,7 +165,7 @@ export default function ProductDetailPage() {
                 value={form.customerPhone}
                 onChange={(e) => setForm((f) => ({ ...f, customerPhone: e.target.value }))}
                 disabled={submitting}
-                className="h-12 rounded-xl border-border bg-background px-4 text-body"
+                className="text-body"
               />
             </div>
 
@@ -186,7 +178,7 @@ export default function ProductDetailPage() {
                 value={form.quantity}
                 onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
                 disabled={submitting}
-                className="h-12 rounded-xl border-border bg-background px-4 text-body"
+                className="text-body font-mono tabular"
               />
             </div>
 
@@ -194,7 +186,7 @@ export default function ProductDetailPage() {
               <Button
                 type="submit"
                 size="xl"
-                className="h-14 w-full gap-3 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-body font-bold shadow-md transition-all hover:from-primary/90 hover:to-primary/70 active:scale-[0.98] text-white"
+                className="w-full"
                 disabled={submitting}>
                 <ShoppingBag className="size-5" />
                 {submitting ? 'Memproses...' : 'Beli Sekarang'}
@@ -202,38 +194,15 @@ export default function ProductDetailPage() {
             </div>
           </form>
         </div>
-      </div>
+      </Surface>
 
-      <div className="mt-8 text-center" style={{ animation: 'fadeIn 0.5s ease both', animationDelay: '0.25s' }}>
-        <div className="mx-auto h-px w-32 bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="mt-8 animate-fade-in-up text-center" style={{ animationDelay: '0.25s' }}>
+        <div className="mx-auto h-px w-32 bg-border" />
         <p className="mt-4 text-caption text-muted-foreground">
           Pembayaran diproses secara aman oleh{' '}
-          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text font-semibold text-transparent">
-            Midtrans
-          </span>
+          <span className="font-semibold text-foreground">Midtrans</span>
         </p>
       </div>
-
-      <style jsx>{`
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   )
 }

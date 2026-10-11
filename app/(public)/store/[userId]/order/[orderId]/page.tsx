@@ -12,54 +12,19 @@ import {
 } from 'lucide-react'
 import { getOrderStatus, type OrderStatus } from '@/services/public'
 import { formatDate, formatIDRCurrency, cn } from '@/lib/utils'
+import { resolveStatus } from '@/lib/status-tokens'
+import { StatusBadge } from '@/components/shared/status-badge'
+import { Surface } from '@/components/shared/surface'
 import { Skeleton } from '@/components/ui/skeleton'
 
-const statusConfig: Record<
-  string,
-  { label: string; icon: typeof CheckCircle2; gradient: string; iconBg: string }
-> = {
-  COMPLETED: {
-    label: 'Lunas',
-    icon: CheckCircle2,
-    gradient: 'from-success/20 to-success/5',
-    iconBg: 'bg-success/15 text-success'
-  },
-  PENDING: {
-    label: 'Menunggu Konfirmasi',
-    icon: Clock,
-    gradient: 'from-warning/20 to-warning/5',
-    iconBg: 'bg-warning/15 text-warning'
-  },
-  PAYMENT_PENDING: {
-    label: 'Menunggu Pembayaran',
-    icon: CreditCard,
-    gradient: 'from-info/20 to-info/5',
-    iconBg: 'bg-info/15 text-info'
-  },
-  CANCELLED: {
-    label: 'Dibatalkan',
-    icon: XCircle,
-    gradient: 'from-error/20 to-error/5',
-    iconBg: 'bg-error/15 text-error'
-  },
-  PAYMENT_FAILED: {
-    label: 'Pembayaran Gagal',
-    icon: XCircle,
-    gradient: 'from-error/20 to-error/5',
-    iconBg: 'bg-error/15 text-error'
-  },
-  CONFIRMED: {
-    label: 'Dikonfirmasi',
-    icon: CheckCircle2,
-    gradient: 'from-success/20 to-success/5',
-    iconBg: 'bg-success/15 text-success'
-  },
-  PROCESSING: {
-    label: 'Diproses',
-    icon: Package,
-    gradient: 'from-info/20 to-info/5',
-    iconBg: 'bg-info/15 text-info'
-  }
+const statusIcon: Record<string, typeof CheckCircle2> = {
+  COMPLETED: CheckCircle2,
+  PENDING: Clock,
+  PAYMENT_PENDING: CreditCard,
+  CANCELLED: XCircle,
+  PAYMENT_FAILED: XCircle,
+  CONFIRMED: CheckCircle2,
+  PROCESSING: Package
 }
 
 export default function OrderStatusPage() {
@@ -80,8 +45,8 @@ export default function OrderStatusPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-lg px-4 py-12">
-        <Skeleton className="mb-6 h-48 w-full rounded-2xl" />
-        <Skeleton className="h-56 w-full rounded-2xl" />
+        <Skeleton className="mb-6 h-48 w-full rounded-lg" />
+        <Skeleton className="h-56 w-full rounded-lg" />
       </div>
     )
   }
@@ -90,55 +55,38 @@ export default function OrderStatusPage() {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="text-center">
-          <div className="mb-6 text-7xl">404</div>
-          <h1 className="mb-3 text-section-header font-black text-foreground">
-            Pesanan Tidak Ditemukan
+          <div className="mb-6 font-mono text-7xl font-semibold text-muted-foreground">404</div>
+          <h1 className="mb-3 text-section-header font-semibold text-foreground">
+            Pesanan tidak ditemukan
           </h1>
           <p className="text-body text-muted-foreground">
             Pesanan dengan kode tersebut tidak ditemukan.
           </p>
-          <div className="mx-auto mt-8 h-1 w-24 rounded-full bg-gradient-to-r from-primary to-secondary" />
         </div>
       </div>
     )
   }
 
-  const cfg = statusConfig[order.status] ?? {
-    label: order.status,
-    icon: Clock,
-    gradient: 'from-warning/20 to-warning/5',
-    iconBg: 'bg-warning/15 text-warning'
-  }
-  const StatusIcon = cfg.icon
+  const st = resolveStatus('order', order.status)
+  const StatusIcon = statusIcon[order.status] ?? Clock
 
   return (
     <div className="mx-auto max-w-lg px-4 py-12">
-      <div
-        className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-background to-secondary/5"
-        style={{ animation: 'slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both' }}
-      >
-        <div className="bg-white/80 backdrop-blur-sm dark:bg-card/80 p-8 text-center">
-          <div className={cn('mx-auto mb-4 flex size-16 items-center justify-center rounded-full', cfg.iconBg)}>
-            <StatusIcon className="size-8" />
-          </div>
-          <h1 className="text-page-title font-black text-foreground">
-            Status Pesanan
-          </h1>
-          <p className="mt-1 font-mono text-body-sm text-muted-foreground">
-            #{order.orderId}
-          </p>
+      <Surface elevation={1} className="animate-fade-in-up p-8 text-center">
+        <div className={cn('mx-auto mb-4 flex size-16 items-center justify-center rounded-full border', st.className)}>
+          <StatusIcon className="size-8" />
         </div>
-      </div>
+        <h1 className="text-page-title font-semibold text-foreground">
+          Status pesanan
+        </h1>
+        <p className="mt-1 font-mono text-mono-data tabular text-body-sm text-muted-foreground">
+          #{order.orderId}
+        </p>
+      </Surface>
 
-      <div
-        className="mt-6 rounded-2xl bg-card"
-        style={{ animation: 'slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both', animationDelay: '0.08s' }}
-      >
-        <div className={cn('rounded-t-2xl bg-gradient-to-br p-8 text-center', cfg.gradient)}>
-          <div className={cn('mx-auto inline-flex items-center gap-2 rounded-full px-5 py-2 text-label font-bold', cfg.iconBg)}>
-            <StatusIcon className="size-4" />
-            {cfg.label}
-          </div>
+      <Surface elevation={1} className="mt-6 animate-fade-in-up overflow-hidden" style={{ animationDelay: '0.08s' }}>
+        <div className="border-b border-border px-6 py-4 text-center">
+          <StatusBadge kind="order" value={order.status} withDot className="px-4 py-1.5" />
         </div>
 
         <div className="space-y-0 p-6">
@@ -166,18 +114,18 @@ export default function OrderStatusPage() {
             />
           )}
         </div>
-      </div>
+      </Surface>
 
       {order.status === 'PAYMENT_PENDING' && order.paymentUrl && (
         <div
-          className="mt-6"
-          style={{ animation: 'slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both', animationDelay: '0.15s' }}
+          className="mt-6 animate-fade-in-up"
+          style={{ animationDelay: '0.15s' }}
         >
           <a
             href={order.paymentUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-primary to-primary/90 text-body font-bold text-primary-foreground shadow-md transition-all hover:from-primary/90 hover:to-primary/70 active:scale-[0.98]"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-primary text-body font-semibold text-primary-foreground shadow-l1 transition-colors hover:bg-primary-hover"
           >
             <ExternalLink className="size-5" />
             Bayar Sekarang
@@ -188,35 +136,13 @@ export default function OrderStatusPage() {
         </div>
       )}
 
-      <div
-        className="mt-10 text-center"
-        style={{ animation: 'fadeIn 0.5s ease both', animationDelay: '0.25s' }}
-      >
-        <div className="mx-auto h-px w-32 bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="mt-10 animate-fade-in-up text-center" style={{ animationDelay: '0.25s' }}>
+        <div className="mx-auto h-px w-32 bg-border" />
         <p className="mt-4 text-caption text-muted-foreground">
           Powered by{' '}
-          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text font-semibold text-transparent">
-            Sellgram
-          </span>
+          <span className="font-semibold text-foreground">Sellgram</span>
         </p>
       </div>
-
-      <style jsx>{`
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-      `}</style>
     </div>
   )
 }
@@ -231,12 +157,12 @@ function DetailRow({
   highlight?: boolean
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-border/50 px-2 py-3.5 last:border-0">
+    <div className="flex items-center justify-between gap-4 border-b border-border px-2 py-3.5 last:border-0">
       <span className="text-body-sm text-muted-foreground">{label}</span>
       <span
         className={cn(
           'text-body-sm text-right font-semibold text-foreground',
-          highlight && 'font-bold text-primary'
+          highlight && 'font-mono tabular text-primary'
         )}
       >
         {value}

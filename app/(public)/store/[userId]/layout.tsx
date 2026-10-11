@@ -8,17 +8,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { PortalAuthProvider, usePortalAuth } from './_components/portal-auth-provider'
 
-function getInitials(name: string): string {
-  return name
-    .replace(/\p{Emoji}/gu, '')
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map(w => w[0])
-    .join('')
-    .toUpperCase()
-}
-
 function StoreNavbar() {
   const params = useParams<{ userId: string }>()
   const pathname = usePathname()
@@ -30,7 +19,7 @@ function StoreNavbar() {
   if (isAuthPage) return null
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+    <nav className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
         <div className="flex items-center gap-3">
           {isProfilePage && (
@@ -45,7 +34,7 @@ function StoreNavbar() {
             href={`/store/${params.userId}`}
             className="flex items-center gap-2 text-small-header font-semibold text-foreground"
           >
-            <div className="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary text-xs font-bold text-white">
+            <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <Store className="size-3.5" />
             </div>
             <span className="hidden sm:inline">Beranda</span>

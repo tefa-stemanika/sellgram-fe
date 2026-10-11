@@ -8,6 +8,8 @@ import { updateProfile, changePassword } from '@/services/portal'
 import { updateProfileSchema, changePasswordSchema } from '@/schemas/portal'
 import { formatDate, cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Surface } from '@/components/shared/surface'
 import { toast } from 'sonner'
 
 export default function ProfilePage() {
@@ -35,7 +37,7 @@ export default function ProfilePage() {
   if (!customer || !token) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-        <div className="text-section-header font-black text-foreground">Belum Masuk</div>
+        <div className="text-section-header font-semibold text-foreground">Belum masuk</div>
         <p className="mt-2 text-body-sm text-muted-foreground">
           Silakan masuk terlebih dahulu untuk melihat profil.
         </p>
@@ -105,38 +107,38 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <div style={{ animation: 'slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
+      <div className="animate-fade-in-up">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-2xl font-bold text-white shadow-lg">
+          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-lg bg-primary text-xl font-semibold text-primary-foreground shadow-l1">
             {getCustomerInitials(customer.name)}
           </div>
-          <h1 className="text-section-header font-black text-foreground">Profil Saya</h1>
+          <h1 className="text-section-header font-semibold text-foreground">Profil saya</h1>
           <p className="mt-1 text-body-sm text-muted-foreground">
             Kelola informasi akun customer kamu
           </p>
         </div>
 
-        <div className="mb-6 rounded-2xl border border-border/50 bg-card p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-card-title font-bold text-foreground">
+        <Surface className="mb-6 p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-card-title font-semibold text-foreground">
             <User className="size-5 text-primary" />
-            Informasi Akun
+            Informasi akun
           </h2>
           <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-4 rounded-lg bg-muted/50 px-4 py-3">
+            <div className="flex items-center justify-between gap-4 rounded-lg bg-muted px-4 py-3">
               <div className="flex items-center gap-2 text-body-sm text-muted-foreground">
                 <Mail className="size-4" />
                 Email
               </div>
               <span className="text-body-sm font-medium text-foreground">{customer.email}</span>
             </div>
-            <div className="flex items-center justify-between gap-4 rounded-lg bg-muted/50 px-4 py-3">
+            <div className="flex items-center justify-between gap-4 rounded-lg bg-muted px-4 py-3">
               <div className="flex items-center gap-2 text-body-sm text-muted-foreground">
                 <Phone className="size-4" />
                 Telepon
               </div>
               <span className="text-body-sm font-medium text-foreground">{customer.phone ?? '-'}</span>
             </div>
-            <div className="flex items-center justify-between gap-4 rounded-lg bg-muted/50 px-4 py-3">
+            <div className="flex items-center justify-between gap-4 rounded-lg bg-muted px-4 py-3">
               <div className="flex items-center gap-2 text-body-sm text-muted-foreground">
                 <Clock className="size-4" />
                 Terdaftar
@@ -147,73 +149,65 @@ export default function ProfilePage() {
             </div>
 
           </div>
-        </div>
+        </Surface>
 
-        <div className="mb-6 rounded-2xl border border-border/50 bg-card p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-card-title font-bold text-foreground">
+        <Surface className="mb-6 p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-card-title font-semibold text-foreground">
             <Save className="size-5 text-primary" />
-            Update Profil
+            Update profil
           </h2>
           <form onSubmit={handleUpdateProfile} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="name" className="text-caption font-medium text-foreground">
                 Nama
               </label>
-              <input
+              <Input
                 id="name"
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="h-10 w-full rounded-lg border border-input bg-background px-3 text-body-sm text-foreground placeholder:text-muted-foreground/50 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <label htmlFor="phone" className="text-caption font-medium text-foreground">
                 Telepon
               </label>
-              <input
+              <Input
                 id="phone"
                 type="text"
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
                 placeholder="628123456789"
-                className="h-10 w-full rounded-lg border border-input bg-background px-3 text-body-sm text-foreground placeholder:text-muted-foreground/50 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+                className="font-mono tabular"
               />
             </div>
-            <button
-              type="submit"
-              disabled={updating}
-              className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary text-body-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-            >
+            <Button type="submit" disabled={updating} className="w-full">
               {updating ? (
                 <div className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
                 <Save className="size-4" />
               )}
               {updating ? 'Menyimpan...' : 'Simpan Perubahan'}
-            </button>
+            </Button>
           </form>
-        </div>
+        </Surface>
 
-        <div className="rounded-2xl border border-border/50 bg-card p-6">
-          <h2 className="mb-4 flex items-center gap-2 text-card-title font-bold text-foreground">
+        <Surface className="p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-card-title font-semibold text-foreground">
             <Lock className="size-5 text-primary" />
-            Ubah Kata Sandi
+            Ubah kata sandi
           </h2>
           <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="oldPassword" className="text-caption font-medium text-foreground">
                 Kata Sandi Lama
               </label>
-              <input
+              <Input
                 id="oldPassword"
                 type="password"
                 value={oldPassword}
                 onChange={e => setOldPassword(e.target.value)}
-                className={cn(
-                  'h-10 w-full rounded-lg border border-input bg-background px-3 text-body-sm text-foreground placeholder:text-muted-foreground/50 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring',
-                  pwErrors.oldPassword && 'border-error'
-                )}
+                className={cn(pwErrors.oldPassword && 'border-error')}
               />
               {pwErrors.oldPassword && (
                 <span className="text-caption text-error">{pwErrors.oldPassword}</span>
@@ -223,16 +217,13 @@ export default function ProfilePage() {
               <label htmlFor="newPassword" className="text-caption font-medium text-foreground">
                 Kata Sandi Baru
               </label>
-              <input
+              <Input
                 id="newPassword"
                 type="password"
                 value={newPassword}
                 onChange={e => setNewPassword(e.target.value)}
                 placeholder="Minimal 6 karakter"
-                className={cn(
-                  'h-10 w-full rounded-lg border border-input bg-background px-3 text-body-sm text-foreground placeholder:text-muted-foreground/50 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring',
-                  pwErrors.newPassword && 'border-error'
-                )}
+                className={cn(pwErrors.newPassword && 'border-error')}
               />
               {pwErrors.newPassword && (
                 <span className="text-caption text-error">{pwErrors.newPassword}</span>
@@ -242,42 +233,28 @@ export default function ProfilePage() {
               <label htmlFor="confirmPassword" className="text-caption font-medium text-foreground">
                 Konfirmasi Kata Sandi
               </label>
-              <input
+              <Input
                 id="confirmPassword"
                 type="password"
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
-                className={cn(
-                  'h-10 w-full rounded-lg border border-input bg-background px-3 text-body-sm text-foreground placeholder:text-muted-foreground/50 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring',
-                  pwErrors.confirmPassword && 'border-error'
-                )}
+                className={cn(pwErrors.confirmPassword && 'border-error')}
               />
               {pwErrors.confirmPassword && (
                 <span className="text-caption text-error">{pwErrors.confirmPassword}</span>
               )}
             </div>
-            <button
-              type="submit"
-              disabled={changingPassword}
-              className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-input bg-background text-body-sm font-semibold text-foreground transition-all hover:bg-accent hover:text-accent-foreground active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-            >
+            <Button type="submit" variant="outline" disabled={changingPassword} className="w-full">
               {changingPassword ? (
                 <div className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
                 <Lock className="size-4" />
               )}
               {changingPassword ? 'Mengubah...' : 'Ubah Kata Sandi'}
-            </button>
+            </Button>
           </form>
-        </div>
+        </Surface>
       </div>
-
-      <style jsx>{`
-        @keyframes slideInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   )
 }
