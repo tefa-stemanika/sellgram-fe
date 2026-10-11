@@ -73,7 +73,7 @@ function statusBadgeVariant(status: string): 'default' | 'secondary' | 'destruct
 function OrderInfoCard({ order, usedAt }: { order: StockItemOrderInfo | null | undefined; usedAt?: string | null }) {
   if (!order) return null
   return (
-    <div className="mt-2 space-y-1 border-t pt-2 text-xs text-muted-foreground">
+    <div className="mt-2 space-y-1 border-t pt-2 text-caption text-muted-foreground">
       {order.firstName && <p>Nama: {order.firstName}</p>}
       {order.username && <p>Username: {order.username}</p>}
       {order.telegramId && <p>Telegram ID: {order.telegramId}</p>}
@@ -588,7 +588,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                             <Badge
                               key={v}
                               variant="outline"
-                              className="cursor-pointer text-xs font-normal hover:bg-primary hover:text-primary-foreground"
+                              className="cursor-pointer text-caption font-normal hover:bg-primary hover:text-primary-foreground"
                               onClick={() => insertVar(v)}
                             >
                               {'{{'}{v}{'}}'}
@@ -815,7 +815,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                   ))}
                 </div>
               ) : stockItems.length === 0 && !stockItemsLoading ? (
-                <p className="text-muted-foreground text-sm">Belum ada item stok</p>
+                <p className="text-body-sm text-muted-foreground">Belum ada item stok</p>
               ) : (
                 <div className="max-h-[300px] space-y-2 overflow-y-auto">
                   {stockItems.map(item => (
@@ -823,7 +823,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                       <CardContent className="p-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <code className="text-sm">{item.content}</code>
+                            <code className="text-body-sm font-mono tabular">{item.content}</code>
                             <Badge variant={statusBadgeVariant(item.status)}>
                               {item.status}
                             </Badge>
@@ -841,7 +841,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                           <OrderInfoCard order={item.order} usedAt={item.usedAt} />
                         )}
                         {item.status === 'USED' && !item.order && item.usedAt && (
-                          <div className="mt-1 text-xs text-muted-foreground">
+                          <div className="mt-1 text-caption text-muted-foreground">
                             <p>Dipakai: {new Date(item.usedAt).toLocaleDateString('id-ID')}</p>
                           </div>
                         )}
@@ -925,7 +925,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                   ))}
                 </div>
               ) : slotAccounts.length === 0 && !slotAccountsLoading ? (
-                <p className="text-muted-foreground text-sm">Belum ada akun slot</p>
+                <p className="text-body-sm text-muted-foreground">Belum ada akun slot</p>
               ) : (
                 <div className="space-y-3">
                   {slotAccounts.map(account => (
@@ -936,7 +936,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                           <Badge variant={account.isActive ? 'default' : 'secondary'}>
                             {account.isActive ? 'Aktif' : 'Nonaktif'}
                           </Badge>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-body-sm text-muted-foreground">
                             {account.usedSlots}/{account.totalSlots} slot terpakai
                           </span>
                         </div>
@@ -969,7 +969,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                               ))}
                             </div>
                           ) : !accountSlots[account.id] || accountSlots[account.id].length === 0 ? (
-                            <p className="text-sm text-muted-foreground">Belum ada slot</p>
+                            <p className="text-body-sm text-muted-foreground">Belum ada slot</p>
                           ) : (
                             <div className="max-h-[250px] space-y-2 overflow-y-auto">
                               {accountSlots[account.id].map(slot => (
@@ -977,20 +977,20 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                                   <CardContent className="p-3">
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center gap-3">
-                                        <code className="text-sm">{slot.slotIdentifier}</code>
+                                        <code className="text-body-sm font-mono tabular">{slot.slotIdentifier}</code>
                                         {slot.additionalInfo && (
-                                          <span className="text-xs text-muted-foreground">{slot.additionalInfo}</span>
+                                          <span className="text-caption text-muted-foreground">{slot.additionalInfo}</span>
                                         )}
                                         <Badge variant={statusBadgeVariant(slot.status)}>{slot.status}</Badge>
                                         {slot.status === 'ACTIVE' && (
-                                          <span className="text-xs text-muted-foreground">
+                                          <span className="text-caption text-muted-foreground">
                                             {slot.assignedAt
                                               ? `Digunakan: ${new Date(slot.assignedAt).toLocaleDateString('id-ID')}`
                                               : ''}
                                           </span>
                                         )}
                                         {slot.expiresAt && (
-                                          <span className="text-xs text-muted-foreground">
+                                          <span className="text-caption text-muted-foreground">
                                             Kadaluwarsa: {new Date(slot.expiresAt).toLocaleDateString('id-ID')}
                                           </span>
                                         )}
