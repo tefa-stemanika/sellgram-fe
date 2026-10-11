@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button'
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
 import { buildDailySeries, type DailyPoint } from '@/lib/analytics'
-import { formatDate, formatIDRCurrency } from '@/lib/utils'
+import { copyToClipboard, formatDate, formatIDRCurrency } from '@/lib/utils'
 import { getDashboard, getQuota, type DashboardData, type DashboardOrder, type QuotaData } from '@/services/dashboard'
 import { getOrders } from '@/services/orders'
 import { getCurrentUser } from '@/services/user'
@@ -291,8 +291,12 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
               size="sm"
               className="shrink-0 gap-2"
               disabled={linkCopied}
-              onClick={() => {
-                navigator.clipboard.writeText(storeUrl)
+              onClick={async () => {
+                const ok = await copyToClipboard(storeUrl)
+                if (!ok) {
+                  toast.error('Gagal menyalin tautan. Silakan copy manual.')
+                  return
+                }
                 setLinkCopied(true)
                 toast.success('Tautan berhasil disalin')
                 setTimeout(() => setLinkCopied(false), 2000)

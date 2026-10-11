@@ -9,6 +9,7 @@ import { Surface } from '@/components/shared/surface'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { copyToClipboard } from '@/lib/utils'
 import { CREDENTIAL_KEYS, type CredentialKey } from '@/schemas/bot-credentials'
 import {
   createBotCredential,
@@ -216,10 +217,10 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
   }
 
   const handleCopyWebhookUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(webhookUrl)
+    const ok = await copyToClipboard(webhookUrl)
+    if (ok) {
       toast.success('Webhook URL berhasil disalin')
-    } catch {
+    } else {
       toast.error('Gagal menyalin URL. Silakan copy manual.')
     }
   }
