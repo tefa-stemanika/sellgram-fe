@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Bot, Grid3x3 } from 'lucide-react'
 
+import { TelegramChatPreview } from '@/components/shared/telegram-chat-preview'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -131,51 +132,9 @@ const BUTTON_FLOW: Message[] = [
   }
 ]
 
-function ChatPreview({ messages }: { messages: Message[] }) {
-  return (
-    <div className="flex-1 space-y-3">
-      {messages.map((msg, i) => (
-        <div key={i}>
-          {msg.role === 'bot' ? (
-            <div className="flex justify-start">
-              <div className="max-w-[85%] space-y-0.5 rounded-2xl rounded-bl-sm bg-white px-4 py-2.5 shadow-sm ring-1 ring-black/5 dark:bg-slate-800 dark:ring-white/10">
-                {msg.lines.map((line, j) =>
-                  line === '' ? (
-                    <div key={j} className="h-1" />
-                  ) : (
-                    <p key={j} className={cn('whitespace-pre-wrap text-sm', j > 0 && line.startsWith('   ') ? 'text-muted-foreground' : '')}>
-                      {line}
-                    </p>
-                  )
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="flex justify-end">
-              <div className="max-w-[75%] rounded-2xl rounded-br-sm bg-primary px-4 py-2.5 text-white shadow-sm">
-                <p className="whitespace-pre-wrap text-sm">{msg.lines[0]}</p>
-              </div>
-            </div>
-          )}
-
-          {msg.role === 'bot' && msg.buttons && (
-            <div className="ml-0.5 mt-1.5 space-y-1.5">
-              {msg.buttons.map((group, gi) => (
-                <div key={gi} className="flex flex-wrap gap-1.5">
-                  {group.map((label) => (
-                    <div
-                      key={label}
-                      className="cursor-default rounded-xl border border-primary/30 bg-white px-3 py-1.5 text-xs font-medium text-primary shadow-sm transition-colors dark:bg-slate-800 dark:text-primary/90">
-                      {label}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
+function toPreviewLines(messages: Message[]): string[] {
+  return messages.map((msg) =>
+    [msg.lines.join('\n'), ...(msg.buttons?.map((group) => group.join('  ')) ?? [])].join('\n')
   )
 }
 
@@ -191,15 +150,15 @@ export function ModePreviewDialog({ defaultMode = 'AI', children }: ModePreviewD
           <DialogDescription>Pratinjau tampilan chat untuk mode yang dipilih</DialogDescription>
         </DialogHeader>
 
-        <div className="flex gap-1 border-b border-white/10 bg-gradient-to-r from-primary/10 to-blue-600/10 p-2">
+        <div className="flex gap-1 border-b border-border bg-muted/50 p-2">
           <button
             type="button"
             onClick={() => setMode('AI')}
             className={cn(
-              'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-all',
+              'flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-caption font-medium transition-colors',
               mode === 'AI'
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-muted-foreground hover:bg-white/40 dark:hover:bg-white/10'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:bg-muted'
             )}>
             <Bot className="h-3.5 w-3.5" />
             AI
@@ -208,38 +167,20 @@ export function ModePreviewDialog({ defaultMode = 'AI', children }: ModePreviewD
             type="button"
             onClick={() => setMode('BUTTON')}
             className={cn(
-              'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-all',
+              'flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-caption font-medium transition-colors',
               mode === 'BUTTON'
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-muted-foreground hover:bg-white/40 dark:hover:bg-white/10'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:bg-muted'
             )}>
             <Grid3x3 className="h-3.5 w-3.5" />
             Button
           </button>
         </div>
 
-        <div
-          className="flex max-h-[440px] min-h-[360px] flex-col overflow-y-auto p-4"
-          style={{
-            backgroundImage: 'url(/images/telegram-chat-background.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          <ChatPreview messages={mode === 'AI' ? AI_MESSAGES : BUTTON_FLOW} />
-
-          <div className="mt-4 flex items-center gap-2 rounded-xl border bg-white px-4 py-2.5 shadow-sm dark:bg-slate-800">
-            <div className="flex-1 text-xs text-muted-foreground">Ketik pesan...</div>
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="h-3.5 w-3.5 -rotate-45">
-                <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
-              </svg>
-            </div>
-          </div>
+        <div className="max-h-[440px] min-h-[360px] overflow-y-auto p-4">
+          <TelegramChatPreview
+            lines={toPreviewLines(mode === 'AI' ? AI_MESSAGES : BUTTON_FLOW)}
+          />
         </div>
       </DialogContent>
     </Dialog>

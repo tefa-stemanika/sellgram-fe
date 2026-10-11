@@ -58,8 +58,8 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
           name="mode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-base font-bold">Mode Operasi</FormLabel>
-              <FormDescription className="text-xs">
+              <FormLabel className="text-small-header">Mode Operasi</FormLabel>
+              <FormDescription className="text-caption">
                 Pilih cara bot menangani chat dari pelanggan.
               </FormDescription>
               <div className="mt-3 grid grid-cols-2 gap-3">
@@ -71,10 +71,10 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
                     <div
                       key={opt.value}
                       className={cn(
-                        'relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-200',
+                        'relative cursor-pointer rounded-lg border p-4 transition-colors',
                         isSelected
-                          ? 'border-primary bg-primary/5 shadow-sm'
-                          : 'border-transparent bg-white/20 backdrop-blur-xl hover:bg-white/30 dark:bg-white/5 dark:hover:bg-white/10'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border bg-card hover:bg-muted/50'
                       )}
                       onClick={() => field.onChange(opt.value)}>
                       <FormControl>
@@ -89,16 +89,16 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
 
                       <div
                         className={cn(
-                          'mb-3 inline-flex rounded-lg p-2.5 transition-colors',
+                          'mb-3 inline-flex rounded-md p-2.5 transition-colors',
                           isSelected
-                            ? 'bg-primary text-white'
+                            ? 'bg-primary text-primary-foreground'
                             : 'bg-muted text-muted-foreground'
                         )}>
                         <Icon className="h-5 w-5" />
                       </div>
 
-                      <h3 className="text-sm font-bold">{opt.title}</h3>
-                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      <h3 className="text-small-header">{opt.title}</h3>
+                      <p className="mt-1 text-caption leading-relaxed text-muted-foreground">
                         {opt.desc}
                       </p>
 
@@ -108,7 +108,7 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
                             type="button"
                             size="sm"
                             variant={isSelected ? 'default' : 'outline'}
-                            className="h-7 w-full text-[11px] font-semibold uppercase tracking-wider"
+                            className="h-7 w-full text-caption font-medium"
                             onClick={(e) => e.stopPropagation()}>
                             Lihat Preview
                           </Button>
@@ -127,10 +127,10 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
           control={form.control}
           name="midtransIsProduction"
           render={({ field }) => (
-            <FormItem className="flex items-center justify-between rounded-xl border bg-white/20 p-4 backdrop-blur-xl transition-colors hover:bg-white/30 dark:bg-white/5 dark:hover:bg-white/10">
+            <FormItem className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
               <div className="space-y-0.5">
-                <FormLabel className="text-base font-bold">Midtrans Production</FormLabel>
-                <FormDescription className="text-xs">
+                <FormLabel className="text-small-header">Midtrans Production</FormLabel>
+                <FormDescription className="text-caption">
                   Nonaktifkan untuk menggunakan environment Sandbox. Aktifkan hanya jika sudah siap production.
                 </FormDescription>
               </div>
@@ -141,7 +141,7 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
           )}
         />
 
-        <Button type="submit" disabled={isLoading} className="w-full shadow-sm transition-all duration-200 hover:shadow-md">
+        <Button type="submit" disabled={isLoading} className="w-full">
           {isLoading ? 'Menyimpan...' : 'Simpan Konfigurasi'}
         </Button>
       </form>
