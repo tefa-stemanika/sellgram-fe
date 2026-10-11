@@ -206,7 +206,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
           {isLoading ? (
             <Skeleton className="mt-4 h-52" />
           ) : ordersBySource ? (
-            <ChartContainer config={SOURCE_CONFIG} className="mt-4 h-52">
+            <ChartContainer config={SOURCE_CONFIG} className="mt-4 h-52 w-full">
               <PieChart>
                 <Pie data={ordersBySource} dataKey="value" nameKey="source" innerRadius={52} outerRadius={78} paddingAngle={2} strokeWidth={0} />
                 <ChartTooltip content={<ChartTooltipContent nameKey="source" />} />
@@ -229,7 +229,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
           {isLoading ? (
             <Skeleton className="mt-4 h-52" />
           ) : revenueBySource ? (
-            <ChartContainer config={SOURCE_CONFIG} className="mt-4 h-52">
+            <ChartContainer config={SOURCE_CONFIG} className="mt-4 h-52 w-full">
               <BarChart data={revenueBySource} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
                 <CartesianGrid vertical={false} stroke="hsl(var(--chart-grid))" strokeDasharray="3 3" />
                 <XAxis dataKey="source" tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 12 }} tickFormatter={(value: string) => SOURCE_TICK[value] ?? value} />
@@ -259,7 +259,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
         {isTrendLoading ? (
           <Skeleton className="mt-4 h-64" />
         ) : trend ? (
-          <ChartContainer config={TREND_CONFIG} className="mt-4 h-64">
+          <ChartContainer config={TREND_CONFIG} className="mt-4 h-64 w-full">
             <AreaChart data={trend} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid vertical={false} stroke="hsl(var(--chart-grid))" strokeDasharray="3 3" />
               <XAxis dataKey="label" tickLine={false} axisLine={false} minTickGap={16} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} />
