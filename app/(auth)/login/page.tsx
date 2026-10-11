@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import LoginLayout from './_layouts/login-layout'
 
 export const metadata: Metadata = {
-  title: 'Login',
+  title: 'Masuk',
   robots: {
     index: false,
     follow: false

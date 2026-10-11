@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import RegisterLayout from './_layouts/register-layout'
 
 export const metadata: Metadata = {
-  title: 'Register',
+  title: 'Daftar',
   robots: {
     index: false,
     follow: false
