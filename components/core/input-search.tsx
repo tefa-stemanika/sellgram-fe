@@ -2,7 +2,7 @@
 
 import { ChangeEvent, forwardRef, useEffect, useMemo, useRef } from 'react'
 import { Input } from '../ui/input'
-import { IoMdSearch } from 'react-icons/io'
+import { Search } from 'lucide-react'
 import _ from 'lodash'
 import { cn } from '@/lib/utils'
 
@@ -39,22 +39,14 @@ const InputSearch = forwardRef<HTMLInputElement, InputSearchProps>(
       <div className={cn('w-full relative', wrapperClassname)}>
         <Input
           ref={ref}
-          className={cn('rounded-full', className)}
+          className={cn('pr-9', className)}
           onChange={debouncedResults}
           value={value}
           {...props}
         />
         {!hideIcon && (
-          <div
-            className="
-          absolute top-[50%] 
-          -translate-y-[50%] 
-          right-[1.5px] 
-          p-1.5 
-          text-muted-foreground 
-          rounded-full"
-          >
-            <IoMdSearch fontSize={20} />
+          <div className="absolute top-[50%] right-3 -translate-y-[50%] text-muted-foreground">
+            <Search className="size-4" aria-hidden />
           </div>
         )}
       </div>

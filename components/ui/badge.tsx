@@ -4,18 +4,18 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2',
+  'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-caption font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
   {
     variants: {
       variant: {
-        default: 'border-primary/30 bg-primary/15 text-primary hover:bg-primary/25',
-        secondary: 'border-secondary/30 bg-secondary/15 text-secondary hover:bg-secondary/25',
-        destructive: 'border-error/30 bg-error/15 text-error hover:bg-error/25',
-        outline: 'border-border text-foreground hover:bg-muted/50',
-        success: 'border-success/30 bg-success/15 text-success hover:bg-success/25',
-        warning: 'border-warning/30 bg-warning/15 text-warning hover:bg-warning/25',
-        error: 'border-error/30 bg-error/15 text-error hover:bg-error/25',
-        info: 'border-info/30 bg-info/15 text-info hover:bg-info/25'
+        default: 'border-status-neutral/25 bg-status-neutral/12 text-status-neutral',
+        secondary: 'border-border bg-muted text-secondary-foreground',
+        destructive: 'border-error/25 bg-error/12 text-error',
+        outline: 'border-border text-foreground',
+        success: 'border-success/25 bg-success/12 text-success',
+        warning: 'border-warning/25 bg-warning/12 text-warning',
+        error: 'border-error/25 bg-error/12 text-error',
+        info: 'border-info/25 bg-info/12 text-info'
       }
     },
     defaultVariants: {
