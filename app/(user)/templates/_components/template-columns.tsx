@@ -16,15 +16,15 @@ export function getTemplateColumns({ onDetail, onDelete }: TemplateColumnsOption
   return [
     {
       accessorKey: 'name',
-      header: 'Nama Template',
+      header: 'Nama template',
       cell: ({ row }) => (
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-blue-600/20 text-sm">
-            <FileText className="h-4 w-4 text-primary" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </div>
           <div>
             <p className="max-w-[240px] truncate font-medium">{row.original.name}</p>
-            <p className="text-xs text-muted-foreground">{formatDateTime(row.original.createdAt)}</p>
+            <p className="text-caption text-muted-foreground">{formatDateTime(row.original.createdAt)}</p>
           </div>
         </div>
       ),
@@ -33,14 +33,14 @@ export function getTemplateColumns({ onDetail, onDelete }: TemplateColumnsOption
       accessorKey: 'content',
       header: 'Konten',
       cell: ({ row }) => (
-        <p className="max-w-[300px] truncate text-sm text-muted-foreground">{row.original.content}</p>
+        <p className="max-w-[300px] truncate font-mono text-mono-data text-muted-foreground">{row.original.content}</p>
       ),
     },
     {
       accessorKey: 'variableCount',
       header: 'Variabel',
       cell: ({ row }) => (
-        <span className="font-mono text-sm">{row.original.variableCount} variabel</span>
+        <span className="font-mono text-mono-data tabular">{row.original.variableCount} variabel</span>
       ),
     },
     {
@@ -64,13 +64,12 @@ export function getTemplateColumns({ onDetail, onDelete }: TemplateColumnsOption
             type="button"
             size="sm"
             variant="destructive"
-            className="text-white"
             onClick={(e) => {
               e.stopPropagation()
               onDelete(row.original)
             }}
           >
-            <Trash2 className="mr-1 h-3.5 w-3.5 text-white" />
+            <Trash2 className="mr-1 h-3.5 w-3.5" />
             Hapus
           </Button>
         </div>
