@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { CreditCard, KeyRound, LayoutDashboard, LogOut, Megaphone, Package, Settings, ShoppingCart, Sparkles, TicketCheck, Users, Variable, Zap } from 'lucide-react'
+import { CreditCard, KeyRound, LayoutDashboard, LogOut, Megaphone, Moon, Package, Settings, ShoppingCart, Sparkles, Sun, TicketCheck, Users, Variable, Zap } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
 
 import { removeToken } from '@/actions/auth'
-import { Button } from '@/components/ui/button'
 import {
   Sidebar,
   SidebarContent,
@@ -40,7 +40,7 @@ const navigation = [
   { title: 'Tiket', href: '/tickets', icon: TicketCheck },
   { title: 'Fulfillment', href: '/fulfillment', icon: Zap },
   { title: 'Langganan', href: '/plan', icon: CreditCard },
-  { title: 'Bot Config', href: '/bot-config', icon: Settings },
+  { title: 'Bot config', href: '/bot-config', icon: Settings },
   { title: 'Credentials', href: '/bot-credentials', icon: KeyRound }
 ]
 
@@ -49,6 +49,7 @@ type HomeLayoutContentProps = HomeLayoutProps
 const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
   const pathname = usePathname()
   const router = useRouter()
+  const { resolvedTheme, setTheme } = useTheme()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const { isMobile, setOpenMobile } = useSidebar()
 
@@ -68,7 +69,7 @@ const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
       // Keep logout flow resilient even if backend request fails.
     } finally {
       await removeToken()
-      toast.success('Berhasil logout')
+      toast.success('Berhasil keluar')
       router.replace('/login')
       router.refresh()
       setIsLoggingOut(false)
@@ -77,7 +78,7 @@ const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
 
   const navGroups = [
     {
-      label: 'Menu Utama',
+      label: 'Menu utama',
       items: navigation.slice(0, 8)
     },
     {
@@ -88,18 +89,16 @@ const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
 
   return (
     <>
-      <Sidebar collapsible="icon">
+      <Sidebar collapsible="icon" className="border-r border-sidebar-border">
         <SidebarHeader className="p-3">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-3 rounded-lg bg-gradient-to-r from-primary to-blue-600 p-3 transition-all hover:from-primary/90 hover:to-blue-600/90">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-white/20">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-bold text-white">Sellgram</span>
-              <span className="truncate text-xs text-white/80">Control Center</span>
-            </div>
+          <Link href="/dashboard" className="flex items-center gap-2.5 rounded-md p-1.5 transition-colors hover:bg-sidebar-accent">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-[0.625rem] bg-sidebar-primary">
+              <Sparkles className="size-4.5 text-sidebar-primary-foreground" aria-hidden />
+            </span>
+            <span className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
+              <span className="truncate text-small-header text-sidebar-foreground">Sellgram</span>
+              <span className="truncate text-caption text-sidebar-foreground/55">Control Center</span>
+            </span>
           </Link>
         </SidebarHeader>
 
@@ -128,25 +127,32 @@ const HomeLayoutContent = ({ children, token }: HomeLayoutContentProps) => {
           ))}
         </SidebarContent>
 
-        <SidebarFooter className="border-t p-3">
-          <Button
-            variant="outline"
-            className="h-10 w-full justify-start text-muted-foreground hover:text-foreground"
-            onClick={handleLogout}
-            disabled={isLoggingOut}>
-            <LogOut />
-            {isLoggingOut ? 'Keluar...' : 'Logout'}
-          </Button>
+        <SidebarFooter className="border-t border-sidebar-border p-3">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton tooltip={resolvedTheme === 'dark' ? 'Mode terang' : 'Mode gelap'} onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
+                {resolvedTheme === 'dark' ? <Sun /> : <Moon />}
+                <span>{resolvedTheme === 'dark' ? 'Mode terang' : 'Mode gelap'}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton className="text-sidebar-foreground/70 hover:bg-error/10 hover:text-error" tooltip="Keluar" onClick={handleLogout} disabled={isLoggingOut}>
+                <LogOut />
+                <span>{isLoggingOut ? 'Keluar...' : 'Keluar'}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
 
       <SidebarInset className="bg-transparent">
-        <div className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3 sm:px-6 md:hidden">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="h-9 w-9" />
-              <p className="text-sm font-semibold">Sellgram</p>
-            </div>
+        <div className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b bg-background/85 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6 md:hidden">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="h-9 w-9" />
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-[0.5rem] bg-sidebar-primary">
+              <Sparkles className="size-4 text-sidebar-primary-foreground" aria-hidden />
+            </span>
+            <p className="text-small-header">Sellgram</p>
           </div>
         </div>
 
