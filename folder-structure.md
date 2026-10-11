@@ -140,6 +140,14 @@ order-bot-dashboard
 ├─ components
 │  ├─ core
 │  ├─ shared
+│  │  ├─ data-table-pagination.tsx
+│  │  ├─ empty-state.tsx
+│  │  ├─ metric-card.tsx
+│  │  ├─ page-header.tsx
+│  │  ├─ quota-bar.tsx
+│  │  ├─ status-badge.tsx
+│  │  ├─ surface.tsx
+│  │  └─ telegram-chat-preview.tsx
 │  └─ ui
 │     ├─ accordion.tsx
 │     ├─ alert-dialog.tsx
@@ -185,6 +193,7 @@ order-bot-dashboard
 ├─ json
 │  └─ data.json
 ├─ lib
+│  ├─ status-tokens.ts
 │  └─ utils.ts
 ├─ next.config.mjs
 ├─ package-lock.json
