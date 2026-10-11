@@ -1,22 +1,12 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { CalendarClock, Eye, Play, SendHorizonal, SquarePen, Trash2 } from 'lucide-react'
+import { CalendarClock, Eye, Mail, Play, Send, SendHorizonal, SquarePen, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { StatusBadge } from '@/components/shared/status-badge'
 import { formatDateTime } from '@/lib/utils'
-import type { BroadcastCampaign, BroadcastStatus } from '@/schemas/broadcast'
-import { getBroadcastStatusLabel } from '@/schemas/broadcast'
-
-const STATUS_BADGE: Record<BroadcastStatus, string> = {
-  DRAFT: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-900/40 dark:text-gray-300',
-  SCHEDULED: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300',
-  SENDING: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300',
-  SENT: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300',
-  PAUSED: 'bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300',
-  FAILED: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300',
-}
+import type { BroadcastCampaign } from '@/schemas/broadcast'
 
 type BroadcastColumnsOptions = {
   onAction: (broadcast: BroadcastCampaign, action: string) => void
@@ -30,17 +20,15 @@ export function getBroadcastColumns({
   return [
     {
       accessorKey: 'name',
-      header: 'Nama Campaign',
+      header: 'Nama campaign',
       cell: ({ row }) => (
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-blue-600/20 text-sm">
-            {row.original.channel === 'TELEGRAM' ? '📨' : '📧'}
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted text-muted-foreground">
+            {row.original.channel === 'TELEGRAM' ? <Send className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="max-w-[200px] truncate font-medium">{row.original.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatDateTime(row.original.createdAt)}
-                    </p>
+            <p className="text-caption tabular text-muted-foreground">{formatDateTime(row.original.createdAt)}</p>
           </div>
         </div>
       ),
@@ -48,14 +36,7 @@ export function getBroadcastColumns({
     {
       id: 'status',
       header: 'Status',
-      cell: ({ row }) => (
-        <Badge
-          variant="outline"
-          className={`${STATUS_BADGE[row.original.status] || ''}`}
-        >
-          {getBroadcastStatusLabel(row.original.status)}
-        </Badge>
-      ),
+      cell: ({ row }) => <StatusBadge kind="broadcast" value={row.original.status} withDot />,
     },
     {
       id: 'progress',
@@ -68,17 +49,14 @@ export function getBroadcastColumns({
         const pct = Math.round((sent / total) * 100)
         return (
           <div className="min-w-[140px]">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">{sent}/{total}</span>
-              {failed > 0 && (
-                <span className="text-red-500">{failed} gagal</span>
-              )}
+            <div className="flex items-center justify-between text-caption">
+              <span className="font-mono tabular text-mono-data text-muted-foreground">
+                {sent}/{total}
+              </span>
+              {failed > 0 && <span className="font-mono tabular text-mono-data text-error">{failed} gagal</span>}
             </div>
-            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-primary to-blue-600 transition-all"
-                style={{ width: `${pct}%` }}
-              />
+            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
             </div>
           </div>
         )
@@ -89,12 +67,12 @@ export function getBroadcastColumns({
       header: 'Jadwal',
       cell: ({ row }) =>
         row.original.scheduledAt ? (
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-caption tabular text-muted-foreground">
             <CalendarClock className="h-3.5 w-3.5" />
             {formatDateTime(row.original.scheduledAt)}
           </div>
         ) : (
-          <span className="text-xs text-muted-foreground">-</span>
+          <span className="text-caption text-muted-foreground">-</span>
         ),
     },
     {
@@ -127,7 +105,7 @@ export function getBroadcastColumns({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-emerald-600"
+                className="h-8 w-8"
                 onClick={(e) => {
                   e.stopPropagation()
                   onAction(b, 'send')
@@ -141,7 +119,7 @@ export function getBroadcastColumns({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-amber-600"
+                className="h-8 w-8"
                 onClick={(e) => {
                   e.stopPropagation()
                   onAction(b, 'pause')
@@ -155,7 +133,7 @@ export function getBroadcastColumns({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-emerald-600"
+                className="h-8 w-8"
                 onClick={(e) => {
                   e.stopPropagation()
                   onAction(b, 'resume')
@@ -169,7 +147,7 @@ export function getBroadcastColumns({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-red-600"
+                className="h-8 w-8"
                 onClick={(e) => {
                   e.stopPropagation()
                   onAction(b, 'cancel')
@@ -183,7 +161,7 @@ export function getBroadcastColumns({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-red-600"
+                className="h-8 w-8"
                 onClick={(e) => {
                   e.stopPropagation()
                   onAction(b, 'delete')

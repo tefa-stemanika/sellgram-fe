@@ -7,7 +7,10 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import InputSearch from '@/components/core/input-search'
+import { PageHeader } from '@/components/shared/page-header'
+import { Surface } from '@/components/shared/surface'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { statusOptions } from '@/lib/status-tokens'
 import {
   getBroadcasts,
   sendBroadcast,
@@ -17,7 +20,6 @@ import {
   deleteBroadcast,
 } from '@/services/broadcast'
 import type { BroadcastCampaign, BroadcastFilters } from '@/schemas/broadcast'
-import { BROADCAST_STATUSES, getBroadcastStatusLabel } from '@/schemas/broadcast'
 
 import { DataTable } from '../../_components/data-table'
 import { getBroadcastColumns } from './broadcast-columns'
@@ -26,13 +28,7 @@ type BroadcastsClientProps = {
   token: string
 }
 
-const STATUS_FILTERS = [
-  { label: 'Semua Status', value: 'ALL' },
-  ...BROADCAST_STATUSES.map((s) => ({
-    label: getBroadcastStatusLabel(s),
-    value: s,
-  })),
-]
+const STATUS_FILTERS = statusOptions('broadcast', 'Semua status')
 
 export function BroadcastsClient({ token }: BroadcastsClientProps) {
   const router = useRouter()
@@ -118,139 +114,78 @@ export function BroadcastsClient({ token }: BroadcastsClientProps) {
 
   return (
     <div className="space-y-6">
-      <header className="animate-in fade-in slide-in-from-top-2 duration-500">
-        <div className="flex items-center gap-2">
-          <div className="h-1 w-8 rounded-full bg-gradient-to-r from-primary to-blue-600" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Broadcast</span>
-        </div>
-        <h1 className="mt-4 text-4xl font-black tracking-tight">
-          Campaign <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Broadcast</span>
-        </h1>
-        <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Kirim pesan massal ke pelanggan melalui Telegram bot.
-        </p>
-      </header>
-
-      <div
-        className="overflow-hidden rounded-2xl border-0 shadow-sm transition-all duration-300 hover:shadow-md"
-        style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.1s' }}>
-        <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 to-indigo-600" />
-        <div className="bg-white p-5 dark:bg-card">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300">
-                <Megaphone className="h-4 w-4" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold">Broadcast</h2>
-                <p className="text-sm text-muted-foreground">{total} campaign</p>
-              </div>
-            </div>
-            <Button
-              className="shadow-sm transition-all duration-200 hover:shadow-md"
-              onClick={() => router.push('/broadcasts/create')}
-            >
-              <Plus className="h-4 w-4" />
-              Buat Broadcast
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="overflow-hidden rounded-2xl border-0 shadow-sm transition-all duration-300 hover:shadow-md"
-        style={{ animation: 'fadeInUp 0.4s ease both', animationDelay: '0.13s' }}>
-        <div className="h-1.5 w-full bg-gradient-to-r from-violet-500 to-purple-600" />
-        <div className="bg-white p-4 dark:bg-card">
-          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <InputSearch
-              placeholder="Cari broadcast..."
-              defaultValue={search}
-              onChangeValue={(value) => {
-                setSearch(value)
-                setPage(1)
-              }}
-              wrapperClassname="flex-1"
-              className="bg-white dark:bg-card"
-            />
-            <Select
-              value={statusFilter}
-              onValueChange={(value) => {
-                setStatusFilter(value)
-                setPage(1)
-              }}>
-              <SelectTrigger className="w-full bg-white dark:bg-card sm:w-40 transition-all duration-200">
-                <SelectValue placeholder="Filter status" />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_FILTERS.map((f) => (
-                  <SelectItem key={f.value} value={f.value}>
-                    {f.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={`${sortBy}:${sortDir}`}
-              onValueChange={(value) => {
-                const [by, dir] = value.split(':')
-                setSortBy(by)
-                setSortDir(dir)
-                setPage(1)
-              }}>
-              <SelectTrigger className="w-full bg-white dark:bg-card sm:w-44 transition-all duration-200">
-                <SelectValue placeholder="Urutkan" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="createdAt:desc">Terbaru</SelectItem>
-                <SelectItem value="createdAt:asc">Terlama</SelectItem>
-                <SelectItem value="name:asc">Nama A-Z</SelectItem>
-                <SelectItem value="name:desc">Nama Z-A</SelectItem>
-                <SelectItem value="status:asc">Status</SelectItem>
-                <SelectItem value="totalCustomers:desc">Terbanyak penerima</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <DataTable
-            columns={columns}
-            data={broadcasts}
-            isLoading={isLoading}
-            onRowClick={(b) => handleDetail(b)}
-            emptyIcon={Megaphone}
-            emptyMessage="Belum ada campaign broadcast."
-          />
-
-          {totalPages > 1 && (
-            <div className="mt-4 flex items-center justify-between border-t pt-4">
-              <p className="text-sm text-muted-foreground">
-                Halaman {page} dari {totalPages}
-              </p>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
-                  Sebelumnya
-                </Button>
-                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-                  Selanjutnya
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+      <PageHeader
+        kicker="Marketing"
+        title="Broadcast"
+        description="Kirim pesan massal ke pelanggan melalui Telegram bot."
+        actions={
+          <Button onClick={() => router.push('/broadcasts/create')}>
+            <Plus className="h-4 w-4" />
+            Buat broadcast
+          </Button>
         }
-      `}</style>
+      />
+
+      <Surface className="animate-fade-in-up p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <InputSearch
+            placeholder="Cari broadcast..."
+            defaultValue={search}
+            onChangeValue={(value) => {
+              setSearch(value)
+              setPage(1)
+            }}
+            wrapperClassname="flex-1"
+          />
+          <Select
+            value={statusFilter}
+            onValueChange={(value) => {
+              setStatusFilter(value)
+              setPage(1)
+            }}>
+            <SelectTrigger className="w-full sm:w-40">
+              <SelectValue placeholder="Filter status" />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUS_FILTERS.map((f) => (
+                <SelectItem key={f.value} value={f.value}>
+                  {f.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={`${sortBy}:${sortDir}`}
+            onValueChange={(value) => {
+              const [by, dir] = value.split(':')
+              setSortBy(by)
+              setSortDir(dir)
+              setPage(1)
+            }}>
+            <SelectTrigger className="w-full sm:w-44">
+              <SelectValue placeholder="Urutkan" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="createdAt:desc">Terbaru</SelectItem>
+              <SelectItem value="createdAt:asc">Terlama</SelectItem>
+              <SelectItem value="name:asc">Nama A-Z</SelectItem>
+              <SelectItem value="name:desc">Nama Z-A</SelectItem>
+              <SelectItem value="status:asc">Status</SelectItem>
+              <SelectItem value="totalCustomers:desc">Terbanyak penerima</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </Surface>
+
+      <DataTable
+        columns={columns}
+        data={broadcasts}
+        isLoading={isLoading}
+        onRowClick={(b) => handleDetail(b)}
+        emptyIcon={Megaphone}
+        emptyMessage="Belum ada campaign broadcast."
+        pagination={{ page, totalPages, onPageChange: setPage, total, totalLabel: 'broadcast' }}
+      />
     </div>
   )
 }
