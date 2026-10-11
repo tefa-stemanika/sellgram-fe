@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import { TicketsBoard } from './tickets-board'
 import { TicketDetailDialog } from './ticket-detail-dialog'
+import { PageHeader } from '@/components/shared/page-header'
 import {
   getTicketsByStatus,
   getLabels,
@@ -139,17 +140,8 @@ export function TicketsClient({ token }: TicketsClientProps) {
 
   return (
     <div className="flex flex-col min-w-0 h-[calc(100vh-7rem)] lg:h-[calc(100vh-6rem)]">
-      <header className="shrink-0 animate-in fade-in slide-in-from-top-2 duration-500">
-        <div className="flex items-center gap-2">
-          <div className="h-1 w-8 rounded-full bg-gradient-to-r from-primary to-blue-600" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Tiket</span>
-        </div>
-        <h1 className="mt-4 text-4xl font-black tracking-tight">
-          Papan <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Tiket</span>
-        </h1>
-        <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Kelola tiket dukungan pelanggan dengan sistem Kanban.
-        </p>
+      <header className="shrink-0">
+        <PageHeader kicker="Bantuan" title="Tiket" description="Kelola tiket dukungan pelanggan dengan sistem Kanban." />
       </header>
 
       <div className="mt-6 flex-1 min-h-0 min-w-0">

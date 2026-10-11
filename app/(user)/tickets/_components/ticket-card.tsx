@@ -5,17 +5,17 @@ import { MessageSquare } from 'lucide-react'
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn, formatDate } from '@/lib/utils'
+import { statusBadge, type Tone } from '@/lib/status-tokens'
 import type { Ticket } from '@/services/tickets'
 
-const PRIORITY_CONFIG: Record<string, { label: string; border: string; dot: string }> = {
-  URGENT: { label: 'Urgent', border: 'border-l-red-500', dot: 'bg-red-500' },
-  HIGH: { label: 'High', border: 'border-l-orange-500', dot: 'bg-orange-500' },
-  MEDIUM: {
-    label: 'Medium',
-    border: 'border-l-blue-500',
-    dot: 'bg-blue-500'
-  },
-  LOW: { label: 'Low', border: 'border-l-slate-400', dot: 'bg-slate-400' }
+const PRIORITY_BORDER: Record<Tone, string> = {
+  error: 'border-l-error',
+  warning: 'border-l-warning',
+  info: 'border-l-info',
+  success: 'border-l-success',
+  processing: 'border-l-status-processing',
+  confirmed: 'border-l-status-confirmed',
+  neutral: 'border-l-status-neutral'
 }
 
 type TicketCardProps = {
@@ -36,7 +36,7 @@ export function TicketCard({ ticket, onClick }: TicketCardProps) {
       }
     : undefined
 
-  const priority = PRIORITY_CONFIG[ticket.priority] ?? PRIORITY_CONFIG.LOW
+  const priority = statusBadge('ticket-priority', ticket.priority)
 
   return (
     <div
@@ -48,22 +48,21 @@ export function TicketCard({ ticket, onClick }: TicketCardProps) {
       tabIndex={0}
       onClick={() => onClick(ticket.id)}
       className={cn(
-        'cursor-grab rounded-xl border bg-white/20 backdrop-blur-xl shadow-sm',
-        'transition-all duration-200 hover:shadow-md active:cursor-grabbing',
-        'dark:bg-white/5',
-        priority.border,
-        'border-l-4',
-        isDragging && 'opacity-50 shadow-xl ring-2 ring-primary/30',
+        'cursor-grab rounded-lg border border-border bg-card text-card-foreground shadow-l1',
+        'transition-all duration-200 hover:shadow-l2 active:cursor-grabbing',
+        PRIORITY_BORDER[priority.tone],
+        'border-l-2',
+        isDragging && 'opacity-50 shadow-l3 ring-2 ring-primary/30',
         !isDragging && 'hover:-translate-y-0.5'
       )}>
       <div className="p-3 space-y-2.5">
         <div className="flex items-start justify-between gap-2">
-          <p className="text-sm font-semibold leading-snug line-clamp-2">{ticket.title}</p>
-          <span className={cn('mt-1 h-2 w-2 shrink-0 rounded-full', priority.dot)} />
+          <p className="text-body-sm font-semibold leading-snug line-clamp-2">{ticket.title}</p>
+          <span className={cn('mt-1 h-2 w-2 shrink-0 rounded-full', priority.dotClassName)} />
         </div>
 
         {ticket.customerName && (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-caption text-muted-foreground">
             {ticket.customerName}
             {ticket.customerContact && ` \u2022 ${ticket.customerContact}`}
           </p>
@@ -74,7 +73,7 @@ export function TicketCard({ ticket, onClick }: TicketCardProps) {
             {ticket.labels.map((tl) => (
               <span
                 key={tl.labelId}
-                className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium leading-none"
+                className="inline-flex items-center rounded-full px-2 py-0.5 text-caption font-medium leading-none"
                 style={{
                   backgroundColor: `${tl.label.color}20`,
                   color: tl.label.color
@@ -85,10 +84,10 @@ export function TicketCard({ ticket, onClick }: TicketCardProps) {
           </div>
         )}
 
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+        <div className="flex items-center justify-between text-caption text-muted-foreground">
           <span>{formatDate(ticket.createdAt)}</span>
           {ticket._count.comments > 0 && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 font-mono text-mono-data tabular">
               <MessageSquare className="h-3 w-3" />
               {ticket._count.comments}
             </span>
@@ -101,7 +100,7 @@ export function TicketCard({ ticket, onClick }: TicketCardProps) {
 
 export function TicketCardSkeleton() {
   return (
-    <div className="rounded-xl border bg-white/20 backdrop-blur-xl dark:bg-white/5 p-3 space-y-3">
+    <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-3">
       <Skeleton className="h-4 w-3/4" />
       <Skeleton className="h-3 w-1/2" />
       <div className="flex gap-1">
