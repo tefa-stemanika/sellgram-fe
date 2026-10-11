@@ -412,7 +412,7 @@ export function PlanClient({ token }: PlanClientProps) {
           </Surface>
         ) : !token ? (
           <Surface className="p-5">
-            <EmptyState icon={FileText} title="Login untuk melihat riwayat tagihan" />
+            <EmptyState icon={FileText} title="Masuk untuk melihat riwayat tagihan" />
           </Surface>
         ) : invoices.length === 0 ? (
           <Surface className="p-5">

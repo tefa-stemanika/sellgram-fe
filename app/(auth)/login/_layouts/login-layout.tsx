@@ -38,11 +38,11 @@ const LoginLayout = () => {
       const token = rawToken.startsWith('Bearer ') ? rawToken.slice(7) : rawToken
 
       await setToken(token, data.remember)
-      toast.success('Login berhasil')
+      toast.success('Berhasil masuk')
       router.replace('/dashboard')
       router.refresh()
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Gagal login'
+      const message = error instanceof Error ? error.message : 'Gagal masuk'
       toast.error(message)
     } finally {
       setIsLoading(false)

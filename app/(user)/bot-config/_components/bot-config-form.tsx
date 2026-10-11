@@ -110,7 +110,7 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
                             variant={isSelected ? 'default' : 'outline'}
                             className="h-7 w-full text-caption font-medium"
                             onClick={(e) => e.stopPropagation()}>
-                            Lihat Preview
+                            Lihat preview
                           </Button>
                         </ModePreviewDialog>
                       </div>
@@ -142,7 +142,7 @@ export function BotConfigForm({ defaultValues, onSubmit, isLoading = false }: Bo
         />
 
         <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+          {isLoading ? 'Menyimpan...' : 'Simpan konfigurasi'}
         </Button>
       </form>
     </Form>

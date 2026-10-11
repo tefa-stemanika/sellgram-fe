@@ -216,7 +216,7 @@ export function TicketDetailDialog({ token, ticketId, open, onOpenChange, onTick
       <DialogContent className="max-w-3xl overflow-hidden border-0 p-0 shadow-l3 max-h-[90vh] flex flex-col">
         <div className="flex flex-col flex-1 min-h-0">
           <DialogHeader className="p-6 pb-0">
-            <DialogTitle className="text-section-header tracking-tight">Detail Tiket</DialogTitle>
+            <DialogTitle className="text-section-header tracking-tight">Detail tiket</DialogTitle>
             <DialogDescription>Informasi lengkap dan aktivitas tiket.</DialogDescription>
           </DialogHeader>
 

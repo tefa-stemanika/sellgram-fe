@@ -30,13 +30,13 @@ type CredentialRowState = {
 
 const CREDENTIAL_HELPERS: Record<CredentialKey, { title: string; description: string; example?: string }> = {
   TELEGRAM_BOT_TOKEN: {
-    title: 'Token Bot Customer',
+    title: 'Token bot customer',
     description:
       'Didapat dari chat @BotFather saat membuat bot customer. Format token biasanya angka panjang, lalu titik dua, lalu secret key.',
     example: '8741169...:AAGKgq-onFo6WudgaZ8gCSjOEAMtbdcI...'
   },
   ADMIN_BOT_TOKEN: {
-    title: 'Token Bot Admin',
+    title: 'Token bot admin',
     description:
       'Didapat dari @BotFather untuk bot khusus admin/operasional. Jika Anda pakai bot yang sama dengan customer, isi dengan token yang sama.',
     example: '1234567...:AAHxxxx...'

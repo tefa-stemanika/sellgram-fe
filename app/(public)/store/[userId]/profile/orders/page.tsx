@@ -91,7 +91,7 @@ export default function OrdersPage() {
               Pesanan kamu akan muncul di sini setelah melakukan pembelian.
             </p>
             <Button className="mt-6" asChild variant="outline">
-              <Link href={`/store/${params.userId}`}>Lihat Produk</Link>
+              <Link href={`/store/${params.userId}`}>Lihat produk</Link>
             </Button>
           </Surface>
         ) : (

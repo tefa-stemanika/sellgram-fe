@@ -756,7 +756,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
 
                   <div className="flex gap-2">
                     <LoadingButton type="submit" loading={saving}>
-                      Simpan Konfigurasi
+                      Simpan konfigurasi
                     </LoadingButton>
                   </div>
                 </form>
@@ -791,7 +791,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                   onClick={handleAddStock}
                   disabled={!newStockItem.trim()}
                 >
-                  Tambah Item
+                  Tambah item
                 </LoadingButton>
               </div>
 
@@ -863,7 +863,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                     setShowAccountForm(true)
                   }}
                 >
-                  Tambah Akun
+                  Tambah akun
                 </Button>
               </div>
 
@@ -1040,7 +1040,7 @@ export function FulfillmentConfigDialog({ productId, productName, open, onOpenCh
                               variant="outline"
                               onClick={() => { setShowSlotForm(true); setSlotFormAccountId(account.id); setNewSlotIdentifier(''); setNewSlotAdditionalInfo('') }}
                             >
-                              + Tambah Slot
+                              + Tambah slot
                             </Button>
                           )}
                         </CardContent>

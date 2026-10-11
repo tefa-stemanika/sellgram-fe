@@ -43,7 +43,7 @@ const CUSTOMER_FIELD_OPTIONS = [
 const DERIVED_FIELD_OPTIONS = [
   { label: 'Total Order', value: 'TOTAL_ORDERS' },
   { label: 'Total Belanja', value: 'TOTAL_SPENT' },
-  { label: 'Tanggal Order Terakhir', value: 'LAST_ORDER_DATE' },
+  { label: 'Tanggal order terakhir', value: 'LAST_ORDER_DATE' },
   { label: 'Produk Terakhir', value: 'LAST_PRODUCT_NAME' },
 ]
 

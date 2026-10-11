@@ -177,7 +177,7 @@ export default function RegisterPage() {
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="confirmPassword" className="text-caption font-medium text-foreground">
-                Konfirmasi Kata Sandi
+                Konfirmasi kata sandi
               </label>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />

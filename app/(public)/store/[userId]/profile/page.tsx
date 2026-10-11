@@ -187,7 +187,7 @@ export default function ProfilePage() {
               ) : (
                 <Save className="size-4" />
               )}
-              {updating ? 'Menyimpan...' : 'Simpan Perubahan'}
+              {updating ? 'Menyimpan...' : 'Simpan perubahan'}
             </Button>
           </form>
         </Surface>
@@ -231,7 +231,7 @@ export default function ProfilePage() {
             </div>
             <div className="flex flex-col gap-1.5">
               <label htmlFor="confirmPassword" className="text-caption font-medium text-foreground">
-                Konfirmasi Kata Sandi
+                Konfirmasi kata sandi
               </label>
               <Input
                 id="confirmPassword"
@@ -250,7 +250,7 @@ export default function ProfilePage() {
               ) : (
                 <Lock className="size-4" />
               )}
-              {changingPassword ? 'Mengubah...' : 'Ubah Kata Sandi'}
+              {changingPassword ? 'Mengubah...' : 'Ubah kata sandi'}
             </Button>
           </form>
         </Surface>

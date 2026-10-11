@@ -44,11 +44,11 @@ const RegisterLayout = () => {
       const token = rawToken.startsWith('Bearer ') ? rawToken.slice(7) : rawToken
 
       await setToken(token)
-      toast.success('Register berhasil')
+      toast.success('Berhasil daftar')
       router.replace('/dashboard')
       router.refresh()
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Gagal register'
+      const message = error instanceof Error ? error.message : 'Gagal daftar'
       toast.error(message)
     } finally {
       setIsLoading(false)

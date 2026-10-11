@@ -82,7 +82,7 @@ export function CustomerFormDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {isEditMode ? 'Edit Pelanggan' : 'Tambah Pelanggan'}
+            {isEditMode ? 'Edit pelanggan' : 'Tambah pelanggan'}
           </DialogTitle>
           <DialogDescription>
             {isEditMode ? 'Perbarui informasi pelanggan.' : 'Masukkan data pelanggan baru.'}

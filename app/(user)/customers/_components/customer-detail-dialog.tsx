@@ -87,7 +87,7 @@ export function CustomerDetailDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Detail Pelanggan</DialogTitle>
+          <DialogTitle>Detail pelanggan</DialogTitle>
           <DialogDescription>Informasi lengkap pelanggan.</DialogDescription>
         </DialogHeader>
 
@@ -163,7 +163,7 @@ export function CustomerDetailDialog({
             <div className="space-y-2">
               <h3 className="text-small-header flex items-center gap-2">
                 <PackageOpen className="h-4 w-4" />
-                Riwayat Order
+                Riwayat order
               </h3>
               {isLoadingDetail ? (
                 <p className="text-body-sm text-muted-foreground">Memuat riwayat order...</p>

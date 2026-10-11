@@ -132,7 +132,7 @@ function PaymentSuccessContent() {
               <Button className="w-full" asChild>
                 <Link href={`/store/${storeUserId}/profile/orders`}>
                   <ListOrdered className="h-5 w-5" />
-                  Lihat Pesanan Saya
+                  Lihat pesanan saya
                 </Link>
               </Button>
             ) : (

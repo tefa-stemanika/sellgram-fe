@@ -187,7 +187,7 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
             <Settings2 className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-subsection-header">{config ? 'Perbarui Konfigurasi' : 'Buat Konfigurasi'}</h2>
+            <h2 className="text-subsection-header">{config ? 'Perbarui konfigurasi' : 'Buat konfigurasi'}</h2>
             <p className="text-body-sm text-muted-foreground">
               {config
                 ? 'Ubah pengaturan bot Anda. Perubahan akan diterapkan setelah disimpan.'
