@@ -62,20 +62,15 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="mt-5 space-y-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="mt-1 space-y-4">
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nama Produk</FormLabel>
+              <FormLabel>Nama produk</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Contoh: Nasi Goreng"
-                  {...field}
-                  value={field.value ?? ''}
-                  className="bg-white dark:bg-card"
-                />
+                <Input placeholder="Contoh: Nasi Goreng" {...field} value={field.value ?? ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,12 +84,7 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
             <FormItem>
               <FormLabel>Deskripsi</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="Deskripsi produk"
-                  {...field}
-                  value={field.value ?? ''}
-                  className="min-h-[80px] bg-white dark:bg-card"
-                />
+                <Textarea placeholder="Deskripsi produk" {...field} value={field.value ?? ''} className="min-h-[80px]" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -109,13 +99,7 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
               <FormItem>
                 <FormLabel>Harga (Rp)</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    min={1}
-                    {...field}
-                    value={field.value ?? 0}
-                    className="bg-white dark:bg-card"
-                  />
+                  <Input type="number" min={1} {...field} value={field.value ?? 0} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -133,7 +117,7 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
                     placeholder="🍳"
                     {...field}
                     value={field.value ?? ''}
-                    className="bg-white dark:bg-card text-center text-xl"
+                    className="text-center text-subsection-header"
                   />
                 </FormControl>
                 <FormMessage />
@@ -147,7 +131,7 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
             control={form.control}
             name="isAvailable"
             render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-lg border bg-white p-3 dark:bg-card">
+              <FormItem className="flex items-center justify-between rounded-lg border border-border p-3">
                 <FormLabel className="m-0 font-medium">Produk tersedia</FormLabel>
                 <FormControl>
                   <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
@@ -159,18 +143,16 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
         )}
 
         <div className="border-t pt-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Manajemen Stok
-          </p>
+          <p className="text-small-header mb-3 text-muted-foreground">Manajemen stok</p>
 
           <FormField
             control={form.control}
             name="stockEnabled"
             render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-lg border bg-white p-3 dark:bg-card">
+              <FormItem className="flex items-center justify-between rounded-lg border border-border p-3">
                 <div>
                   <FormLabel className="m-0 font-medium">Lacak stok</FormLabel>
-                  <p className="text-xs text-muted-foreground">Aktifkan untuk mengelola stok produk</p>
+                  <p className="text-caption text-muted-foreground">Aktifkan untuk mengelola stok produk</p>
                 </div>
                 <FormControl>
                   <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
@@ -190,13 +172,7 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
                     <FormItem>
                       <FormLabel>Stok awal</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          {...field}
-                          value={field.value ?? 0}
-                          className="bg-white dark:bg-card"
-                        />
+                        <Input type="number" min={0} {...field} value={field.value ?? 0} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -210,13 +186,7 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
                     <FormItem>
                       <FormLabel>Batas stok rendah</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          {...field}
-                          value={field.value ?? 5}
-                          className="bg-white dark:bg-card"
-                        />
+                        <Input type="number" min={0} {...field} value={field.value ?? 5} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -228,10 +198,10 @@ export function ProductForm({ mode, defaultValues, onSubmit, isLoading = false }
                 control={form.control}
                 name="allowOversell"
                 render={({ field }) => (
-                  <FormItem className="flex items-center justify-between rounded-lg border bg-white p-3 dark:bg-card">
+                  <FormItem className="flex items-center justify-between rounded-lg border border-border p-3">
                     <div>
                       <FormLabel className="m-0 font-medium">Izinkan oversell</FormLabel>
-                      <p className="text-xs text-muted-foreground">Izinkan pesanan meskipun stok habis</p>
+                      <p className="text-caption text-muted-foreground">Izinkan pesanan meskipun stok habis</p>
                     </div>
                     <FormControl>
                       <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />

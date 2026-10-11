@@ -3,6 +3,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { Package, Pencil, Trash2, Zap } from 'lucide-react'
 
+import { StatusBadge } from '@/components/shared/status-badge'
 import { Button } from '@/components/ui/button'
 import { formatIDRCurrency } from '@/lib/utils'
 import type { Product } from '@/services/products'
@@ -14,12 +15,20 @@ type ProductColumnsOptions = {
   onManageFulfillment: (product: Product) => void
 }
 
-export function getProductColumns({ onEdit, onDelete, onManageStock, onManageFulfillment }: ProductColumnsOptions): ColumnDef<Product>[] {
+const NEUTRAL_CHIP_CLASS =
+  'inline-flex items-center rounded-full border border-border bg-muted/50 px-2 py-0.5 text-caption font-medium text-muted-foreground'
+
+export function getProductColumns({
+  onEdit,
+  onDelete,
+  onManageStock,
+  onManageFulfillment
+}: ProductColumnsOptions): ColumnDef<Product>[] {
   return [
     {
       accessorKey: 'emoji',
       header: '',
-      cell: ({ row }) => <span className="text-xl">{row.original.emoji}</span>
+      cell: ({ row }) => <span className="text-subsection-header leading-none">{row.original.emoji}</span>
     },
     {
       accessorKey: 'name',
@@ -30,16 +39,14 @@ export function getProductColumns({ onEdit, onDelete, onManageStock, onManageFul
       accessorKey: 'description',
       header: 'Deskripsi',
       cell: ({ row }) => (
-        <span className="max-w-[200px] truncate text-sm text-muted-foreground">
-          {row.original.description || '-'}
-        </span>
+        <span className="max-w-[200px] truncate text-body-sm text-muted-foreground">{row.original.description || '-'}</span>
       )
     },
     {
       accessorKey: 'price',
       header: 'Harga',
       cell: ({ row }) => (
-        <span className="font-mono font-semibold">{formatIDRCurrency(row.original.price)}</span>
+        <span className="text-mono-data font-mono font-semibold tabular">{formatIDRCurrency(row.original.price)}</span>
       )
     },
     {
@@ -47,36 +54,26 @@ export function getProductColumns({ onEdit, onDelete, onManageStock, onManageFul
       header: 'Stok',
       cell: ({ row }) => {
         const { stock, stockEnabled, lowStockAlert } = row.original
-        if (!stockEnabled) return <span className="text-sm text-muted-foreground">-</span>
+        if (!stockEnabled) return <span className="text-body-sm text-muted-foreground">-</span>
 
-        const isLow = stock <= lowStockAlert
+        const stockKey = stock <= 0 ? 'OUT' : stock <= lowStockAlert ? 'LOW' : 'AVAILABLE'
         return (
-          <span
-            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 font-mono text-xs font-semibold ${
-              stock <= 0
-                ? 'border-red-200 bg-red-100 text-red-700 dark:border-red-800 dark:bg-red-900/40 dark:text-red-300'
-                : isLow
-                  ? 'border-amber-200 bg-amber-100 text-amber-700 dark:border-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
-                  : 'border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-            }`}>
-            {stock}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-mono-data font-mono tabular">{stock}</span>
+            <StatusBadge kind="stock" value={stockKey} />
+          </div>
         )
       }
     },
     {
       accessorKey: 'isAvailable',
       header: 'Status',
-      cell: ({ row }) => (
-        <span
-          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${
-            row.original.isAvailable
-              ? 'border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-              : 'border-red-200 bg-red-100 text-red-700 dark:border-red-800 dark:bg-red-900/40 dark:text-red-300'
-          }`}>
-          {row.original.isAvailable ? 'Tersedia' : 'Tidak tersedia'}
-        </span>
-      )
+      cell: ({ row }) =>
+        row.original.isAvailable ? (
+          <StatusBadge kind="stock" value="AVAILABLE" />
+        ) : (
+          <span className={NEUTRAL_CHIP_CLASS}>Tidak tersedia</span>
+        )
     },
     {
       id: 'actions',
@@ -90,7 +87,8 @@ export function getProductColumns({ onEdit, onDelete, onManageStock, onManageFul
             onClick={(event) => {
               event.stopPropagation()
               onEdit(row.original)
-            }}>
+            }}
+          >
             <Pencil className="mr-1 h-3.5 w-3.5" />
             Edit
           </Button>
@@ -101,7 +99,8 @@ export function getProductColumns({ onEdit, onDelete, onManageStock, onManageFul
             onClick={(event) => {
               event.stopPropagation()
               onManageStock(row.original)
-            }}>
+            }}
+          >
             <Package className="mr-1 h-3.5 w-3.5" />
             Stok
           </Button>
@@ -109,11 +108,11 @@ export function getProductColumns({ onEdit, onDelete, onManageStock, onManageFul
             type="button"
             size="sm"
             variant="outline"
-            className="border-orange-200 text-orange-700 hover:bg-orange-50 hover:text-orange-800 dark:border-orange-800 dark:text-orange-300 dark:hover:bg-orange-900/40"
             onClick={(event) => {
               event.stopPropagation()
               onManageFulfillment(row.original)
-            }}>
+            }}
+          >
             <Zap className="mr-1 h-3.5 w-3.5" />
             Fulfillment
           </Button>
@@ -121,12 +120,12 @@ export function getProductColumns({ onEdit, onDelete, onManageStock, onManageFul
             type="button"
             size="sm"
             variant="destructive"
-            className="text-white"
             onClick={(event) => {
               event.stopPropagation()
               onDelete(row.original)
-            }}>
-            <Trash2 className="mr-1 h-3.5 w-3.5 text-white" />
+            }}
+          >
+            <Trash2 className="mr-1 h-3.5 w-3.5" />
             Hapus
           </Button>
         </div>
