@@ -3,7 +3,7 @@ import type { FulfillmentStatus } from '@/schemas/fulfillment'
 import type { OrderStatus } from '@/services/orders'
 import type { TicketPriority, TicketStatus } from '@/services/tickets'
 
-export type StatusKind = 'order' | 'ticket-status' | 'ticket-priority' | 'broadcast' | 'fulfillment' | 'invoice' | 'stock' | 'source'
+export type StatusKind = 'order' | 'ticket-status' | 'ticket-priority' | 'broadcast' | 'fulfillment' | 'invoice' | 'stock' | 'source' | 'bot-health'
 
 export type Tone = 'success' | 'warning' | 'error' | 'info' | 'processing' | 'confirmed' | 'neutral'
 
@@ -64,6 +64,12 @@ const MAPS: Record<StatusKind, Record<string, StatusToken>> = {
     TELEGRAM: { label: 'Telegram', labelId: 'Telegram', tone: 'success' },
     ORDER: { label: 'Order', labelId: 'Order', tone: 'processing' },
     MANUAL: { label: 'Manual', labelId: 'Manual', tone: 'warning' }
+  },
+  'bot-health': {
+    HEALTHY: { label: 'Healthy', labelId: 'Sehat', tone: 'success' },
+    DEGRADED: { label: 'Degraded', labelId: 'Terganggu', tone: 'warning' },
+    UNHEALTHY: { label: 'Unhealthy', labelId: 'Bermasalah', tone: 'error' },
+    UNKNOWN: { label: 'Unknown', labelId: 'Tidak diketahui', tone: 'neutral' }
   }
 }
 

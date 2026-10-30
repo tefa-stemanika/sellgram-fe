@@ -61,7 +61,9 @@ order-bot-dashboard
 │  │  ├─ bot-config
 │  │  │  ├─ _components
 │  │  │  │  ├─ bot-config-client.tsx
-│  │  │  │  └─ bot-config-form.tsx
+│  │  │  │  ├─ bot-config-form.tsx
+│  │  │  │  ├─ bot-health-card.tsx
+│  │  │  │  └─ mode-preview-dialog.tsx
 │  │  │  └─ page.tsx
 │  │  ├─ bot-credentials
 │  │  │  ├─ _components
@@ -221,6 +223,8 @@ order-bot-dashboard
 │  ├─ bot-config
 │  │  └─ index.ts
 │  ├─ bot-credentials
+│  │  └─ index.ts
+│  ├─ bot-health
 │  │  └─ index.ts
 │  ├─ cashflow
 │  │  └─ index.ts

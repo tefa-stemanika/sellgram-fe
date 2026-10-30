@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { createBotConfig, getBotConfig, updateBotConfig, reconnectBot, type BotConfig, type BotConfigPayload } from '@/services/bot-config'
 
+import { BotHealthCard } from './bot-health-card'
 import { BotConfigForm } from './bot-config-form'
 
 type BotConfigClientProps = {
@@ -154,6 +155,8 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
               </Surface>
             )}
       </div>
+
+      {config && <BotHealthCard token={token} />}
 
       {config && (
         <Surface className="flex items-center justify-between gap-4 p-5">
