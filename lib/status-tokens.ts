@@ -3,7 +3,17 @@ import type { FulfillmentStatus } from '@/schemas/fulfillment'
 import type { OrderStatus } from '@/services/orders'
 import type { TicketPriority, TicketStatus } from '@/services/tickets'
 
-export type StatusKind = 'order' | 'ticket-status' | 'ticket-priority' | 'broadcast' | 'fulfillment' | 'invoice' | 'stock' | 'source' | 'bot-health'
+export type StatusKind =
+  | 'order'
+  | 'ticket-status'
+  | 'ticket-priority'
+  | 'broadcast'
+  | 'fulfillment'
+  | 'invoice'
+  | 'stock'
+  | 'source'
+  | 'bot-health'
+  | 'whatsapp-state'
 
 export type Tone = 'success' | 'warning' | 'error' | 'info' | 'processing' | 'confirmed' | 'neutral'
 
@@ -70,6 +80,12 @@ const MAPS: Record<StatusKind, Record<string, StatusToken>> = {
     DEGRADED: { label: 'Degraded', labelId: 'Terganggu', tone: 'warning' },
     UNHEALTHY: { label: 'Unhealthy', labelId: 'Bermasalah', tone: 'error' },
     UNKNOWN: { label: 'Unknown', labelId: 'Tidak diketahui', tone: 'neutral' }
+  },
+  'whatsapp-state': {
+    OPEN: { label: 'Connected', labelId: 'Terhubung', tone: 'success' },
+    CONNECTING: { label: 'Connecting', labelId: 'Menghubungkan', tone: 'processing' },
+    CLOSE: { label: 'Disconnected', labelId: 'Terputus', tone: 'warning' },
+    ERROR: { label: 'Error', labelId: 'Bermasalah', tone: 'error' }
   }
 }
 
@@ -112,7 +128,10 @@ export function statusBadge(kind: StatusKind, key: string | null | undefined, lo
 }
 
 export function statusOptions(kind: StatusKind, allLabel: string): Array<{ label: string; value: string }> {
-  return [{ label: allLabel, value: 'ALL' }, ...Object.entries(MAPS[kind]).map(([key, token]) => ({ label: token.labelId, value: key }))]
+  return [
+    { label: allLabel, value: 'ALL' },
+    ...Object.entries(MAPS[kind]).map(([key, token]) => ({ label: token.labelId, value: key }))
+  ]
 }
 
 export const ORDER_STATUS_VALUES = Object.keys(MAPS.order) as OrderStatus[]

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { CreditCard, KeyRound, LayoutDashboard, LogOut, Megaphone, Moon, Package, Settings, ShoppingCart, Sparkles, Sun, TicketCheck, Users, Variable, Zap } from 'lucide-react'
+import { CreditCard, KeyRound, LayoutDashboard, LogOut, Megaphone, MessageCircle, Moon, Package, Settings, ShoppingCart, Sparkles, Sun, TicketCheck, Users, Variable, Zap } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
 
@@ -41,6 +41,7 @@ const navigation = [
   { title: 'Fulfillment', href: '/fulfillment', icon: Zap },
   { title: 'Langganan', href: '/plan', icon: CreditCard },
   { title: 'Bot config', href: '/bot-config', icon: Settings },
+  { title: 'WhatsApp', href: '/whatsapp', icon: MessageCircle },
   { title: 'Credentials', href: '/bot-credentials', icon: KeyRound }
 ]
 

@@ -119,6 +119,12 @@ order-bot-dashboard
 │  │  │  │  ├─ template-detail-dialog.tsx
 │  │  │  │  └─ templates-client.tsx
 │  │  │  └─ page.tsx
+│  │  ├─ whatsapp
+│  │  │  ├─ _components
+│  │  │  │  ├─ create-instance-dialog.tsx
+│  │  │  │  ├─ qr-dialog.tsx
+│  │  │  │  └─ whatsapp-client.tsx
+│  │  │  └─ page.tsx
 │  │  └─ types.ts
 │  ├─ tickets
 │  │  ├─ _components
@@ -241,6 +247,8 @@ order-bot-dashboard
 │  ├─ products
 │  │  └─ index.ts
 │  ├─ template
+│  │  └─ index.ts
+│  ├─ whatsapp
 │  │  └─ index.ts
 │  └─ user
 │     └─ index.ts
