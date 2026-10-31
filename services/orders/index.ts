@@ -17,15 +17,19 @@ export type OrderStatus =
   | 'CANCELLED'
   | 'PAYMENT_FAILED'
 
+export type OrderSource = 'TELEGRAM' | 'WHATSAPP' | 'WEBSITE' | 'API'
+
+export const ORDER_SOURCES: readonly OrderSource[] = ['TELEGRAM', 'WHATSAPP', 'WEBSITE', 'API']
+
 export type OrderItem = {
-  id: number
-  orderId: number
-  productId: number
+  id: string
+  orderId: string
+  productId: string
   quantity: number
   unitPrice: number
   product: {
-    id: number
-    userId: number
+    id: string
+    userId: string
     name: string
     description: string
     price: number
@@ -37,15 +41,17 @@ export type OrderItem = {
 }
 
 export type Order = {
-  id: number
-  userId: number
+  id: string
+  userId: string
   orderId: string
   source: string
   telegramId: string | null
+  whatsappId: string | null
   username: string | null
   firstName: string | null
   customerName: string | null
   customerPhone: string | null
+  customerId: string | null
   totalPrice: number
   status: OrderStatus
   paymentUrl: string | null
@@ -104,7 +110,7 @@ export async function getOrders(
   }
 }
 
-export async function getOrderById(token: string, id: number): Promise<Order> {
+export async function getOrderById(token: string, id: string): Promise<Order> {
   const response = await fetcher<{ success: boolean; data: Order }>(`/orders/${id}`, { token })
   return response.data
 }

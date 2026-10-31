@@ -15,6 +15,7 @@ export type WhatsAppStatus = {
   instanceSource: 'tenant' | 'env' | string
   ownInstance: boolean
   instanceExists: boolean
+  needsCreate: boolean
   instanceLimit: number
   suggestedInstance?: string | null
   apiUrl: string | null

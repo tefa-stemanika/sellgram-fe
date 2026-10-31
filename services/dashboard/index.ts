@@ -6,6 +6,8 @@ export type DashboardOrder = {
   source: string
   firstName: string | null
   username: string | null
+  telegramId: string | null
+  whatsappId: string | null
   customerName: string | null
   customerPhone: string | null
   status: string
@@ -13,20 +15,17 @@ export type DashboardOrder = {
   createdAt: string
 }
 
+/** Keyed by order source enum; the backend only returns sources that have data. */
+export type SourceBreakdown = Record<string, number>
+
 export type DashboardData = {
   activeProducts: number
   totalOrders: number
   pendingOrders: number
   totalRevenue: number
   revenueGrowth: number
-  ordersBySource: {
-    TELEGRAM: number
-    WEBSITE: number
-  }
-  revenueBySource: {
-    TELEGRAM: number
-    WEBSITE: number
-  }
+  ordersBySource: SourceBreakdown
+  revenueBySource: SourceBreakdown
   recentOrders: DashboardOrder[]
   tickets: {
     total: number

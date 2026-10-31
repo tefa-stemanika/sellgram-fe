@@ -115,6 +115,13 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
   const [showValueMap, setShowValueMap] = useState<Record<CredentialKey, boolean>>({} as Record<CredentialKey, boolean>)
   const [savingKey, setSavingKey] = useState<CredentialKey | null>(null)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const [origin, setOrigin] = useState('')
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin)
+    }
+  }, [])
 
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '')
   const webhookUrl = apiBaseUrl
@@ -364,7 +371,13 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
             const isSaving = savingKey === key
             const hasValue = row?.value?.trim().length > 0
             const isStored = keyStatus[key]
-            const helper = CREDENTIAL_HELPERS[key]
+            const baseHelper = CREDENTIAL_HELPERS[key]
+            const helper = {
+              ...baseHelper,
+              ...(key === 'MIDTRANS_FINISH_URL' && origin
+                ? { example: `${origin}/payment/success` }
+                : {})
+            }
             const meta = CREDENTIAL_META[key]
             const Icon = meta.icon
 
@@ -409,7 +422,11 @@ export function CredentialsClient({ token }: CredentialsClientProps) {
                       <Input
                         id={`credential-${key}`}
                         type={showValueMap[key] ? 'text' : 'password'}
-                        placeholder={`Masukkan ${helper.title.toLowerCase()}`}
+                        placeholder={
+                          key === 'MIDTRANS_FINISH_URL' && helper.example
+                            ? helper.example
+                            : `Masukkan ${helper.title.toLowerCase()}`
+                        }
                         value={row.value}
                         onChange={(event) => handleChangeValue(key, event.target.value)}
                         className="pr-10"

@@ -13,6 +13,7 @@ import { createBotConfig, getBotConfig, updateBotConfig, reconnectBot, type BotC
 
 import { BotHealthCard } from './bot-health-card'
 import { BotConfigForm } from './bot-config-form'
+import { WhatsAppChannelCard } from './whatsapp-channel-card'
 
 type BotConfigClientProps = {
   token: string
@@ -183,6 +184,8 @@ export function BotConfigClient({ token }: BotConfigClientProps) {
           </Button>
         </Surface>
       )}
+
+      {config && <WhatsAppChannelCard token={token} />}
 
       <Surface className="p-6">
         <div className="flex items-center gap-3">

@@ -4,6 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Eye } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { OrderBuyerInfo } from '@/components/shared/order-buyer-info'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { formatDate, formatIDRCurrency } from '@/lib/utils'
 import type { Order } from '@/services/orders'
@@ -29,11 +30,7 @@ export function getOrderColumns({ onDetail }: OrderColumnsOptions): ColumnDef<Or
     {
       id: 'customer',
       header: 'Pelanggan',
-      cell: ({ row }) => {
-        const o = row.original
-        const name = o.source === 'WEBSITE' ? o.customerName : (o.firstName ?? o.username)
-        return <span className="font-medium">{name ?? '-'}</span>
-      }
+      cell: ({ row }) => <OrderBuyerInfo order={row.original} variant="cell" />
     },
     {
       accessorKey: 'totalPrice',

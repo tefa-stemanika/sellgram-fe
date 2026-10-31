@@ -74,11 +74,13 @@ export type UpsertFulfillmentConfigPayload = {
 }
 
 export type StockItemOrderInfo = {
+  source?: string | null
   firstName: string | null
   customerName: string | null
   customerPhone: string | null
   username: string | null
   telegramId: string | null
+  whatsappId?: string | null
   customer: {
     name: string | null
     phone: string | null

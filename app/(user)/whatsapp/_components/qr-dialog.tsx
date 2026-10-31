@@ -87,8 +87,9 @@ export function QrDialog({ open, onOpenChange, token, initialQr, number, onConne
         <DialogHeader>
           <DialogTitle>Hubungkan WhatsApp</DialogTitle>
           <DialogDescription>
-            Buka WhatsApp di ponsel Anda, pilih Perangkat Tertaut, lalu pindai QR ini. QR berlaku singkat &mdash; muat ulang
-            bila kedaluwarsa.
+            {qrSrc
+              ? 'Buka WhatsApp di ponsel Anda, pilih Perangkat Tertaut, lalu pindai QR ini. QR berlaku singkat — muat ulang bila kedaluwarsa.'
+              : 'QR belum tersedia. Gunakan kode pairing di bawah, atau muat ulang QR.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -104,7 +105,10 @@ export function QrDialog({ open, onOpenChange, token, initialQr, number, onConne
 
           {qr?.pairingCode && (
             <div className="w-full rounded-lg border border-border bg-muted/50 p-3 text-center">
-              <p className="text-caption text-muted-foreground">Atau gunakan kode pairing ini</p>
+              <p className="text-caption text-muted-foreground">
+                Alternatif tanpa memindai: di WhatsApp pilih Setelan &rarr; Perangkat Tertaut &rarr; Tautkan perangkat,
+                lalu ketik kode berikut.
+              </p>
               <p className="text-mono-data mt-1 break-all">{qr.pairingCode}</p>
               <Button
                 type="button"

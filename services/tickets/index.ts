@@ -78,6 +78,7 @@ export type TicketDetail = Ticket & {
     orderId: string
     source: string
     telegramId: string | null
+    whatsappId: string | null
     username: string | null
     firstName: string | null
     customerName: string | null

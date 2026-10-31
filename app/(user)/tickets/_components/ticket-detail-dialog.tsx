@@ -12,8 +12,9 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { MessageSquare, Activity, Send, Loader2, User, Clock, Plus, X, Check } from 'lucide-react'
 
-import { cn, formatDate } from '@/lib/utils'
+import { cn, formatDate, formatPhoneNumber } from '@/lib/utils'
 import { statusBadge } from '@/lib/status-tokens'
+import { OrderBuyerInfo } from '@/components/shared/order-buyer-info'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { Surface } from '@/components/shared/surface'
 import {
@@ -325,13 +326,21 @@ export function TicketDetailDialog({ token, ticketId, open, onOpenChange, onTick
                   </DropdownMenu>
                 </div>
 
-                {detail.customerName && (
+                {(detail.customerName || detail.customerContact) && (
                   <div className="flex items-center gap-4 text-caption text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <User className="h-3 w-3" />
-                      {detail.customerName}
-                    </span>
-                    {detail.customerContact && <span>{detail.customerContact}</span>}
+                    {detail.customerName && (
+                      <span className="flex items-center gap-1">
+                        <User className="h-3 w-3" />
+                        {detail.customerName}
+                      </span>
+                    )}
+                    {detail.customerContact && (
+                      <span className="font-mono tabular">
+                        {detail.source === 'WHATSAPP'
+                          ? formatPhoneNumber(detail.customerContact)
+                          : detail.customerContact}
+                      </span>
+                    )}
                     <span className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       {formatDate(detail.createdAt)}
@@ -340,11 +349,15 @@ export function TicketDetailDialog({ token, ticketId, open, onOpenChange, onTick
                 )}
 
                 {detail.order && (
-                  <Surface className="p-3 text-body-sm">
+                  <Surface className="space-y-2 p-3 text-body-sm">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold font-mono text-mono-data tabular">Order #{detail.order.id}</span>
-                      <StatusBadge kind="order" value={detail.order.status} withDot />
+                      <div className="flex items-center gap-2">
+                        <StatusBadge kind="source" value={detail.order.source} />
+                        <StatusBadge kind="order" value={detail.order.status} withDot />
+                      </div>
                     </div>
+                    <OrderBuyerInfo order={detail.order} className="text-caption" />
                   </Surface>
                 )}
               </div>

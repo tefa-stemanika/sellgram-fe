@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Link2, MessageCircle, QrCode, RefreshCw, Server, Unplug, Webhook } from 'lucide-react'
+import { AlertTriangle, Link2, MessageCircle, QrCode, RefreshCw, Server, Unplug, Webhook } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { PageHeader } from '@/components/shared/page-header'
@@ -22,10 +22,13 @@ import { CreateInstanceDialog } from './create-instance-dialog'
 import { QrDialog } from './qr-dialog'
 
 const ERROR_LABELS: Record<string, string> = {
-  instance_missing: 'Instance belum dibuat',
-  invalid_number: 'Format nomor tidak valid',
-  connect_failed: 'Gagal menghubungi server Evolution',
-  instance_limit_reached: 'Anda sudah memiliki instance WhatsApp'
+  instance_missing: 'Instance belum dibuat. Buat instance terlebih dahulu.',
+  invalid_number: 'Format nomor tidak valid. Gunakan angka saja, contoh 6281234567890.',
+  instance_limit_reached: 'Batas 1 instance per akun tercapai. Putuskan instance lama sebelum menghubungkan nomor lain.',
+  webhook_secret_missing: 'Secret webhook belum dikonfigurasi di sisi server.',
+  server_unreachable: 'Server Evolution tidak dapat dihubungi, coba lagi.',
+  create_failed: 'Server Evolution tidak dapat dihubungi, coba lagi.',
+  connect_failed: 'Server Evolution tidak dapat dihubungi, coba lagi.'
 }
 
 type WhatsAppClientProps = {
@@ -139,6 +142,8 @@ export function WhatsAppClient({ token }: WhatsAppClientProps) {
   }
 
   const stateBadge = status?.state ?? (status ? 'close' : '')
+  const webhookUnsynced = status?.webhook?.synced === false
+  const needsCreate = !status?.configured || status.needsCreate || !status.instanceExists
 
   return (
     <div className="space-y-6">
@@ -167,12 +172,16 @@ export function WhatsAppClient({ token }: WhatsAppClientProps) {
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 className="text-small-header">Instance WhatsApp</h2>
-                  {status.configured && <StatusBadge kind="whatsapp-state" value={stateBadge} withDot />}
-                  {status.webhook?.synced === false && <StatusBadge kind="bot-health" value="DEGRADED" />}
+                  {status.configured && status.instanceExists && (
+                    <StatusBadge kind="whatsapp-state" value={stateBadge} withDot />
+                  )}
+                  {webhookUnsynced && status.instanceExists && <StatusBadge kind="bot-health" value="DEGRADED" />}
                 </div>
                 <p className="text-caption mt-0.5 text-muted-foreground">
                   {status.configured
-                    ? `Instance ${status.instance ?? '-'}${status.instanceSource === 'env' ? ' (fallback env)' : ''}`
+                    ? status.instanceExists
+                      ? `Instance ${status.instance ?? '-'}${status.instanceSource === 'env' ? ' (fallback env)' : ''} · batas ${status.instanceLimit ?? 1} instance per akun`
+                      : `Instance belum dibuat. Batas ${status.instanceLimit ?? 1} instance per akun.`
                     : 'Credential Evolution API belum dikonfigurasi.'}
                 </p>
               </div>
@@ -202,17 +211,23 @@ export function WhatsAppClient({ token }: WhatsAppClientProps) {
                     className="min-w-0 flex-1 truncate text-body-sm text-muted-foreground"
                     title={status.webhook?.url ?? '-'}
                   >
-                    {status.webhook?.enabled ? (status.webhook.url ?? '-') : 'Tidak aktif'}
-                    {status.webhook?.synced === false && ' — belum sinkron'}
+                    {!status.instanceExists
+                      ? 'Terpasang otomatis saat instance dibuat'
+                      : status.webhook?.enabled
+                        ? (status.webhook.url ?? '-')
+                        : 'Tidak aktif'}
+                    {status.instanceExists && webhookUnsynced && ' — belum sinkron'}
                   </span>
                 </li>
-                <li className="flex items-center gap-3 py-2.5 last:pb-0">
-                  <Link2 className="h-4 w-4 shrink-0 text-muted-foreground" />
-                  <span className="w-36 shrink-0 text-body-sm">Kepemilikan</span>
-                  <span className="min-w-0 flex-1 text-body-sm text-muted-foreground">
-                    {status.ownInstance ? 'Instance milik akun ini' : 'Instance dipakai konfigurasi lain'}
-                  </span>
-                </li>
+                {status.instanceExists && (
+                  <li className="flex items-center gap-3 py-2.5 last:pb-0">
+                    <Link2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="w-36 shrink-0 text-body-sm">Kepemilikan</span>
+                    <span className="min-w-0 flex-1 text-body-sm text-muted-foreground">
+                      {status.ownInstance ? 'Instance milik akun ini' : 'Instance dipakai konfigurasi lain'}
+                    </span>
+                  </li>
+                )}
               </ul>
 
               {status.errors?.length > 0 && (
@@ -226,29 +241,12 @@ export function WhatsAppClient({ token }: WhatsAppClientProps) {
                 </ul>
               )}
 
-              <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
-                {!status.instanceExists ? (
-                  <Button size="sm" onClick={() => setIsCreateOpen(true)}>
-                    <MessageCircle className="mr-1.5 h-4 w-4" />
-                    Buat instance
-                  </Button>
-                ) : (
-                  <Button size="sm" disabled={isConnecting} onClick={() => void handleConnect()}>
-                    <QrCode className="mr-1.5 h-4 w-4" />
-                    {isConnecting ? 'Mengambil QR...' : status.connected ? 'Perbarui QR' : 'Hubungkan WhatsApp'}
-                  </Button>
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                  disabled={isRestarting}
-                  onClick={() => void handleRestart()}
-                >
-                  <Unplug className={`h-4 w-4 ${isRestarting ? 'animate-spin' : ''}`} />
-                  {isRestarting ? 'Merestart...' : 'Restart & sinkronkan webhook'}
-                </Button>
-              </div>
+              {status.instanceExists && webhookUnsynced && (
+                <p className="mt-3 flex items-start gap-2 rounded-md border border-warning/25 bg-warning/12 p-3 text-body-sm text-warning">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                  Webhook belum sinkron dengan Evolution. Pesan masuk mungkin tidak diproses sampai webhook disinkronkan.
+                </p>
+              )}
             </>
           ) : (
             <p className="mt-4 text-body-sm text-muted-foreground">
@@ -256,6 +254,32 @@ export function WhatsAppClient({ token }: WhatsAppClientProps) {
               <span className="text-mono-data">EVOLUTION_API_KEY</span>, lalu muat status ulang.
             </p>
           )}
+
+          <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
+            {needsCreate ? (
+              <Button size="sm" className="gap-2" onClick={() => setIsCreateOpen(true)}>
+                <MessageCircle className="h-4 w-4" />
+                Hubungkan WhatsApp
+              </Button>
+            ) : (
+              <Button size="sm" className="gap-2" disabled={isConnecting} onClick={() => void handleConnect()}>
+                <QrCode className="h-4 w-4" />
+                {isConnecting ? 'Mengambil QR...' : status.connected ? 'Perbarui QR' : 'Hubungkan WhatsApp'}
+              </Button>
+            )}
+            {status.instanceExists && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                disabled={isRestarting}
+                onClick={() => void handleRestart()}
+              >
+                <Unplug className={`h-4 w-4 ${isRestarting ? 'animate-spin' : ''}`} />
+                {isRestarting ? 'Memproses...' : webhookUnsynced ? 'Sinkronkan webhook' : 'Restart instance'}
+              </Button>
+            )}
+          </div>
         </Surface>
       ) : (
         <Surface className="p-5">

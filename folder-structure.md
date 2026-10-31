@@ -63,7 +63,8 @@ order-bot-dashboard
 │  │  │  │  ├─ bot-config-client.tsx
 │  │  │  │  ├─ bot-config-form.tsx
 │  │  │  │  ├─ bot-health-card.tsx
-│  │  │  │  └─ mode-preview-dialog.tsx
+│  │  │  │  ├─ mode-preview-dialog.tsx
+│  │  │  │  └─ whatsapp-channel-card.tsx
 │  │  │  └─ page.tsx
 │  │  ├─ bot-credentials
 │  │  │  ├─ _components
@@ -151,7 +152,9 @@ order-bot-dashboard
 │  │  ├─ auth-shell.tsx
 │  │  ├─ data-table-pagination.tsx
 │  │  ├─ empty-state.tsx
+│  │  ├─ info-card.tsx
 │  │  ├─ metric-card.tsx
+│  │  ├─ order-buyer-info.tsx
 │  │  ├─ page-header.tsx
 │  │  ├─ quota-bar.tsx
 │  │  ├─ status-badge.tsx

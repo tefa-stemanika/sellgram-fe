@@ -72,6 +72,8 @@ const MAPS: Record<StatusKind, Record<string, StatusToken>> = {
   source: {
     WEBSITE: { label: 'Website', labelId: 'Website', tone: 'confirmed' },
     TELEGRAM: { label: 'Telegram', labelId: 'Telegram', tone: 'success' },
+    WHATSAPP: { label: 'WhatsApp', labelId: 'WhatsApp', tone: 'info' },
+    API: { label: 'API', labelId: 'API', tone: 'neutral' },
     ORDER: { label: 'Order', labelId: 'Order', tone: 'processing' },
     MANUAL: { label: 'Manual', labelId: 'Manual', tone: 'warning' }
   },
@@ -84,6 +86,7 @@ const MAPS: Record<StatusKind, Record<string, StatusToken>> = {
   'whatsapp-state': {
     OPEN: { label: 'Connected', labelId: 'Terhubung', tone: 'success' },
     CONNECTING: { label: 'Connecting', labelId: 'Menghubungkan', tone: 'processing' },
+    'CONNECTING-QR': { label: 'Waiting for QR', labelId: 'Menunggu scan QR', tone: 'processing' },
     CLOSE: { label: 'Disconnected', labelId: 'Terputus', tone: 'warning' },
     ERROR: { label: 'Error', labelId: 'Bermasalah', tone: 'error' }
   }
@@ -127,10 +130,17 @@ export function statusBadge(kind: StatusKind, key: string | null | undefined, lo
   return { ...resolved, label: locale === 'id' ? resolved.labelId : resolved.label }
 }
 
-export function statusOptions(kind: StatusKind, allLabel: string): Array<{ label: string; value: string }> {
+export function statusOptions(
+  kind: StatusKind,
+  allLabel: string,
+  only?: readonly string[]
+): Array<{ label: string; value: string }> {
+  const entries = only ? only.map((value) => [value, MAPS[kind][value]] as const) : Object.entries(MAPS[kind])
   return [
     { label: allLabel, value: 'ALL' },
-    ...Object.entries(MAPS[kind]).map(([key, token]) => ({ label: token.labelId, value: key }))
+    ...entries
+      .filter((entry): entry is readonly [string, StatusToken] => Boolean(entry[1]))
+      .map(([key, token]) => ({ label: token.labelId, value: key }))
   ]
 }
 
