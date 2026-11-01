@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+import { apiErrorMessage } from '@/lib/api-error'
 import { copyToClipboard } from '@/lib/utils'
 import { getWhatsAppConnect, getWhatsAppStatus, type WhatsAppQr } from '@/services/whatsapp'
 
@@ -42,7 +43,7 @@ export function QrDialog({ open, onOpenChange, token, initialQr, number, onConne
       }
       setQr({ base64: res.base64, code: res.code, pairingCode: res.pairingCode, count: res.count })
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Gagal memuat QR')
+      toast.error(apiErrorMessage(error, 'Gagal memuat QR'))
     } finally {
       setIsLoading(false)
     }

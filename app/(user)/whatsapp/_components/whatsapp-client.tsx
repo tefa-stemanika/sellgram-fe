@@ -9,6 +9,7 @@ import { StatusBadge } from '@/components/shared/status-badge'
 import { Surface } from '@/components/shared/surface'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { apiErrorMessage, copyForErrorCode, describeApiError, type ApiErrorInfo } from '@/lib/api-error'
 import {
   getWhatsAppConnect,
   getWhatsAppStatus,
@@ -21,34 +22,18 @@ import {
 import { CreateInstanceDialog } from './create-instance-dialog'
 import { QrDialog } from './qr-dialog'
 
-const ERROR_LABELS: Record<string, string> = {
-  instance_missing: 'Instance belum dibuat. Buat instance terlebih dahulu.',
-  invalid_number: 'Format nomor tidak valid. Gunakan angka saja, contoh 6281234567890.',
-  instance_limit_reached: 'Batas 1 instance per akun tercapai. Putuskan instance lama sebelum menghubungkan nomor lain.',
-  webhook_secret_missing: 'Secret webhook belum dikonfigurasi di sisi server.',
-  server_unreachable: 'Server Evolution tidak dapat dihubungi, coba lagi.',
-  create_failed: 'Server Evolution tidak dapat dihubungi, coba lagi.',
-  connect_failed: 'Server Evolution tidak dapat dihubungi, coba lagi.'
-}
-
 type WhatsAppClientProps = {
   token: string
 }
 
 function errorText(error: unknown, fallback: string): string {
-  if (error instanceof Error) {
-    for (const [code, label] of Object.entries(ERROR_LABELS)) {
-      if (error.message.toLowerCase().includes(code)) return `${label}. ${error.message}`
-    }
-    return error.message
-  }
-  return fallback
+  return apiErrorMessage(error, fallback)
 }
 
 export function WhatsAppClient({ token }: WhatsAppClientProps) {
   const [status, setStatus] = useState<WhatsAppStatus | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [loadError, setLoadError] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState<ApiErrorInfo | null>(null)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
@@ -65,7 +50,7 @@ export function WhatsAppClient({ token }: WhatsAppClientProps) {
       setStatus(data)
       setLoadError(null)
     } catch (error) {
-      setLoadError(errorText(error, 'Gagal memuat status WhatsApp'))
+      setLoadError(describeApiError(error, 'Gagal memuat status WhatsApp'))
     } finally {
       setIsLoading(false)
     }
@@ -129,10 +114,17 @@ export function WhatsAppClient({ token }: WhatsAppClientProps) {
       const res = await restartWhatsApp(token)
       setStatus(res.status)
       setLoadError(null)
+      const webhookAction = res.webhook?.action
       if (res.restarted) {
-        toast.success('Instance direstart dan webhook disinkronkan')
+        toast.success(
+          webhookAction === 'unchanged'
+            ? 'Instance direstart, webhook sudah sesuai'
+            : webhookAction === 'created'
+              ? 'Instance direstart dan webhook baru dipasang'
+              : 'Instance direstart dan webhook diperbarui'
+        )
       } else {
-        toast.warning(res.restartError ?? 'Webhook disinkronkan, tetapi instance gagal direstart')
+        toast.warning(res.restartError ?? 'Webhook sinkron, tetapi instance gagal direstart')
       }
     } catch (error) {
       toast.error(errorText(error, 'Gagal merestart instance'))
@@ -235,7 +227,7 @@ export function WhatsAppClient({ token }: WhatsAppClientProps) {
                   {status.errors.map((code) => (
                     <li key={code} className="flex items-center gap-2 text-caption">
                       <span className="size-1.5 shrink-0 rounded-full bg-error" aria-hidden />
-                      <span className="font-medium text-error">{ERROR_LABELS[code] ?? code}</span>
+                      <span className="font-medium text-error">{copyForErrorCode(code) ?? code}</span>
                     </li>
                   ))}
                 </ul>
@@ -283,11 +275,17 @@ export function WhatsAppClient({ token }: WhatsAppClientProps) {
         </Surface>
       ) : (
         <Surface className="p-5">
-          <p className="text-body-sm text-muted-foreground">{loadError ?? 'Status WhatsApp tidak tersedia.'}</p>
-          <Button variant="outline" size="sm" className="mt-3 gap-2" onClick={() => void refresh()}>
-            <RefreshCw className="h-4 w-4" />
-            Coba lagi
-          </Button>
+          <p className="text-body-sm text-muted-foreground">{loadError?.message ?? 'Status WhatsApp tidak tersedia.'}</p>
+          {!loadError || loadError.canRetry ? (
+            <Button variant="outline" size="sm" className="mt-3 gap-2" onClick={() => void refresh()}>
+              <RefreshCw className="h-4 w-4" />
+              Coba lagi
+            </Button>
+          ) : loadError.status === 502 ? (
+            <p className="mt-3 text-caption text-muted-foreground">
+              Status tidak dapat dimuat dari server upstream. Periksa konfigurasi Evolution API bila masalah berlanjut.
+            </p>
+          ) : null}
         </Surface>
       )}
 

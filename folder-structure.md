@@ -206,6 +206,7 @@ order-bot-dashboard
 │  └─ data.json
 ├─ lib
 │  ├─ analytics.ts
+│  ├─ api-error.ts
 │  ├─ status-tokens.ts
 │  └─ utils.ts
 ├─ next.config.mjs

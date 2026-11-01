@@ -55,6 +55,7 @@ export async function isTokenExpired(token: string): Promise<boolean> {
     
     // Jika error adalah 401 Unauthorized, token expired
     if (
+      (error as { status?: number }).status === 401 ||
       message.includes('401') ||
       message.toLowerCase().includes('unauthorized') ||
       message.toLowerCase().includes('expired')

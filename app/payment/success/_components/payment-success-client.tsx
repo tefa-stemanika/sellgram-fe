@@ -1,12 +1,21 @@
 'use client'
 
-import { CircleCheck, Loader2, AlertCircle, Eye, ListOrdered } from 'lucide-react'
-import { Suspense, useEffect, useState } from 'react'
+import { AlertCircle, CircleCheck, Clock, Eye, ListOrdered, Loader2, RefreshCw } from 'lucide-react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { StatusBadge } from '@/components/shared/status-badge'
 import { getOrderDetail, type PublicOrderDetail } from '@/services/public'
-import { formatIDRCurrency } from '@/lib/utils'
+import { describeApiError, type ApiErrorInfo } from '@/lib/api-error'
+import { cn, formatIDRCurrency } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+
+const RETRY_DELAYS_MS = [2000, 5000, 10000]
+const UNCONFIRMED_STATUSES = new Set(['PENDING', 'PAYMENT_PENDING'])
+
+function isUnconfirmed(status: string | null | undefined) {
+  return Boolean(status && UNCONFIRMED_STATUSES.has(status))
+}
 
 function LoadingState() {
   return (
@@ -16,13 +25,38 @@ function LoadingState() {
   )
 }
 
-function ErrorState({ message }: { message: string }) {
+function ErrorState({ error }: { error: ApiErrorInfo }) {
+  const notFound = error.status === 404 || error.status === 400
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
       <div className="animate-fade-in-up text-center">
         <AlertCircle className="mx-auto h-16 w-16 text-error" />
-        <h1 className="mt-4 text-section-header font-semibold text-error">Pembayaran gagal</h1>
-        <p className="mt-2 text-body text-muted-foreground">{message}</p>
+        <h1 className="mt-4 text-section-header font-semibold text-foreground">
+          {notFound ? 'Pesanan tidak ditemukan' : 'Pembayaran gagal'}
+        </h1>
+        <p className="mt-2 text-body text-muted-foreground">{error.message}</p>
+      </div>
+    </div>
+  )
+}
+
+function WaitingState({ showRetry, onRetry }: { showRetry: boolean; onRetry: () => void }) {
+  return (
+    <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
+      <div className="animate-fade-in-up text-center">
+        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border border-warning/25 bg-warning/12">
+          <Clock className="h-12 w-12 text-warning" />
+        </div>
+        <h1 className="mt-6 text-section-header font-semibold text-foreground">Konfirmasi sedang diproses</h1>
+        <p className="mx-auto mt-2 max-w-sm text-body leading-relaxed text-muted-foreground">
+          Pembayaran kamu sudah kami terima, konfirmasi sedang diproses.
+        </p>
+        {showRetry && (
+          <Button variant="outline" size="sm" className="mt-5 gap-2" onClick={onRetry}>
+            <RefreshCw className="h-4 w-4" />
+            Coba lagi
+          </Button>
+        )}
       </div>
     </div>
   )
@@ -30,13 +64,14 @@ function ErrorState({ message }: { message: string }) {
 
 function PaymentSuccessContent() {
   const [data, setData] = useState<PublicOrderDetail | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<ApiErrorInfo | null>(null)
   const [storeUserId, setStoreUserId] = useState<string | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const searchParams = useSearchParams()
   const orderId = searchParams.get('order_id')
+  const attemptRef = useRef(0)
 
   useEffect(() => {
     const uid = localStorage.getItem('customer_userId') || sessionStorage.getItem('store_userId')
@@ -44,59 +79,126 @@ function PaymentSuccessContent() {
     setIsLoggedIn(!!localStorage.getItem('customer_token'))
   }, [])
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (!orderId) {
-      setLoading(false)
-      setError('ID pesanan tidak ditemukan')
+      setError({ message: 'ID pesanan tidak ditemukan', canRetry: false })
+      setIsLoading(false)
       return
     }
-
-    setLoading(true)
-    getOrderDetail(orderId)
-      .then((res) => {
-        setData(res)
-        setError(null)
-      })
-      .catch((err) => {
-        setError(err?.message || 'Pesanan tidak ditemukan')
-      })
-      .finally(() => setLoading(false))
+    setIsLoading(true)
+    try {
+      const res = await getOrderDetail(orderId)
+      setData(res)
+      setError(null)
+    } catch (err) {
+      setError(describeApiError(err, 'Pesanan tidak ditemukan'))
+    } finally {
+      setIsLoading(false)
+    }
   }, [orderId])
 
-  if (loading) return <LoadingState />
-  if (error) return <ErrorState message={error} />
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  // Webhook pembayaran bisa terlambat, jadi status dibaca ulang dengan backoff
+  // sebelum halaman menyimpulkan apa pun.
+  const needsFollowUp = !isLoading && ((!data && !!error?.canRetry) || (!!data && isUnconfirmed(data.status)))
+
+  useEffect(() => {
+    if (!needsFollowUp) return
+    const delay = RETRY_DELAYS_MS[attemptRef.current]
+    if (delay === undefined) return
+    attemptRef.current += 1
+    const timer = setTimeout(() => void load(), delay)
+    return () => clearTimeout(timer)
+  }, [needsFollowUp, load])
+
+  const retriesExhausted = attemptRef.current >= RETRY_DELAYS_MS.length
+
+  if (isLoading && !data) return <LoadingState />
+
+  if (error && !data) {
+    if (error.canRetry) {
+      return (
+        <WaitingState
+          showRetry={retriesExhausted}
+          onRetry={() => {
+            attemptRef.current = 0
+            void load()
+          }}
+        />
+      )
+    }
+    return <ErrorState error={error} />
+  }
+
+  const pending = isUnconfirmed(data?.status)
+  const failed = data?.status === 'PAYMENT_FAILED'
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-4 sm:p-6">
       <div className="w-full max-w-md animate-fade-in-up text-center">
         <div
-          className="mx-auto mb-6 flex h-24 w-24 animate-fade-in-up items-center justify-center rounded-full border border-success/25 bg-success/12"
+          className={cn(
+            'mx-auto mb-6 flex h-24 w-24 animate-fade-in-up items-center justify-center rounded-full border',
+            failed
+              ? 'border-error/25 bg-error/12'
+              : pending
+                ? 'border-warning/25 bg-warning/12'
+                : 'border-success/25 bg-success/12'
+          )}
           style={{ animationDelay: '0.2s' }}
         >
-          <CircleCheck className="h-12 w-12 text-success" />
+          {failed ? (
+            <AlertCircle className="h-12 w-12 text-error" />
+          ) : pending ? (
+            <Clock className="h-12 w-12 text-warning" />
+          ) : (
+            <CircleCheck className="h-12 w-12 text-success" />
+          )}
         </div>
 
         <h1
           className="animate-fade-in-up text-section-header font-semibold tracking-tight text-foreground"
           style={{ animationDelay: '0.3s' }}
         >
-          Pembayaran Berhasil!
+          {failed
+            ? 'Pembayaran belum terverifikasi'
+            : pending
+              ? 'Menunggu konfirmasi pembayaran'
+              : data?.status === 'COMPLETED'
+                ? 'Pembayaran Berhasil!'
+                : 'Pesanan kamu sudah kami terima'}
         </h1>
         <p
           className="mt-3 animate-fade-in-up text-body leading-relaxed text-muted-foreground"
           style={{ animationDelay: '0.4s' }}
         >
-          Pesanan Anda telah diterima dan sedang diproses. Silakan tunggu konfirmasi dari admin melalui Telegram.
+          {failed
+            ? 'Pembayaran pesanan ini belum berhasil. Hubungi pemilik toko bila Anda sudah melakukan pembayaran.'
+            : pending
+              ? 'Pembayaran kamu sudah kami terima, konfirmasi sedang diproses. Silakan tunggu pembaruan status pesanan.'
+              : 'Pesanan Anda telah diterima dan sedang diproses. Silakan tunggu konfirmasi dari admin.'}
         </p>
+        {pending && (
+          <p className="mt-2 flex items-center justify-center gap-1.5 text-caption text-muted-foreground">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            Status diperbarui otomatis
+          </p>
+        )}
 
         {data && (
           <div
             className="mt-8 animate-fade-in-up space-y-3 text-left"
             style={{ animationDelay: '0.5s' }}
           >
-            <p className="font-mono text-mono-data tabular text-body-sm text-muted-foreground">
-              Pesanan: <span className="font-semibold text-foreground">{data.orderId}</span>
-            </p>
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-mono text-mono-data tabular text-body-sm text-muted-foreground">
+                Pesanan: <span className="font-semibold text-foreground">{data.orderId}</span>
+              </p>
+              <StatusBadge kind="order" value={data.status} withDot />
+            </div>
 
             <div className="divide-y divide-border rounded-lg border border-border bg-card">
               {data.items.map((item) => (
