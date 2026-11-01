@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, Fragment, useMemo, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Eye, Loader2, Radio, Users } from 'lucide-react'
+import { ArrowLeft, Eye, Loader2, Mail, MessageCircle, Send, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -10,15 +10,17 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { PageHeader } from '@/components/shared/page-header'
 import { Surface } from '@/components/shared/surface'
 import { TelegramChatPreview } from '@/components/shared/telegram-chat-preview'
-import { createBroadcastSchema, type CreateBroadcastFormValues, type BroadcastFilters, type TemplateMapping } from '@/schemas/broadcast'
+import { cn } from '@/lib/utils'
+import { createBroadcastSchema, type BroadcastChannel, type CreateBroadcastFormValues, type BroadcastFilters, type TemplateMapping } from '@/schemas/broadcast'
 import type { CampaignTemplate } from '@/schemas/broadcast'
 import { createBroadcast, createBroadcastFromTemplate, previewBroadcast } from '@/services/broadcast'
 import { getTemplates } from '@/services/template'
@@ -45,6 +47,12 @@ const DERIVED_FIELD_OPTIONS = [
   { label: 'Total Belanja', value: 'TOTAL_SPENT' },
   { label: 'Tanggal order terakhir', value: 'LAST_ORDER_DATE' },
   { label: 'Produk Terakhir', value: 'LAST_PRODUCT_NAME' },
+]
+
+const CHANNEL_OPTIONS: Array<{ value: BroadcastChannel; label: string; icon: typeof Send; supported: boolean }> = [
+  { value: 'TELEGRAM', label: 'Telegram', icon: Send, supported: true },
+  { value: 'WHATSAPP', label: 'WhatsApp', icon: MessageCircle, supported: false },
+  { value: 'EMAIL', label: 'Email', icon: Mail, supported: false },
 ]
 
 export function BroadcastCreatePage({ token }: BroadcastCreatePageProps) {
@@ -119,6 +127,7 @@ export function BroadcastCreatePage({ token }: BroadcastCreatePageProps) {
   }
 
   const message = form.watch('message')
+  const watchedChannel = form.watch('channel')
 
   const messagePreview = useMemo(() => {
     if (useTemplate && selectedTemplate) {
@@ -337,10 +346,43 @@ export function BroadcastCreatePage({ token }: BroadcastCreatePageProps) {
                   />
                 )}
 
-                <div className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-body">
-                  <Radio className="h-4 w-4 text-primary" />
-                  <span>Telegram</span>
-                </div>
+                <FormItem>
+                  <FormLabel>Kanal pengiriman</FormLabel>
+                  <div className="grid grid-cols-3 gap-2">
+                    {CHANNEL_OPTIONS.map((opt) => {
+                      const Icon = opt.icon
+                      const isSelected = watchedChannel === opt.value
+                      const trigger = (
+                        <button
+                          type="button"
+                          className={cn(
+                            'flex items-center justify-center gap-1.5 rounded-md border px-2 py-2 text-body-sm transition-colors',
+                            isSelected
+                              ? 'border-primary bg-primary/5 font-medium text-foreground'
+                              : 'border-border bg-card text-muted-foreground',
+                            opt.supported ? 'hover:bg-muted/50' : 'cursor-not-allowed opacity-55'
+                          )}
+                          onClick={() => {
+                            if (opt.supported) form.setValue('channel', opt.value)
+                          }}>
+                          <Icon className="h-4 w-4" />
+                          {opt.label}
+                        </button>
+                      )
+                      return opt.supported ? (
+                        <Fragment key={opt.value}>{trigger}</Fragment>
+                      ) : (
+                        <Tooltip key={opt.value}>
+                          <TooltipTrigger asChild>{trigger}</TooltipTrigger>
+                          <TooltipContent>Belum didukung</TooltipContent>
+                        </Tooltip>
+                      )
+                    })}
+                  </div>
+                  <FormDescription className="text-caption">
+                    Broadcast baru hanya bisa dikirim lewat Telegram.
+                  </FormDescription>
+                </FormItem>
 
                 <FormField
                   control={form.control}

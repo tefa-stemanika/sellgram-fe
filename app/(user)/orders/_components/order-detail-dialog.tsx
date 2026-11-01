@@ -1,9 +1,11 @@
 'use client'
 
-import { ExternalLink, Hash, PackageOpen, Phone, User } from 'lucide-react'
+import { ExternalLink, MessageCircle, PackageOpen } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { InfoCard } from '@/components/shared/info-card'
+import { OrderBuyerInfo, buyerJid } from '@/components/shared/order-buyer-info'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { Surface } from '@/components/shared/surface'
 import { formatDate, formatIDRCurrency } from '@/lib/utils'
@@ -27,22 +29,16 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
         {!order ? null : (
           <div className="space-y-5 text-body-sm">
             <div className="grid gap-3 md:grid-cols-2">
-              {order.source === 'WEBSITE' ? (
-                <>
-                  <InfoCard icon={User} label="Nama Customer" value={order.customerName ?? '-'} />
-                  <InfoCard icon={Phone} label="No. WhatsApp" value={order.customerPhone ?? '-'} mono />
-                </>
-              ) : (
-                <>
-                  <InfoCard icon={User} label="Nama" value={order.firstName ?? '-'} />
-                  <InfoCard icon={User} label="Username" value={order.username ?? '-'} />
-                </>
-              )}
-              <InfoCard icon={Hash} label="Telegram ID" value={order.telegramId ?? '-'} mono />
+              <OrderBuyerInfo order={order} variant="cards" />
+              <BuyerJidCard order={order} />
               <InfoCard icon={PackageOpen} label="Total" value={formatIDRCurrency(order.totalPrice)} mono />
             </div>
 
             <Surface className="space-y-3 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-caption text-muted-foreground">Sumber</p>
+                <StatusBadge kind="source" value={order.source} />
+              </div>
               <div className="flex items-center justify-between">
                 <p className="text-caption text-muted-foreground">Status</p>
                 <StatusBadge kind="order" value={order.status} withDot />
@@ -93,24 +89,8 @@ export function OrderDetailDialog({ order, open, onOpenChange }: OrderDetailDial
   )
 }
 
-function InfoCard({
-  icon: Icon,
-  label,
-  value,
-  mono = false
-}: {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  value: string
-  mono?: boolean
-}) {
-  return (
-    <Surface className="p-3">
-      <div className="flex items-center gap-2 text-caption text-muted-foreground">
-        <Icon className="h-3 w-3" aria-hidden />
-        {label}
-      </div>
-      <p className={`mt-1 font-medium${mono ? ' font-mono text-mono-data tabular' : ''}`}>{value}</p>
-    </Surface>
-  )
+function BuyerJidCard({ order }: { order: Order }) {
+  const jid = buyerJid(order)
+  if (!jid) return null
+  return <InfoCard icon={MessageCircle} label="WhatsApp JID" value={jid} mono />
 }

@@ -1,6 +1,20 @@
+import { describeApiError } from '@/lib/api-error'
+
 type FetcherOptions = Omit<RequestInit, 'headers'> & {
   token?: string
   headers?: HeadersInit
+}
+
+export class ApiError extends Error {
+  readonly code?: string
+  readonly status?: number
+
+  constructor(message: string, options: { code?: string; status?: number } = {}) {
+    super(message)
+    this.name = 'ApiError'
+    this.code = options.code
+    this.status = options.status
+  }
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5505'
@@ -34,8 +48,9 @@ export async function fetcher<T>(path: string, options: FetcherOptions = {}): Pr
 
     const data = await response.json().catch(() => ({}))
     if (!response.ok) {
-      const message = (data as { message?: string }).message ?? 'Terjadi kesalahan pada server'
-      throw new Error(message)
+      const body = data as { message?: string; code?: string }
+      const info = describeApiError({ message: body.message, code: body.code, status: response.status })
+      throw new ApiError(info.message, { code: body.code, status: response.status })
     }
 
     return data as T

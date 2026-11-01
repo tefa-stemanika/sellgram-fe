@@ -7,6 +7,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAx
 import { toast } from 'sonner'
 
 import { EmptyState } from '@/components/shared/empty-state'
+import { OrderBuyerInfo } from '@/components/shared/order-buyer-info'
 import { DataTable } from './data-table'
 import { MetricCard } from '@/components/shared/metric-card'
 import { PageHeader } from '@/components/shared/page-header'
@@ -26,9 +27,18 @@ type DashboardOverviewProps = {
   token: string
 }
 
-const SOURCE_CONFIG = {
+const SOURCE_SERIES: Record<string, { label: string; color: string }> = {
   telegram: { label: 'Telegram', color: 'hsl(var(--chart-2))' },
+  whatsapp: { label: 'WhatsApp', color: 'hsl(var(--chart-1))' },
   website: { label: 'Website', color: 'hsl(var(--chart-4))' },
+  api: { label: 'API', color: 'hsl(var(--chart-3))' },
+  other: { label: 'Lainnya', color: 'hsl(var(--chart-5))' }
+}
+
+const SOURCE_CONFIG = {
+  ...Object.fromEntries(
+    Object.entries(SOURCE_SERIES).map(([key, series]) => [key, { label: series.label, color: series.color }])
+  ),
   value: { label: 'Jumlah' }
 } satisfies ChartConfig
 
@@ -36,9 +46,20 @@ const TREND_CONFIG = {
   orders: { label: 'Order', color: 'hsl(var(--chart-1))' }
 } satisfies ChartConfig
 
-const SOURCE_TICK: Record<string, string> = {
-  telegram: 'Telegram',
-  website: 'Website'
+/** One backend source key → one chart series id, so unknown sources still render. */
+function sourceSeriesId(source: string): string {
+  const key = source.toLowerCase()
+  return key in SOURCE_SERIES ? key : 'other'
+}
+
+function buildSourceSeries(breakdown: Record<string, number> | null | undefined) {
+  if (!breakdown) return []
+  return Object.entries(breakdown)
+    .filter(([source, value]) => Number.isFinite(value) && value > 0 && Boolean(source))
+    .map(([source, value]) => {
+      const id = sourceSeriesId(source)
+      return { source: id, value, fill: `var(--color-${id})` }
+    })
 }
 
 function compactIDR(value: number): string {
@@ -108,18 +129,14 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
 
   const ordersBySource = useMemo(() => {
     if (!dashboard || dashboard.totalOrders <= 0) return null
-    return [
-      { source: 'telegram', value: dashboard.ordersBySource.TELEGRAM, fill: 'var(--color-telegram)' },
-      { source: 'website', value: dashboard.ordersBySource.WEBSITE, fill: 'var(--color-website)' }
-    ]
+    const series = buildSourceSeries(dashboard.ordersBySource)
+    return series.length ? series : null
   }, [dashboard])
 
   const revenueBySource = useMemo(() => {
     if (!dashboard || dashboard.totalRevenue <= 0) return null
-    return [
-      { source: 'telegram', value: dashboard.revenueBySource.TELEGRAM, fill: 'var(--color-telegram)' },
-      { source: 'website', value: dashboard.revenueBySource.WEBSITE, fill: 'var(--color-website)' }
-    ]
+    const series = buildSourceSeries(dashboard.revenueBySource)
+    return series.length ? series : null
   }, [dashboard])
 
   const recentOrderColumns = useMemo<ColumnDef<DashboardOrder>[]>(
@@ -135,9 +152,9 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
         cell: ({ row }) => <StatusBadge kind="source" value={row.original.source} />
       },
       {
-        accessorKey: 'customerName',
+        id: 'customer',
         header: 'Pelanggan',
-        cell: ({ row }) => row.original.customerName ?? row.original.firstName ?? row.original.username ?? '-'
+        cell: ({ row }) => <OrderBuyerInfo order={row.original} variant="cell" />
       },
       {
         accessorKey: 'status',
@@ -202,7 +219,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
       <div className="grid gap-4 animate-fade-in-up lg:grid-cols-2">
         <Surface className="p-5">
           <h2 className="text-small-header">Order per sumber</h2>
-          <p className="text-caption mt-0.5 text-muted-foreground">Bagian order Telegram vs website.</p>
+          <p className="text-caption mt-0.5 text-muted-foreground">Bagian order Telegram, WhatsApp, dan website.</p>
           {isLoading ? (
             <Skeleton className="mt-4 h-52" />
           ) : ordersBySource ? (
@@ -218,7 +235,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
               className="h-52"
               icon={ShoppingCart}
               title="Belum ada order"
-              description="Order dari Telegram atau website akan muncul di sini."
+              description="Order dari Telegram, WhatsApp, atau toko publik akan muncul di sini."
             />
           )}
         </Surface>
@@ -232,7 +249,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
             <ChartContainer config={SOURCE_CONFIG} className="mt-4 h-52 w-full">
               <BarChart data={revenueBySource} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
                 <CartesianGrid vertical={false} stroke="hsl(var(--chart-grid))" strokeDasharray="3 3" />
-                <XAxis dataKey="source" tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 12 }} tickFormatter={(value: string) => SOURCE_TICK[value] ?? value} />
+                <XAxis dataKey="source" tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 12 }} tickFormatter={(value: string) => SOURCE_SERIES[value]?.label ?? value} />
                 <YAxis width={56} tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--chart-axis))', fontSize: 11 }} tickFormatter={(value: number) => compactIDR(value)} />
                 <ChartTooltip content={<ChartTooltipContent nameKey="source" formatter={(value) => formatIDRCurrency(Number(value))} />} />
                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
@@ -334,7 +351,7 @@ export function DashboardOverview({ token }: DashboardOverviewProps) {
           isLoading={isLoading}
           emptyIcon={ShoppingCart}
           emptyMessage="Belum ada order."
-          emptyDescription="Order dari Telegram atau toko publik akan tampil di sini."
+          emptyDescription="Order dari Telegram, WhatsApp, atau toko publik akan tampil di sini."
         />
       </section>
     </div>

@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/shared/page-header'
 import { Surface } from '@/components/shared/surface'
 import { Button } from '@/components/ui/button'
 import InputSearch from '@/components/core/input-search'
+import { statusOptions } from '@/lib/status-tokens'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   getCustomers,
@@ -17,6 +18,7 @@ import {
   type Customer,
   type UpdateCustomerPayload
 } from '@/services/customers'
+import { ORDER_SOURCES } from '@/services/orders'
 
 import { DataTable } from '../../_components/data-table'
 import { CustomerDetailDialog } from './customer-detail-dialog'
@@ -33,11 +35,7 @@ const SOURCE_FILTERS = [
   { label: 'Order', value: 'ORDER' },
 ]
 
-const ORDER_SOURCE_FILTERS = [
-  { label: 'Semua', value: 'ALL' },
-  { label: 'Telegram', value: 'TELEGRAM' },
-  { label: 'Website', value: 'WEBSITE' },
-]
+const ORDER_SOURCE_FILTERS = statusOptions('source', 'Semua', ORDER_SOURCES)
 
 export function CustomersClient({ token }: CustomersClientProps) {
   const [customers, setCustomers] = useState<Customer[]>([])

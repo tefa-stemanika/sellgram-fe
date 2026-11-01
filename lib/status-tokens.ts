@@ -3,7 +3,17 @@ import type { FulfillmentStatus } from '@/schemas/fulfillment'
 import type { OrderStatus } from '@/services/orders'
 import type { TicketPriority, TicketStatus } from '@/services/tickets'
 
-export type StatusKind = 'order' | 'ticket-status' | 'ticket-priority' | 'broadcast' | 'fulfillment' | 'invoice' | 'stock' | 'source' | 'bot-health'
+export type StatusKind =
+  | 'order'
+  | 'ticket-status'
+  | 'ticket-priority'
+  | 'broadcast'
+  | 'fulfillment'
+  | 'invoice'
+  | 'stock'
+  | 'source'
+  | 'bot-health'
+  | 'whatsapp-state'
 
 export type Tone = 'success' | 'warning' | 'error' | 'info' | 'processing' | 'confirmed' | 'neutral'
 
@@ -62,6 +72,8 @@ const MAPS: Record<StatusKind, Record<string, StatusToken>> = {
   source: {
     WEBSITE: { label: 'Website', labelId: 'Website', tone: 'confirmed' },
     TELEGRAM: { label: 'Telegram', labelId: 'Telegram', tone: 'success' },
+    WHATSAPP: { label: 'WhatsApp', labelId: 'WhatsApp', tone: 'info' },
+    API: { label: 'API', labelId: 'API', tone: 'neutral' },
     ORDER: { label: 'Order', labelId: 'Order', tone: 'processing' },
     MANUAL: { label: 'Manual', labelId: 'Manual', tone: 'warning' }
   },
@@ -70,6 +82,13 @@ const MAPS: Record<StatusKind, Record<string, StatusToken>> = {
     DEGRADED: { label: 'Degraded', labelId: 'Terganggu', tone: 'warning' },
     UNHEALTHY: { label: 'Unhealthy', labelId: 'Bermasalah', tone: 'error' },
     UNKNOWN: { label: 'Unknown', labelId: 'Tidak diketahui', tone: 'neutral' }
+  },
+  'whatsapp-state': {
+    OPEN: { label: 'Connected', labelId: 'Terhubung', tone: 'success' },
+    CONNECTING: { label: 'Connecting', labelId: 'Menghubungkan', tone: 'processing' },
+    'CONNECTING-QR': { label: 'Waiting for QR', labelId: 'Menunggu scan QR', tone: 'processing' },
+    CLOSE: { label: 'Disconnected', labelId: 'Terputus', tone: 'warning' },
+    ERROR: { label: 'Error', labelId: 'Bermasalah', tone: 'error' }
   }
 }
 
@@ -111,8 +130,18 @@ export function statusBadge(kind: StatusKind, key: string | null | undefined, lo
   return { ...resolved, label: locale === 'id' ? resolved.labelId : resolved.label }
 }
 
-export function statusOptions(kind: StatusKind, allLabel: string): Array<{ label: string; value: string }> {
-  return [{ label: allLabel, value: 'ALL' }, ...Object.entries(MAPS[kind]).map(([key, token]) => ({ label: token.labelId, value: key }))]
+export function statusOptions(
+  kind: StatusKind,
+  allLabel: string,
+  only?: readonly string[]
+): Array<{ label: string; value: string }> {
+  const entries = only ? only.map((value) => [value, MAPS[kind][value]] as const) : Object.entries(MAPS[kind])
+  return [
+    { label: allLabel, value: 'ALL' },
+    ...entries
+      .filter((entry): entry is readonly [string, StatusToken] => Boolean(entry[1]))
+      .map(([key, token]) => ({ label: token.labelId, value: key }))
+  ]
 }
 
 export const ORDER_STATUS_VALUES = Object.keys(MAPS.order) as OrderStatus[]

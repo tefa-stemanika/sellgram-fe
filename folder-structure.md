@@ -63,7 +63,8 @@ order-bot-dashboard
 │  │  │  │  ├─ bot-config-client.tsx
 │  │  │  │  ├─ bot-config-form.tsx
 │  │  │  │  ├─ bot-health-card.tsx
-│  │  │  │  └─ mode-preview-dialog.tsx
+│  │  │  │  ├─ mode-preview-dialog.tsx
+│  │  │  │  └─ whatsapp-channel-card.tsx
 │  │  │  └─ page.tsx
 │  │  ├─ bot-credentials
 │  │  │  ├─ _components
@@ -119,6 +120,12 @@ order-bot-dashboard
 │  │  │  │  ├─ template-detail-dialog.tsx
 │  │  │  │  └─ templates-client.tsx
 │  │  │  └─ page.tsx
+│  │  ├─ whatsapp
+│  │  │  ├─ _components
+│  │  │  │  ├─ create-instance-dialog.tsx
+│  │  │  │  ├─ qr-dialog.tsx
+│  │  │  │  └─ whatsapp-client.tsx
+│  │  │  └─ page.tsx
 │  │  └─ types.ts
 │  ├─ tickets
 │  │  ├─ _components
@@ -145,7 +152,9 @@ order-bot-dashboard
 │  │  ├─ auth-shell.tsx
 │  │  ├─ data-table-pagination.tsx
 │  │  ├─ empty-state.tsx
+│  │  ├─ info-card.tsx
 │  │  ├─ metric-card.tsx
+│  │  ├─ order-buyer-info.tsx
 │  │  ├─ page-header.tsx
 │  │  ├─ quota-bar.tsx
 │  │  ├─ status-badge.tsx
@@ -197,6 +206,7 @@ order-bot-dashboard
 │  └─ data.json
 ├─ lib
 │  ├─ analytics.ts
+│  ├─ api-error.ts
 │  ├─ status-tokens.ts
 │  └─ utils.ts
 ├─ next.config.mjs
@@ -241,6 +251,8 @@ order-bot-dashboard
 │  ├─ products
 │  │  └─ index.ts
 │  ├─ template
+│  │  └─ index.ts
+│  ├─ whatsapp
 │  │  └─ index.ts
 │  └─ user
 │     └─ index.ts

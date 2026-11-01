@@ -28,6 +28,8 @@ import {
 } from '@/services/fulfillment'
 import type { FulfillmentType, StockItem, SlotAccount, Slot, StockItemOrderInfo } from '@/schemas/fulfillment'
 import { FULFILLMENT_TYPES, getFulfillmentTypeLabel } from '@/schemas/fulfillment'
+import { OrderBuyerInfo } from '@/components/shared/order-buyer-info'
+import { StatusBadge } from '@/components/shared/status-badge'
 
 const SUPPORTED_VARS = ['order_id', 'product_name', 'result', 'customer_name'] as const
 
@@ -73,14 +75,9 @@ function statusBadgeVariant(status: string): 'default' | 'secondary' | 'destruct
 function OrderInfoCard({ order, usedAt }: { order: StockItemOrderInfo | null | undefined; usedAt?: string | null }) {
   if (!order) return null
   return (
-    <div className="mt-2 space-y-1 border-t pt-2 text-caption text-muted-foreground">
-      {order.firstName && <p>Nama: {order.firstName}</p>}
-      {order.username && <p>Username: {order.username}</p>}
-      {order.telegramId && <p>Telegram ID: {order.telegramId}</p>}
-      {order.customerName && <p>Pelanggan: {order.customerName}</p>}
-      {order.customerPhone && <p>No. HP: {order.customerPhone}</p>}
-      {order.customer?.name && !order.firstName && <p>Nama: {order.customer.name}</p>}
-      {order.customer?.phone && !order.customerPhone && <p>No. HP: {order.customer.phone}</p>}
+    <div className="mt-2 space-y-1.5 border-t pt-2 text-caption text-muted-foreground">
+      {order.source && <StatusBadge kind="source" value={order.source} />}
+      <OrderBuyerInfo order={order} />
       {usedAt && <p>Dipakai: {new Date(usedAt).toLocaleDateString('id-ID')}</p>}
     </div>
   )

@@ -35,6 +35,15 @@ export const formatIDRCurrency = (amount: number): string => {
   return `Rp${amount.toLocaleString('id-ID')}`
 }
 
+/** Indonesian numbers arrive bare ("62813...", "0813...", "813..."); render them as "+62...". */
+export function formatPhoneNumber(raw: string): string {
+  const digits = raw.replace(/\D/g, '')
+  if (!digits) return raw
+  if (digits.startsWith('62')) return `+${digits}`
+  if (digits.startsWith('0')) return `+62${digits.slice(1)}`
+  return `+62${digits}`
+}
+
 export function parseDateValue(value: unknown): Date | null {
   if (!value) return null
 

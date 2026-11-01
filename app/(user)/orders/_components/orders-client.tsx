@@ -7,11 +7,12 @@ import { toast } from 'sonner'
 import { DataTable } from '../../_components/data-table'
 import { getOrderColumns } from './order-columns'
 import { OrderDetailDialog } from './order-detail-dialog'
-import { getOrders, type Order, type OrderStatus } from '@/services/orders'
+import { getOrders, ORDER_SOURCES, type Order, type OrderStatus } from '@/services/orders'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import InputSearch from '@/components/core/input-search'
 import { PageHeader } from '@/components/shared/page-header'
 import { Surface } from '@/components/shared/surface'
+import { statusOptions } from '@/lib/status-tokens'
 
 type OrdersClientProps = {
   token: string
@@ -28,11 +29,7 @@ const STATUS_FILTERS: Array<{ label: string; value: OrderStatus | 'ALL' }> = [
   { label: 'Processing', value: 'PROCESSING' }
 ]
 
-const SOURCE_FILTERS = [
-  { label: 'Semua', value: 'ALL' },
-  { label: 'Telegram', value: 'TELEGRAM' },
-  { label: 'Website', value: 'WEBSITE' },
-]
+const SOURCE_FILTERS = statusOptions('source', 'Semua', ORDER_SOURCES)
 
 export function OrdersClient({ token }: OrdersClientProps) {
   const [orders, setOrders] = useState<Order[]>([])
