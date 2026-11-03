@@ -41,7 +41,7 @@ jobs:
       - name: Publish release asset
         run: |
           gh release create "deploy-${GITHUB_SHA}" release.tar.gz \
-            --title "deploy ${GITHUB_SHA}" --notes "auto deploy" --target "${GITHUB_SHA}"
+            --title "deploy ${GITHUB_SHA}" --notes "auto deploy" --target "${GITHUB_SHA}" || true
 
       - name: Trigger deploy webhook
         run: |
@@ -57,4 +57,4 @@ jobs:
         run: |
           gh release list --limit 100 --json tagName --jq '.[].tagName' \
             | grep '^deploy-' | tail -n +6 \
-            | xargs -r -I{} gh release delete {} --cleanup-tag -y
+            | xargs -r -I{} gh release delete {} --cleanup-tag -y || true
